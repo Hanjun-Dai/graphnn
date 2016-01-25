@@ -182,6 +182,25 @@ public:
 	}
 };
 
+//=================================== sigmoid ======================================
+
+template<typename Dtype>
+class UnarySigmoid
+{
+public:
+    UnarySigmoid() {}
+    
+    __device__ inline void operator()(Dtype& dst)
+	{
+		dst = 1.0 / (1.0 + cuda_exp(-dst));
+	}
+    
+    __device__ inline void operator()(Dtype& dst, const Dtype& src)
+	{
+		dst = 1.0 / (1.0 + cuda_exp(-src));
+	}
+};
+
 //=================================== cos ======================================
 
 template<typename Dtype>

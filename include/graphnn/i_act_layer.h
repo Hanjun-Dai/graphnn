@@ -58,6 +58,7 @@ public:
             auto& prev_output = prev_layer->graph_output->node_states->DenseDerived();
 			auto& cur_output = this->graph_output->node_states->DenseDerived();
             
+            prev_grad.Resize(cur_grad.rows, cur_grad.cols);
             Derivative(prev_grad, prev_output, cur_output, cur_grad);
 		}
 		
@@ -67,8 +68,6 @@ public:
 		}
     }
     
-
-
     virtual void Act(DenseMat<mode, Dtype>& prev_out, DenseMat<mode, Dtype>& cur_out) = 0;
     virtual void Derivative(DenseMat<mode, Dtype>& dst, DenseMat<mode, Dtype>& prev_output, DenseMat<mode, Dtype>& cur_output, DenseMat<mode, Dtype>& cur_grad) = 0;
 	
