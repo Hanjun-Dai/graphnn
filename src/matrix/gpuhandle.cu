@@ -2,7 +2,7 @@
 
 __global__ void SetupRandKernel(curandState_t *state, unsigned long long seed) 
 {
-    const uint tidx = NUM_RND_THREADS_PER_BLOCK * blockIdx.x + threadIdx.x;
+    const unsigned int tidx = NUM_RND_THREADS_PER_BLOCK * blockIdx.x + threadIdx.x;
     /* Each thread gets same seed, a different sequence number,
      no offset */
     curand_init(seed, tidx, 0, &state[tidx]);
