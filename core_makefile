@@ -1,10 +1,13 @@
 dir_guard = @mkdir -p $(@D)
 
-GNN_HOME := $(HOME)/Workspace/cpp/graphnn
+GNN_HOME ?= $(HOME)/Workspace/cpp/graphnn
+CUDA_HOME ?= /Developer/NVIDIA/CUDA-7.5
+MKL_HOME ?= /opt/intel/mkl/
+
 CXX := g++
-NVCC := nvcc
+NVCC := $(CUDA_HOME)/bin/nvcc
 CXXFLAGS += -Wall -O2 -std=c++11
-LDFLAGS += -lm -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand -lcusparse -lmkl_rt -lcppformat -lwht
+LDFLAGS += -lm -L$(CUDA_HOME)/lib -lcudart -lcublas -lcurand -lcusparse -L$(MKL_HOME)/lib -lmkl_rt -lcppformat -lwht 
 CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
 		-gencode arch=compute_20,code=sm_21 \
 		-gencode arch=compute_30,code=sm_30 \
@@ -12,19 +15,19 @@ CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
 		-gencode arch=compute_50,code=sm_50 \
 		-gencode arch=compute_50,code=compute_50
 		
-include_dirs := $(CUDA_HOME)/include $(MKL_ROOT)/include $(GNN_HOME)/include/matrix $(GNN_HOME)/include/graphnn
+include_dirs := $(CUDA_HOME)/include $(MKL_HOME)/include $(GNN_HOME)/include/matrix $(GNN_HOME)/include/graphnn
 CXXFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += -std=c++11 --use_fast_math 
 
-mat_cu_files := $(shell find $(GNN_HOME)/src/matrix -name "*.cu" -printf "%f\n")
-mat_cpp_files := $(shell find $(GNN_HOME)/src/matrix -name "*.cpp" -printf "%f\n")
+mat_cu_files := $(shell gfind $(GNN_HOME)/src/matrix -name "*.cu" -printf "%f\n")
+mat_cpp_files := $(shell gfind $(GNN_HOME)/src/matrix -name "*.cpp" -printf "%f\n")
 mat_objs += $(subst .cu,.cuo,$(mat_cu_files))
 mat_objs += $(subst .cpp,.o,$(mat_cpp_files))
 mat_obj_path := $(GNN_HOME)/build/objs/matrix
 
-graphnn_cu_files := $(shell find $(GNN_HOME)/src/graphnn -name "*.cu" -printf "%f\n")
-graphnn_cpp_files := $(shell find $(GNN_HOME)/src/graphnn -name "*.cpp" -printf "%f\n")
+graphnn_cu_files := $(shell gfind $(GNN_HOME)/src/graphnn -name "*.cu" -printf "%f\n")
+graphnn_cpp_files := $(shell gfind $(GNN_HOME)/src/graphnn -name "*.cpp" -printf "%f\n")
 graphnn_objs += $(subst .cu,.cuo,$(graphnn_cu_files))
 graphnn_objs += $(subst .cpp,.o,$(graphnn_cpp_files))
 graphnn_obj_path := $(GNN_HOME)/build/objs/graphnn
