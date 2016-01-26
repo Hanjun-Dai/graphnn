@@ -1,3 +1,5 @@
+dir_guard = @mkdir -p $(@D)
+
 GNN_HOME := $(HOME)/Workspace/cpp/graphnn
 CXX := g++
 NVCC := nvcc
@@ -31,13 +33,18 @@ gnn_objs := $(addprefix $(mat_obj_path)/,$(mat_objs)) $(addprefix $(graphnn_obj_
 gnn_include := $(GNN_HOME)/include/matrix/*.h $(GNN_HOME)/include/graphnn/*.h $(GNN_HOME)/include/matrix/*.cuh
 
 $(mat_obj_path)/%.cuo: $(GNN_HOME)/src/matrix/%.cu
+	$(dir_guard)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARTH) -c $< -o $@
 		
 $(mat_obj_path)/%.o: $(GNN_HOME)/src/matrix/%.cpp $(GNN_HOME)/include/matrix/*.h
+	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(filter %.cpp, $^) $(LDFLAGS)
 
 $(graphnn_obj_path)/%.cuo: $(GNN_HOME)/src/graphnn/%.cu $(gnn_include)
+	$(dir_guard)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARTH) -c $< -o $@
     
 $(graphnn_obj_path)/%.o: $(GNN_HOME)/src/graphnn/%.cpp $(gnn_include)
+	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(filter %.cpp, $^) $(LDFLAGS)
+

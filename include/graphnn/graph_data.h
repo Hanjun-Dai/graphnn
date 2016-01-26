@@ -4,6 +4,13 @@
 #include "imatrix.h"
 #include "graph_struct.h"
 
+enum class GraphAtt
+{
+	NODE = 0,
+	EDGE = 1,
+	NODE_EDGE = 2	
+};
+
 template<MatMode mode, typename Dtype>
 class GraphData
 {

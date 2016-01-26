@@ -31,13 +31,10 @@ void NodePoolLayer<mode, Dtype>::UpdateOutput(ILayer<mode, Dtype>* prev_layer, S
 template<MatMode mode, typename Dtype>
 void NodePoolLayer<mode, Dtype>::BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv)
 {
-		// warning: we assume edge states never update
-		if (param->npt == NodePoolType::E2N)
-			return;
-		
-		auto& cur_grad = this->graph_gradoutput->node_states->DenseDerived();
-		auto& prev_grad = prev_layer->graph_gradoutput->node_states->DenseDerived();
-		prev_grad.SparseMM(param->weight, cur_grad, Trans::T, Trans::N, 1.0, sv == SvType::WRITE2 ? 0.0 : 1.0);
+        auto& cur_grad = this->graph_gradoutput->node_states->DenseDerived();
+        auto* prev_mat = param->npt == NodePoolType::E2N ? prev_layer->graph_gradoutput->edge_states : prev_layer->graph_gradoutput->node_states;
+        auto& prev_grad = prev_mat->DenseDerived();    
+        prev_grad.SparseMM(param->weight, cur_grad, Trans::T, Trans::N, 1.0, sv == SvType::WRITE2 ? 0.0 : 1.0);
 }
 
 template class NodePoolLayer<CPU, float>;

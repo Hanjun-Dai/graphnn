@@ -10,7 +10,7 @@ template<typename Dtype>
 class SigmoidLayer<CPU, Dtype> : public IActLayer<CPU, Dtype> 
 {
 public:
-    SigmoidLayer(std::string _name, WriteType _wt, ActTarget _at, PropErr _properr = PropErr::T)
+    SigmoidLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T)
             : IActLayer<CPU, Dtype>(_name, _wt, _at, _properr) {}            
 
 
@@ -24,7 +24,7 @@ template<typename Dtype>
 class SigmoidLayer<GPU, Dtype> : public IActLayer<GPU, Dtype> 
 {
 public:
-    SigmoidLayer(std::string _name, WriteType _wt, ActTarget _at, PropErr _properr = PropErr::T)
+    SigmoidLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T)
             : IActLayer<GPU, Dtype>(_name, _wt, _at, _properr) {}    
 
 

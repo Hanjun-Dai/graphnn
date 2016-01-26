@@ -6,7 +6,7 @@
 #include <cmath>
 #include "dense_matrix.h"
 #include "graphnn.h"
-#include "node_layer.h"
+#include "multi_param_layer.h"
 #include "input_layer.h"
 #include "cppformat/format.h"
 #include "relu_layer.h"
@@ -90,12 +90,12 @@ void InitModel()
     auto* h1_weight = new NonsharedLinearParam<mode, Dtype>("h1_weight", dim, 1024, 0, 0.01);
 	auto* h1 = new SimpleNodeLayer<mode, Dtype>("h1", h1_weight);
     
-    auto* relu_1 = new ReLULayer<mode, Dtype>("relu_1", WriteType::INPLACE, ActTarget::NODE);
+    auto* relu_1 = new ReLULayer<mode, Dtype>("relu_1", WriteType::INPLACE, GraphAtt::NODE);
     
     auto* h2_weight = new NonsharedLinearParam<mode, Dtype>("h2_weight", 1024, 1024, 0, 0.01);
 	auto* h2 = new SimpleNodeLayer<mode, Dtype>("h2", h2_weight);
     
-    auto* relu_2 = new ReLULayer<mode, Dtype>("relu_2", WriteType::INPLACE, ActTarget::NODE);
+    auto* relu_2 = new ReLULayer<mode, Dtype>("relu_2", WriteType::INPLACE, GraphAtt::NODE);
     
     auto* o_weight = new NonsharedLinearParam<mode, Dtype>("o_weight", 1024, 10, 0, 0.01);
 	auto* output = new SimpleNodeLayer<mode, Dtype>("output", o_weight);
