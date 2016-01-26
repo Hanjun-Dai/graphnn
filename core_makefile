@@ -4,6 +4,9 @@ GNN_HOME ?= $(HOME)/Workspace/cpp/graphnn
 CUDA_HOME ?= /Developer/NVIDIA/CUDA-7.5
 MKL_HOME ?= /opt/intel/mkl/
 
+# Use `brew install findutils` and FIND=gfind for Mac OSX
+FIND ?= find
+
 CXX := g++
 NVCC := $(CUDA_HOME)/bin/nvcc
 CXXFLAGS += -Wall -O2 -std=c++11
@@ -20,14 +23,14 @@ CXXFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += -std=c++11 --use_fast_math 
 
-mat_cu_files := $(shell gfind $(GNN_HOME)/src/matrix -name "*.cu" -printf "%f\n")
-mat_cpp_files := $(shell gfind $(GNN_HOME)/src/matrix -name "*.cpp" -printf "%f\n")
+mat_cu_files := $(shell $(FIND) $(GNN_HOME)/src/matrix -name "*.cu" -printf "%f\n")
+mat_cpp_files := $(shell $(FIND) $(GNN_HOME)/src/matrix -name "*.cpp" -printf "%f\n")
 mat_objs += $(subst .cu,.cuo,$(mat_cu_files))
 mat_objs += $(subst .cpp,.o,$(mat_cpp_files))
 mat_obj_path := $(GNN_HOME)/build/objs/matrix
 
-graphnn_cu_files := $(shell gfind $(GNN_HOME)/src/graphnn -name "*.cu" -printf "%f\n")
-graphnn_cpp_files := $(shell gfind $(GNN_HOME)/src/graphnn -name "*.cpp" -printf "%f\n")
+graphnn_cu_files := $(shell $(FIND) $(GNN_HOME)/src/graphnn -name "*.cu" -printf "%f\n")
+graphnn_cpp_files := $(shell $(FIND) $(GNN_HOME)/src/graphnn -name "*.cpp" -printf "%f\n")
 graphnn_objs += $(subst .cu,.cuo,$(graphnn_cu_files))
 graphnn_objs += $(subst .cpp,.o,$(graphnn_cpp_files))
 graphnn_obj_path := $(GNN_HOME)/build/objs/graphnn
