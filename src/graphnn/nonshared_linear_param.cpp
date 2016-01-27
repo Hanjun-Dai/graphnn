@@ -8,12 +8,12 @@ NonsharedLinearParam<mode, Dtype>::NonsharedLinearParam(FILE* fid)
 										: LinearParam<mode, Dtype>(fid) {}										
 
 template<MatMode mode, typename Dtype>
-NonsharedLinearParam<mode, Dtype>::NonsharedLinearParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, BiasOption _bo)
-							   			: LinearParam<mode, Dtype>(_name, _operand, _input_size, _output_size, _bo) {}
+NonsharedLinearParam<mode, Dtype>::NonsharedLinearParam(std::string _name, size_t _input_size, size_t _output_size, BiasOption _bo)
+							   			: LinearParam<mode, Dtype>(_name, _input_size, _output_size, _bo) {}
 
 template<MatMode mode, typename Dtype>
-NonsharedLinearParam<mode, Dtype>::NonsharedLinearParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo)
-										: LinearParam<mode, Dtype>(_name, _operand, _input_size, _output_size, mean, std, _bo) {}
+NonsharedLinearParam<mode, Dtype>::NonsharedLinearParam(std::string _name, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo)
+										: LinearParam<mode, Dtype>(_name, _input_size, _output_size, mean, std, _bo) {}
 
 template<MatMode mode, typename Dtype>		
 void NonsharedLinearParam<mode, Dtype>::Reset(Dtype mean, Dtype std)
@@ -26,15 +26,14 @@ void NonsharedLinearParam<mode, Dtype>::Reset(Dtype mean, Dtype std)
 }
 
 template<MatMode mode, typename Dtype>		
-void NonsharedLinearParam<mode, Dtype>::InitializeBatch(GraphData<mode, Dtype>* g)
+void NonsharedLinearParam<mode, Dtype>::InitializeBatch(GraphData<mode, Dtype>* g, GraphAtt operand)
 {
 	cur_input = cur_gradOutput = nullptr;
 }
 
 template<MatMode mode, typename Dtype>		
-void NonsharedLinearParam<mode, Dtype>::AccDeriv(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* gradOutput)
+void NonsharedLinearParam<mode, Dtype>::AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput)
 {
-    auto* input = GetImatState(input_graph, this->operand);
 	cur_input = input;
 	cur_gradOutput = gradOutput;
 }

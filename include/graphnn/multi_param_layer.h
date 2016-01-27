@@ -12,16 +12,17 @@ class IMultiParamLayer : public ILayer<mode, Dtype>
 public:
 	typedef typename std::map<std::string, ILayer<mode, Dtype>* >::iterator layeriter;
 	
-	IMultiParamLayer(std::string _name, GraphAtt _at, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, _at, _properr) 
+	IMultiParamLayer(std::string _name, GraphAtt _at, PropErr _properr = PropErr::T)
+        : ILayer<mode, Dtype>(_name, _at, _properr) 
     {
         this->graph_output = new GraphData<mode, Dtype>(DENSE);
 		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);	
 		params_map.clear();
     }
 	
-	void AddParam(std::string prev_layer_name, IParam<mode, Dtype>* _param)
+	void AddParam(std::string prev_layer_name, IParam<mode, Dtype>* _param, GraphAtt _operand)
     {
-        params_map[prev_layer_name] = _param;
+        params_map[prev_layer_name] = std::make_pair(_param, _operand);
     }
 	
 	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
@@ -29,7 +30,9 @@ public:
         auto& cur_output = GetImatState(this->graph_output, this->at)->DenseDerived();
 
 		Dtype beta;				
-		auto* param = params_map[prev_layer->name];
+		auto* param = params_map[prev_layer->name].first;
+        auto operand = params_map[prev_layer->name].second;
+        
 		auto* prev_output = prev_layer->graph_output;
 		
 		if (sv == SvType::WRITE2)
@@ -37,51 +40,57 @@ public:
 			beta = 0.0;
 			// we assume all the params have the same output size;
             if (param->OutSize()) // if we can know the outputsize ahead
-                cur_output.Resize(prev_output->graph->num_nodes, param->OutSize());
-			// we assume all the prev layers have the same graph structure;
+            {
+                auto num_states = this->at == GraphAtt::NODE ? prev_output->graph->num_nodes
+                                                             : prev_output->graph->num_edges;
+                                                             
+                cur_output.Resize(num_states, param->OutSize());
+            }
+            // we assume all the prev layers have the same graph structure;
 			this->graph_output->graph = prev_output->graph;
-			// we assume all the prev layers have the same edge states;
-            if (param->operand == GraphAtt::NODE)
+
+            if (this->at == GraphAtt::NODE)
                 this->graph_output->edge_states = prev_output->edge_states; // edge state will remain the same
             else // EDGE
                 this->graph_output->node_states = prev_output->node_states;
 		} else
 			beta = 1.0;
-											
-		param->InitializeBatch(prev_output);
-		param->UpdateOutput(prev_output, &cur_output, beta, phase);
+		
+		param->InitializeBatch(prev_output, operand);
+		param->UpdateOutput(GetImatState(prev_output, operand),  
+                            &cur_output, beta, phase);
     }
     
 	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override
     {
-        auto* param = params_map[prev_layer->name];
-		
+		auto* param = params_map[prev_layer->name].first;
+        auto operand = params_map[prev_layer->name].second;
+        
 		auto& cur_grad = GetImatState(this->graph_gradoutput, this->at)->DenseDerived();
 		
 		Dtype beta = 1.0;
+        auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, operand)->DenseDerived(); 
 		if (sv == SvType::WRITE2)
 		{
 			beta = 0.0;
             if (param->InSize()) // if we can know the inputsize ahead
-            {
-                auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, param->operand)->DenseDerived(); 
                 prev_grad.Resize(cur_grad.rows, param->InSize());
-            }
 		}
 		
-		param->UpdateGradInput(prev_layer->graph_gradoutput, &cur_grad, beta); 		
+		param->UpdateGradInput(&prev_grad, &cur_grad, beta);
     }
     
 	virtual void AccDeriv(ILayer<mode, Dtype>* prev_layer) override
     {
-        auto* param = params_map[prev_layer->name];
+		auto* param = params_map[prev_layer->name].first;
+        auto operand = params_map[prev_layer->name].second;
 		
 		auto& cur_grad = GetImatState(this->graph_gradoutput, this->at)->DenseDerived();
 		
-		param->AccDeriv(prev_layer->graph_output, &cur_grad);
+		param->AccDeriv(GetImatState(prev_layer->graph_output, operand), &cur_grad);
     }
 	
-	std::map< std::string, IParam<mode, Dtype>* > params_map;		
+	std::map< std::string, std::pair< IParam<mode, Dtype>*, GraphAtt > > params_map;		
 };
 
 template<MatMode mode, typename Dtype>

@@ -24,7 +24,8 @@ class ILayer
 public:
 	typedef typename std::map<std::string, ILayer<mode, Dtype>* >::iterator layeriter;
 	
-	ILayer(std::string _name, GraphAtt _at, PropErr _properr = PropErr::T) : name(_name), properr(_properr), at(_at) 
+	ILayer(std::string _name, GraphAtt _at, PropErr _properr = PropErr::T) 
+            : name(_name), properr(_properr), at(_at) 
 	{
 		graph_output = nullptr;
 		graph_gradoutput = nullptr;

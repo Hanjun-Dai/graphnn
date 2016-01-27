@@ -4,8 +4,8 @@
 #include <iostream>
 
 template<MatMode mode, typename Dtype>
-NodeGatherLayer<mode, Dtype>::NodeGatherLayer(std::string _name, GraphAtt _at, PropErr _properr) : 
-								  ILayer<mode, Dtype>(_name, _at, _properr)
+NodeGatherLayer<mode, Dtype>::NodeGatherLayer(std::string _name, PropErr _properr) : 
+								  ILayer<mode, Dtype>(_name, GraphAtt::NODE, _properr)
 {
 		this->graph_output = new GraphData<mode, Dtype>(DENSE);
 		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);

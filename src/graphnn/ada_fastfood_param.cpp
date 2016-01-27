@@ -12,12 +12,12 @@ AdaFastfoodParam<mode, Dtype>::AdaFastfoodParam(FILE* fid)
 }
 
 template<MatMode mode, typename Dtype>
-AdaFastfoodParam<mode, Dtype>::AdaFastfoodParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, BiasOption _bo)
-									: AdaFastfoodParam<mode, Dtype>(_name, _operand, _input_size, _output_size, 0.0, 1.0 / sqrt(output_size), _bo) {}
+AdaFastfoodParam<mode, Dtype>::AdaFastfoodParam(std::string _name, size_t _input_size, size_t _output_size, BiasOption _bo)
+									: AdaFastfoodParam<mode, Dtype>(_name, _input_size, _output_size, 0.0, 1.0 / sqrt(output_size), _bo) {}
 
 template<MatMode mode, typename Dtype>
-AdaFastfoodParam<mode, Dtype>::AdaFastfoodParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo)
-									: IParam<mode, Dtype>(_name, _operand), bo(_bo)
+AdaFastfoodParam<mode, Dtype>::AdaFastfoodParam(std::string _name, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo)
+									: IParam<mode, Dtype>(_name), bo(_bo)
 {
 	input_size = _input_size;
 	output_size = _output_size;
@@ -98,15 +98,14 @@ void AdaFastfoodParam<mode, Dtype>::InitParams(Dtype mean, Dtype std)
 }
 
 template<MatMode mode, typename Dtype>		
-void AdaFastfoodParam<mode, Dtype>::InitializeBatch(GraphData<mode, Dtype>* g)
+void AdaFastfoodParam<mode, Dtype>::InitializeBatch(GraphData<mode, Dtype>* g, GraphAtt operand)
 {
 	grad_updated = false;	
 }
 
 template<MatMode mode, typename Dtype>		
-void AdaFastfoodParam<mode, Dtype>::UpdateOutput(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
+void AdaFastfoodParam<mode, Dtype>::UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
 {		
-    auto* input = GetImatState(input_graph, this->operand); 
 	state_input.Resize(input->rows, pad_input_size);	
 	state_input.SubmatAdd(0, 0, input, 0);
 	for (size_t p = 0; p < num_parts; ++p)
@@ -178,9 +177,9 @@ void AdaFastfoodParam<mode, Dtype>::BackProp(DenseMat<mode, Dtype>* gradOutput)
 }
 
 template<MatMode mode, typename Dtype>		
-void AdaFastfoodParam<mode, Dtype>::UpdateGradInput(GraphData<mode, Dtype>* gradInput_graph, DenseMat<mode, Dtype>* gradOutput, Dtype beta)
+void AdaFastfoodParam<mode, Dtype>::UpdateGradInput(IMatrix<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput, Dtype beta)
 {
-    auto& gradInput = GetImatState(gradInput_graph, this->operand)->DenseDerived();
+    auto& prevGrad = gradInput->DenseDerived();
     BackProp(gradOutput);
     // now state_G is the gradient after applying B in feedforward    
     grad_input.MulRowVec(*state_G[0], *binomial[0]);
@@ -189,11 +188,11 @@ void AdaFastfoodParam<mode, Dtype>::UpdateGradInput(GraphData<mode, Dtype>* grad
         for (size_t p = 1; p < num_parts; ++p)
             grad_input.MulRowVec(*state_G[p], *binomial[p], 1.0);
     }
-    gradInput.AddSubmat(grad_input, 0, 0, beta);
+    prevGrad.AddSubmat(grad_input, 0, 0, beta);
 }
 
 template<MatMode mode, typename Dtype>		
-void AdaFastfoodParam<mode, Dtype>::AccDeriv(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* gradOutput)
+void AdaFastfoodParam<mode, Dtype>::AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput)
 {
 	BackProp(gradOutput);
 }
