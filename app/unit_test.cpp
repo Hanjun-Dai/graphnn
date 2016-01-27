@@ -8,7 +8,7 @@
 #include "sparse_matrix.h"
 #include "linear_param.h"
 #include "graphnn.h"
-#include "multi_param_layer.h"
+#include "param_layer.h"
 #include "input_layer.h"
 #include "cppformat/format.h"
 #include "mse_criterion_layer.h"

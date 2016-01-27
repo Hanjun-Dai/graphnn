@@ -6,7 +6,7 @@
 #include <cmath>
 #include "dense_matrix.h"
 #include "graphnn.h"
-#include "multi_param_layer.h"
+#include "param_layer.h"
 #include "input_layer.h"
 #include "ada_fastfood_param.h"
 #include "cppformat/format.h"
@@ -16,7 +16,7 @@
 #include "batch_norm_param.h"
 
 typedef double Dtype;
-const MatMode mode = GPU;
+const MatMode mode = CPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
 int dev_id;
@@ -89,8 +89,7 @@ void InitModel()
     auto* input_layer = new InputLayer<mode, Dtype>("input", GraphAtt::NODE);
     
     auto* h1_weight = new LinearParam<mode, Dtype>("h1_weight", dim, 1024, 0, 0.01);
-	auto* h1 = new NodeLayer<mode, Dtype>("h1");
-    h1->AddParam(input_layer->name, h1_weight, GraphAtt::NODE);
+	auto* h1 = new SingleParamNodeLayer<mode, Dtype>("h1", h1_weight, GraphAtt::NODE);
     /*
     auto* bn_1 = new BatchNormParam<mode, Dtype>("bn1", GraphAtt::NODE, 1024, true);
     auto* bn_layer_1 = new NodeLayer<mode, Dtype>("bn_layer_1");
@@ -99,8 +98,7 @@ void InitModel()
     auto* relu_1 = new ReLULayer<mode, Dtype>("relu_1", GraphAtt::NODE, WriteType::INPLACE);
     
     auto* h2_weight = new LinearParam<mode, Dtype>("h2_weight", 1024, 1024, 0, 0.01);
-	auto* h2 = new NodeLayer<mode, Dtype>("h2");
-    h2->AddParam(relu_1->name, h2_weight, GraphAtt::NODE); 
+	auto* h2 = new SingleParamNodeLayer<mode, Dtype>("h2", h2_weight, GraphAtt::NODE);
     /*
     auto* bn_2 = new BatchNormParam<mode, Dtype>("bn2", GraphAtt::NODE, 1024, true);
     auto* bn_layer_2 = new NodeLayer<mode, Dtype>("bn_layer_2");
@@ -109,8 +107,7 @@ void InitModel()
     auto* relu_2 = new ReLULayer<mode, Dtype>("relu_2", GraphAtt::NODE, WriteType::INPLACE);
     
     auto* o_weight = new LinearParam<mode, Dtype>("o_weight", 1024, 10, 0, 0.01);
-	auto* output = new NodeLayer<mode, Dtype>("output");
-    output->AddParam(relu_2->name, o_weight, GraphAtt::NODE); 
+	auto* output = new SingleParamNodeLayer<mode, Dtype>("output", o_weight, GraphAtt::NODE);
     
     auto* classnll = new ClassNLLCriterionLayer<mode, Dtype>("classnll", true);
     
