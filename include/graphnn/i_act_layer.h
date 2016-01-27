@@ -14,11 +14,11 @@ class IActLayer : public ILayer<mode, Dtype>
 {
 public:
 	
-	IActLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, _at, _properr), wt(_wt)
+	IActLayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, _at, _properr), wt(_wt)
     {
         this->graph_output = new GraphData<mode, Dtype>(DENSE);		
 		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
-    }	
+    }
 
     virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
     {

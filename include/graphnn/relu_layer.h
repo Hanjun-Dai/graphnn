@@ -10,8 +10,8 @@ template<typename Dtype>
 class ReLULayer<CPU, Dtype> : public IActLayer<CPU, Dtype> 
 {
 public:
-    ReLULayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T)
-            : IActLayer<CPU, Dtype>(_name, _wt, _at, _properr) {}            
+    ReLULayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T)
+            : IActLayer<CPU, Dtype>(_name, _at, _wt, _properr) {}            
 
 
     virtual void Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out) override;
@@ -24,8 +24,8 @@ template<typename Dtype>
 class ReLULayer<GPU, Dtype> : public IActLayer<GPU, Dtype> 
 {
 public:
-    ReLULayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T)
-            : IActLayer<GPU, Dtype>(_name, _wt, _at, _properr) {}    
+    ReLULayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T)
+            : IActLayer<GPU, Dtype>(_name, _at, _wt, _properr) {}    
 
 
     virtual void Act(DenseMat<GPU, Dtype>& prev_out, DenseMat<GPU, Dtype>& cur_out) override; 

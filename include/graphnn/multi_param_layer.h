@@ -56,7 +56,7 @@ public:
     {
         auto* param = params_map[prev_layer->name];
 		
-		auto& cur_grad = GetImatState(this->graph_gradoutput, this->att)->DenseDerived();
+		auto& cur_grad = GetImatState(this->graph_gradoutput, this->at)->DenseDerived();
 		
 		Dtype beta = 1.0;
 		if (sv == SvType::WRITE2)
@@ -64,7 +64,7 @@ public:
 			beta = 0.0;
             if (param->InSize()) // if we can know the inputsize ahead
             {
-                auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, param->operand); 
+                auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, param->operand)->DenseDerived(); 
                 prev_grad.Resize(cur_grad.rows, param->InSize());
             }
 		}

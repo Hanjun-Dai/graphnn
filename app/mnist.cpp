@@ -8,10 +8,12 @@
 #include "graphnn.h"
 #include "multi_param_layer.h"
 #include "input_layer.h"
+#include "ada_fastfood_param.h"
 #include "cppformat/format.h"
 #include "relu_layer.h"
 #include "nonshared_linear_param.h"
 #include "classnll_criterion_layer.h"
+#include "batch_norm_param.h"
 
 typedef double Dtype;
 const MatMode mode = GPU;
@@ -84,38 +86,55 @@ void LoadRaw(const char* f_image, const char* f_label, std::vector< Dtype* >& im
 
 void InitModel()
 {
-    auto* input_layer = new InputLayer<mode, Dtype>("input");
+    auto* input_layer = new InputLayer<mode, Dtype>("input", GraphAtt::NODE);
     
-    auto* h1_weight = new NonsharedLinearParam<mode, Dtype>("h1_weight", dim, 1024, 0, 0.01);
-	auto* h1 = new NodeLayer<mode, Dtype>("h1", h1_weight);
+    auto* h1_weight = new LinearParam<mode, Dtype>("h1_weight", GraphAtt::NODE, dim, 1024, 0, 0.01);
+	auto* h1 = new NodeLayer<mode, Dtype>("h1");
+    h1->AddParam(input_layer->name, h1_weight);
+    /*
+    auto* bn_1 = new BatchNormParam<mode, Dtype>("bn1", GraphAtt::NODE, 1024, true);
+    auto* bn_layer_1 = new NodeLayer<mode, Dtype>("bn_layer_1");
+    bn_layer_1->AddParam(h1->name, bn_1);
+    */
+    auto* relu_1 = new ReLULayer<mode, Dtype>("relu_1", GraphAtt::NODE, WriteType::INPLACE);
     
-    auto* relu_1 = new ReLULayer<mode, Dtype>("relu_1", WriteType::INPLACE, GraphAtt::NODE);
+    auto* h2_weight = new LinearParam<mode, Dtype>("h2_weight", GraphAtt::NODE, 1024, 1024, 0, 0.01);
+	auto* h2 = new NodeLayer<mode, Dtype>("h2");
+    h2->AddParam(relu_1->name, h2_weight); 
+    /*
+    auto* bn_2 = new BatchNormParam<mode, Dtype>("bn2", GraphAtt::NODE, 1024, true);
+    auto* bn_layer_2 = new NodeLayer<mode, Dtype>("bn_layer_2");
+    bn_layer_2->AddParam(h2->name, bn_2);
+    */
+    auto* relu_2 = new ReLULayer<mode, Dtype>("relu_2", GraphAtt::NODE, WriteType::INPLACE);
     
-    auto* h2_weight = new NonsharedLinearParam<mode, Dtype>("h2_weight", 1024, 1024, 0, 0.01);
-	auto* h2 = new SimpleNodeLayer<mode, Dtype>("h2", h2_weight);
-    
-    auto* relu_2 = new ReLULayer<mode, Dtype>("relu_2", WriteType::INPLACE, GraphAtt::NODE);
-    
-    auto* o_weight = new NonsharedLinearParam<mode, Dtype>("o_weight", 1024, 10, 0, 0.01);
-	auto* output = new SimpleNodeLayer<mode, Dtype>("output", o_weight);
+    auto* o_weight = new LinearParam<mode, Dtype>("o_weight", GraphAtt::NODE, 1024, 10, 0, 0.01);
+	auto* output = new NodeLayer<mode, Dtype>("output");
+    output->AddParam(relu_2->name, o_weight); 
     
     auto* classnll = new ClassNLLCriterionLayer<mode, Dtype>("classnll", true);
     
     gnn.AddParam(h1_weight); 
 	gnn.AddParam(h2_weight);
     gnn.AddParam(o_weight);
+    //gnn.AddParam(bn_1); 
+    //gnn.AddParam(bn_2); 
     
     gnn.AddLayer(input_layer);
 	gnn.AddLayer(h1);
+    //gnn.AddLayer(bn_layer_1);
 	gnn.AddLayer(relu_1);
     gnn.AddLayer(h2);
+    //gnn.AddLayer(bn_layer_2);
     gnn.AddLayer(relu_2);
 	gnn.AddLayer(output);
     
     gnn.AddEdge(input_layer, h1);
 	gnn.AddEdge(h1, relu_1);
+    //gnn.AddEdge(bn_layer_1, relu_1); 
 	gnn.AddEdge(relu_1, h2);
     gnn.AddEdge(h2, relu_2);
+    //gnn.AddEdge(bn_layer_2, relu_2);
     gnn.AddEdge(relu_2, output); 
            
     gnn.AddEdge(output, classnll);    
@@ -158,7 +177,6 @@ int main(const int argc, const char** argv)
     LoadParams(argc, argv);    
 	GPUHandle::Init(dev_id);
     InitModel();
-    
     LoadRaw(f_train_feat, f_train_label, images_train, labels_train);
     LoadRaw(f_test_feat, f_test_label, images_test, labels_test);
         

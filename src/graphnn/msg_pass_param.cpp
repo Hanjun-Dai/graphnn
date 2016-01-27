@@ -1,5 +1,6 @@
 #include "msg_pass_param.h"
 #include "sparse_matrix.h"
+#include "dense_matrix.h"
 #include "graph_data.h"
 #include <iostream>
 
@@ -49,13 +50,19 @@ void IMessagePassParam<mode, Dtype>::InitializeBatch(GraphData<mode, Dtype>* g)
 template<MatMode mode, typename Dtype>
 void IMessagePassParam<mode, Dtype>::UpdateOutput(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
 {
-    
+        auto& prev_states = this->operand == GraphAtt::EDGE ? input_graph->edge_states->DenseDerived() :
+                                                              input_graph->node_states->DenseDerived();
+        
+        output->SparseMM(this->weight, prev_states, Trans::N, Trans::N, 1.0, beta);                                                                       
 }
 
 template<MatMode mode, typename Dtype>
 void IMessagePassParam<mode, Dtype>::UpdateGradInput(GraphData<mode, Dtype>* gradInput_graph, DenseMat<mode, Dtype>* gradOutput, Dtype beta)
 {
-    
+        auto& prev_grad = this->operand == GraphAtt::EDGE ? gradInput_graph->edge_states->DenseDerived() : 
+                                                            gradInput_graph->node_states->DenseDerived();
+        
+        prev_grad.SparseMM(this->weight, *gradOutput, Trans::T, Trans::N, 1.0, beta);                                                             
 }
 
 template<MatMode mode, typename Dtype>

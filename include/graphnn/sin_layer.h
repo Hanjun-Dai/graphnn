@@ -7,8 +7,8 @@ template<MatMode mode, typename Dtype>
 class SinLayer : public IActLayer<mode, Dtype> 
 {
 public:
-    SinLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T)
-            : IActLayer<mode, Dtype>(_name, _wt, _at, _properr) 
+    SinLayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T)
+            : IActLayer<mode, Dtype>(_name, _at, _wt, _properr) 
     {
         assert(_wt == WriteType::OUTPLACE);
     }            

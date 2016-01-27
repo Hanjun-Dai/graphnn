@@ -7,8 +7,8 @@ template<MatMode mode, typename Dtype>
 class ExpLayer : public IActLayer<mode, Dtype> 
 {
 public:
-    ExpLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T)
-            : IActLayer<mode, Dtype>(_name, _wt, _at, _properr) 
+    ExpLayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T)
+            : IActLayer<mode, Dtype>(_name, _at, _wt, _properr) 
     {
     }            
 
