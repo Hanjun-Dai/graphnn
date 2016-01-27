@@ -117,6 +117,66 @@ template class NodeCentricPoolParam<CPU, float>;
 template class NodeCentricPoolParam<GPU, double>;
 template class NodeCentricPoolParam<GPU, float>;
 
+// =============================== EdgePoolParam =========================================
+
+template<MatMode mode, typename Dtype>
+void EdgeCentricPoolParam<mode, Dtype>::InitCPUWeight(GraphData<mode, Dtype>* g, GraphAtt operand)
+{
+ 		auto* graph = g->graph;
+        int nnz = 0;
+		if (operand == GraphAtt::EDGE)
+        {
+			this->cpu_weight->Resize(graph->num_edges, g->edge_states->rows);
+            size_t cnt = 0;
+            for (int i = 0; i < graph->num_nodes; ++i)
+            {
+                auto in_cnt = graph->in_edges->head[i].size();
+                cnt += (in_cnt - 1) * (in_cnt - 1); 
+            }
+            this->cpu_weight->ResizeSp(cnt, graph->num_edges + 1);            
+            
+            auto& data = this->cpu_weight->data;
+            for (int i = 0; i < graph->num_edges; ++i)
+            {
+                data->ptr[i] = nnz;
+                int node_from = graph->edge_list[i].first, node_to = graph->edge_list[i].second; 
+                auto& list = graph->in_edges->head[node_from]; 
+                for (size_t j = 0; j < list.size(); ++j)
+                {
+                    if (list[j].second == node_to)
+                        continue; // the same edge in another direction
+                    data->val[nnz] = 1.0;
+                    data->col_idx[nnz] = list[j].first; // the edge index
+                    nnz++;
+                }
+            }
+            data->ptr[graph->num_edges] = nnz;
+            assert(nnz == data->nnz);
+            assert(data->nnz == cnt); 
+        }
+		else // NODE
+        {
+            this->cpu_weight->Resize(graph->num_edges, g->node_states->rows);
+            this->cpu_weight->ResizeSp(graph->num_edges, graph->num_edges + 1);
+            
+		    auto& data = this->cpu_weight->data;
+            for (int i = 0; i < graph->num_edges; ++i)
+            {
+                data->ptr[i] = nnz;
+                data->val[nnz] = 1.0;
+                data->col_idx[nnz] = graph->edge_list[i].first;
+                nnz++;
+            }
+            data->ptr[graph->num_edges] = nnz;
+            assert(nnz == data->nnz);     
+        }
+}
+
+template class EdgeCentricPoolParam<CPU, double>;
+template class EdgeCentricPoolParam<CPU, float>;
+template class EdgeCentricPoolParam<GPU, double>;
+template class EdgeCentricPoolParam<GPU, float>;
+
 // =============================== SubgraphPoolParam =========================================
 
 template<MatMode mode, typename Dtype>

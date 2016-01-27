@@ -47,6 +47,17 @@ protected:
 };
 
 template<MatMode mode, typename Dtype>
+class EdgeCentricPoolParam : public IMessagePassParam<mode, Dtype>
+{
+public:
+		EdgeCentricPoolParam(std::string _name)
+            : IMessagePassParam<mode, Dtype>(_name) {} 
+            
+protected:
+        virtual void InitCPUWeight(GraphData<mode, Dtype>* g, GraphAtt operand) override;
+};
+
+template<MatMode mode, typename Dtype>
 class SubgraphPoolParam : public IMessagePassParam<mode, Dtype>
 {
 public:

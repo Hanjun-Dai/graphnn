@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <cassert>
 
 template<typename T>
 class LinkedTable
@@ -80,6 +81,7 @@ public:
 		out_edges = new LinkedTable< std::pair<int, int> >();
         in_edges = new LinkedTable< std::pair<int, int> >();
 		subgraph = new LinkedTable< int >();
+        edge_list.clear();
 	}
     
 	~GraphStruct()
@@ -94,6 +96,9 @@ public:
         out_edges->AddEntry(x, std::pair<int, int>(idx, y));
         in_edges->AddEntry(y, std::pair<int, int>(idx, x));         
 		num_edges++;
+        edge_list.push_back(std::make_pair(x, y));
+        assert(num_edges == edge_list.size());
+        assert(num_edges - 1 == (unsigned)idx);
 	}
 	
 	inline void AddNode(int subg_id, int n_idx)
@@ -105,6 +110,7 @@ public:
 	{
 		num_nodes = _num_nodes;
 		num_edges = 0;
+        edge_list.clear();
 		num_subgraph = _num_subgraph;
 		
 		in_edges->Resize(num_nodes);
@@ -114,7 +120,8 @@ public:
 	
 	LinkedTable< std::pair<int, int> > *out_edges, *in_edges;
 	LinkedTable< int >* subgraph;
-	
+	std::vector< std::pair<int, int> > edge_list;
+    
 	unsigned num_nodes, num_edges, num_subgraph;	
 };
 
