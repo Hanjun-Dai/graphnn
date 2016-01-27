@@ -11,8 +11,8 @@ BatchNormParam<mode, Dtype>::BatchNormParam(FILE* fid)
 }
 
 template<MatMode mode, typename Dtype>
-BatchNormParam<mode, Dtype>::BatchNormParam(std::string _name, size_t _input_size, bool _parametrized, Dtype _eps, Dtype _smooth)
-									: IParam<mode, Dtype>(_name), input_size(_input_size), eps(_eps), smooth(_smooth)
+BatchNormParam<mode, Dtype>::BatchNormParam(std::string _name, GraphAtt _operand, size_t _input_size, bool _parametrized, Dtype _eps, Dtype _smooth)
+									: IParam<mode, Dtype>(_name, _operand), input_size(_input_size), eps(_eps), smooth(_smooth)
 {
     parametrized = _parametrized; 
     acc_mean.Zeros(1, input_size);
@@ -29,8 +29,9 @@ BatchNormParam<mode, Dtype>::BatchNormParam(std::string _name, size_t _input_siz
 }
 
 template<MatMode mode, typename Dtype>		
-void BatchNormParam<mode, Dtype>::UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
+void BatchNormParam<mode, Dtype>::UpdateOutput(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
 {
+    auto* input = GetImatState(input_graph, this->operand);
     assert(beta == 0);
     output->CopyFrom(input->DenseDerived());
     if (phase == TEST)
@@ -70,8 +71,9 @@ void BatchNormParam<mode, Dtype>::UpdateOutput(IMatrix<mode, Dtype>* input, Dens
 //     ./ sqrt(var(X) + eps)
 //
 template<MatMode mode, typename Dtype>		
-void BatchNormParam<mode, Dtype>::UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput, Dtype beta)
+void BatchNormParam<mode, Dtype>::UpdateGradInput(GraphData<mode, Dtype>* gradInput_graph, DenseMat<mode, Dtype>* gradOutput, Dtype beta)
 {
+    auto& gradInput = GetImatState(gradInput_graph, this->operand)->DenseDerived(); 
     // dE/dY \cdot Y
     mat_buffer.EleWiseMul(*gradOutput, normed_output);
     // mean(dE/dY \cdot Y)
@@ -93,11 +95,11 @@ void BatchNormParam<mode, Dtype>::UpdateGradInput(DenseMat<mode, Dtype>* gradInp
     if (parametrized)
         mat_buffer.MulRowVec(scale);
         
-    gradInput->Axpby(1.0, mat_buffer, beta);                    
+    gradInput.Axpby(1.0, mat_buffer, beta);                    
 }
 
 template<MatMode mode, typename Dtype>		
-void BatchNormParam<mode, Dtype>::AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput)
+void BatchNormParam<mode, Dtype>::AccDeriv(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* gradOutput)
 {
     cur_grad_output = gradOutput;
 }

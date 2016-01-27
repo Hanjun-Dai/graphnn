@@ -4,10 +4,9 @@
 #include <iostream>
 
 template<MatMode mode, typename Dtype>
-NodeGatherLayer<mode, Dtype>::NodeGatherLayer(std::string _name, PoolingOp _op, PropErr _properr) : 
-								  ILayer<mode, Dtype>(_name, _properr), op(_op)
+NodeGatherLayer<mode, Dtype>::NodeGatherLayer(std::string _name, GraphAtt _at, PropErr _properr) : 
+								  ILayer<mode, Dtype>(_name, _at, _properr)
 {
-		assert(op != PoolingOp::MAX);
 		this->graph_output = new GraphData<mode, Dtype>(DENSE);
 		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
 }

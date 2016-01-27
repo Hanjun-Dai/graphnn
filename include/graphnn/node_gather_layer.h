@@ -10,12 +10,10 @@ class NodeGatherLayer : public ILayer<mode, Dtype>
 public:
 	typedef typename std::map<std::string, ILayer<mode, Dtype>* >::iterator layeriter;
 	
-	NodeGatherLayer(std::string _name, PoolingOp _op, PropErr _properr = PropErr::T);
+	NodeGatherLayer(std::string _name, GraphAtt _at, PropErr _properr = PropErr::T);
 	
 	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override;
-	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override;
-	
-	PoolingOp op;
+	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override;	
 };
 
 #endif

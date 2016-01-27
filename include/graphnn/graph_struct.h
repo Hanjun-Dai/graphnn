@@ -62,7 +62,7 @@ public:
 	void Resize(unsigned _num_subgraph, unsigned _num_nodes = 0);
 	void TopSort(std::vector<std::pair<T, T> >& sorted_edges);
 	
-	LinkedTable< std::pair<int, int> >* adj_list;
+    LinkedTable< std::pair<int, int> > *out_edges, *in_edges;
 	LinkedTable< int >* subgraph;
 	unsigned num_nodes, num_edges, num_subgraph;
 		
@@ -77,21 +77,25 @@ class GraphStruct<int>
 public:
 	GraphStruct()
 	{
-		adj_list = new LinkedTable< std::pair<int, int> >();
+		out_edges = new LinkedTable< std::pair<int, int> >();
+        in_edges = new LinkedTable< std::pair<int, int> >();
 		subgraph = new LinkedTable< int >();
 	}
+    
 	~GraphStruct()
 	{
-		delete adj_list;
+		delete out_edges;
+        delete in_edges;
 		delete subgraph;
 	}
 	
 	inline void AddEdge(int idx, int x, int y)
 	{
-		adj_list->AddEntry(x, std::pair<int, int>(idx, y));
+        out_edges->AddEntry(x, std::pair<int, int>(idx, y));
+        in_edges->AddEntry(y, std::pair<int, int>(idx, x));         
 		num_edges++;
 	}
-		
+	
 	inline void AddNode(int subg_id, int n_idx)
 	{
 		subgraph->AddEntry(subg_id, n_idx);
@@ -103,11 +107,12 @@ public:
 		num_edges = 0;
 		num_subgraph = _num_subgraph;
 		
-		adj_list->Resize(num_nodes);
+		in_edges->Resize(num_nodes);
+        out_edges->Resize(num_nodes);
 		subgraph->Resize(num_subgraph);
 	}
 	
-	LinkedTable< std::pair<int, int> >* adj_list;
+	LinkedTable< std::pair<int, int> > *out_edges, *in_edges;
 	LinkedTable< int >* subgraph;
 	
 	unsigned num_nodes, num_edges, num_subgraph;	

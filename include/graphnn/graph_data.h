@@ -8,7 +8,7 @@ enum class GraphAtt
 {
 	NODE = 0,
 	EDGE = 1,
-	NODE_EDGE = 2	
+    NODE_EDGE = 2
 };
 
 template<MatMode mode, typename Dtype>
@@ -25,5 +25,15 @@ public:
 
     MatType mt;
 };
+
+template<MatMode mode, typename Dtype>
+inline IMatrix<mode, Dtype>* GetImatState(GraphData<mode, Dtype>* graph_data, GraphAtt att)
+{
+    if (att == GraphAtt::NODE)
+        return graph_data->node_states;
+    if (att == GraphAtt::EDGE)
+        return graph_data->edge_states;
+    throw "err";
+} 
 
 #endif

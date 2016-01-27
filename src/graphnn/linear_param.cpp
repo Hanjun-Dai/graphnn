@@ -10,8 +10,8 @@ LinearParam<mode, Dtype>::LinearParam(FILE* fid)
 }
 
 template<MatMode mode, typename Dtype>
-LinearParam<mode, Dtype>::LinearParam(std::string _name, size_t _input_size, size_t _output_size, BiasOption _bo)
-							   : IParam<mode, Dtype>(_name), bo(_bo)
+LinearParam<mode, Dtype>::LinearParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, BiasOption _bo)
+							   : IParam<mode, Dtype>(_name, _operand), bo(_bo)
 {
 	input_size = _input_size;
 	output_size = _output_size;
@@ -19,8 +19,8 @@ LinearParam<mode, Dtype>::LinearParam(std::string _name, size_t _input_size, siz
 }
 
 template<MatMode mode, typename Dtype>
-LinearParam<mode, Dtype>::LinearParam(std::string _name, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo)
-								: IParam<mode, Dtype>(_name), bo(_bo)
+LinearParam<mode, Dtype>::LinearParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo)
+								: IParam<mode, Dtype>(_name, _operand), bo(_bo)
 {
 	input_size = _input_size;
 	output_size = _output_size;
@@ -52,8 +52,9 @@ void LinearParam<mode, Dtype>::InitializeBatch(GraphData<mode, Dtype>* g)
 }
 
 template<MatMode mode, typename Dtype>		
-void LinearParam<mode, Dtype>::UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
-{	
+void LinearParam<mode, Dtype>::UpdateOutput(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
+{
+    auto* input = GetImatState(input_graph, this->operand);
 	if (input->GetMatType() == DENSE)
 		output->GeMM(input->DenseDerived(), this->weight, Trans::N, Trans::N, 1.0, beta);
 	else
@@ -67,14 +68,16 @@ void LinearParam<mode, Dtype>::UpdateOutput(IMatrix<mode, Dtype>* input, DenseMa
 }
 
 template<MatMode mode, typename Dtype>		
-void LinearParam<mode, Dtype>::UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput, Dtype beta)
+void LinearParam<mode, Dtype>::UpdateGradInput(GraphData<mode, Dtype>* gradInput_graph, DenseMat<mode, Dtype>* gradOutput, Dtype beta)
 {
-	gradInput->GeMM(*gradOutput, this->weight, Trans::N, Trans::T, 1.0, beta);
+    auto& gradInput = GetImatState(gradInput_graph, this->operand)->DenseDerived();
+	gradInput.GeMM(*gradOutput, this->weight, Trans::N, Trans::T, 1.0, beta);
 }
 
 template<MatMode mode, typename Dtype>		
-void LinearParam<mode, Dtype>::AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput)
+void LinearParam<mode, Dtype>::AccDeriv(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* gradOutput)
 {
+    auto* input = GetImatState(input_graph, this->operand);
 	if (input->GetMatType() == DENSE)
 		this->delta_weight.GeMM(input->DenseDerived(), *gradOutput, Trans::T, Trans::N, 1.0, 1.0);
 	else

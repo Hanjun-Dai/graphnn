@@ -6,7 +6,8 @@
 template<typename T>
 GraphStruct<T>::GraphStruct()
 {
-		adj_list = new LinkedTable< std::pair<int, int> >();
+		out_edges = new LinkedTable< std::pair<int, int> >();
+        in_edges = new LinkedTable< std::pair<int, int> >();
 		subgraph = new LinkedTable< int >();
 		num_nodes = num_edges = num_subgraph = 0;
 		degree_in.clear();
@@ -17,7 +18,8 @@ GraphStruct<T>::GraphStruct()
 template<typename T>
 GraphStruct<T>::~GraphStruct()
 {
-		delete adj_list;
+		delete out_edges;
+        delete in_edges;
 		delete subgraph;
 }
 
@@ -30,7 +32,8 @@ void GraphStruct<T>::AddEdge(int idx, T node_x, T node_y)
 			AddNode(0, node_y);
 		int x = idx_map[node_x], y = idx_map[node_y];
 		
-		adj_list->AddEntry(x, std::pair<int, int>(idx, y));
+		out_edges->AddEntry(x, std::pair<int, int>(idx, y));
+        in_edges->AddEntry(y, std::pair<int, int>(idx, x)); 
 		num_edges++;
 		degree_in[y]++;
 }
@@ -60,7 +63,8 @@ void GraphStruct<T>::Resize(unsigned _num_subgraph, unsigned _num_nodes)
 		num_edges = 0;
 		num_subgraph = _num_subgraph;
 		
-		adj_list->Resize(num_nodes);
+		out_edges->Resize(num_nodes);
+        in_edges->Resize(num_nodes);
 		subgraph->Resize(num_subgraph);
 		degree_in.resize(num_nodes);
 		for (size_t i = 0; i < degree_in.size(); ++i)
@@ -87,11 +91,11 @@ void GraphStruct<T>::TopSort(std::vector<std::pair<T, T> >& sorted_edges)
 			x = top;
 			//sorted_list.push_back(t_map[x]);
 			top = next_idx[top];
-			if (adj_list->head.size() > x)
+			if (out_edges->head.size() > x)
 			{
-				for (size_t i = 0; i < adj_list->head[x].size(); ++i)
+				for (size_t i = 0; i < out_edges->head[x].size(); ++i)
 				{
-					y = adj_list->head[x][i].second;
+					y = out_edges->head[x][i].second;
 					sorted_edges.push_back(std::pair<T, T>(t_map[x], t_map[y]));
 					next_idx[y]--;
 					if (next_idx[y] == 0)

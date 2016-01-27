@@ -14,12 +14,12 @@ class IActLayer : public ILayer<mode, Dtype>
 {
 public:
 	
-	IActLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, _properr), wt(_wt), at(_at) 
+	IActLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, _at, _properr), wt(_wt)
     {
         this->graph_output = new GraphData<mode, Dtype>(DENSE);		
 		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
     }	
-				
+
     virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
     {
         assert(sv == SvType::WRITE2);
@@ -65,7 +65,6 @@ public:
     virtual void Derivative(DenseMat<mode, Dtype>& dst, DenseMat<mode, Dtype>& prev_output, DenseMat<mode, Dtype>& cur_output, DenseMat<mode, Dtype>& cur_grad) = 0;
 	
 	WriteType wt;
-	GraphAtt at;
 };
 
 /*

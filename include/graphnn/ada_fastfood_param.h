@@ -15,8 +15,8 @@ class AdaFastfoodParam : public IParam<mode, Dtype>
 {
 public:
 		AdaFastfoodParam(FILE* fid);
-		AdaFastfoodParam(std::string _name, size_t _input_size, size_t _output_size, BiasOption _bo = BiasOption::BIAS);
-		AdaFastfoodParam(std::string _name, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo = BiasOption::BIAS);
+		AdaFastfoodParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, BiasOption _bo = BiasOption::BIAS);
+		AdaFastfoodParam(std::string _name, GraphAtt _operand, size_t _input_size, size_t _output_size, Dtype mean, Dtype std, BiasOption _bo = BiasOption::BIAS);
 				
 		void InitParams(Dtype mean, Dtype std);
 		
@@ -27,9 +27,9 @@ public:
 		virtual void Serialize(FILE* fid) override;
 		virtual void Deserialize(FILE* fid) override;
 		
-		virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase) override;
-		virtual void UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput, Dtype beta) override;						
-		virtual void AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput) override;
+		virtual void UpdateOutput(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase) override;
+        virtual void UpdateGradInput(GraphData<mode, Dtype>* gradInput_graph, DenseMat<mode, Dtype>* gradOutput, Dtype beta) override;
+        virtual void AccDeriv(GraphData<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* gradOutput) override;
 		
 		virtual size_t OutSize() override
 		{

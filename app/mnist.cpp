@@ -11,7 +11,6 @@
 #include "cppformat/format.h"
 #include "relu_layer.h"
 #include "nonshared_linear_param.h"
-#include "simple_node_layer.h"
 #include "classnll_criterion_layer.h"
 
 typedef double Dtype;
@@ -88,7 +87,7 @@ void InitModel()
     auto* input_layer = new InputLayer<mode, Dtype>("input");
     
     auto* h1_weight = new NonsharedLinearParam<mode, Dtype>("h1_weight", dim, 1024, 0, 0.01);
-	auto* h1 = new SimpleNodeLayer<mode, Dtype>("h1", h1_weight);
+	auto* h1 = new NodeLayer<mode, Dtype>("h1", h1_weight);
     
     auto* relu_1 = new ReLULayer<mode, Dtype>("relu_1", WriteType::INPLACE, GraphAtt::NODE);
     

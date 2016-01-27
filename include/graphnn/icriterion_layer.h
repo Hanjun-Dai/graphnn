@@ -7,7 +7,7 @@ template<MatMode mode, typename Dtype>
 class ICriterionLayer : public ILayer<mode, Dtype>
 {
 public:
-		ICriterionLayer(std::string _name, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, _properr) {}
+		ICriterionLayer(std::string _name, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, GraphAtt::NODE, _properr) {}
 		
 		virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
 		{
