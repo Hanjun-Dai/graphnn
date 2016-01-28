@@ -13,6 +13,7 @@
 #include "relu_layer.h"
 #include "nonshared_linear_param.h"
 #include "classnll_criterion_layer.h"
+#include "err_cnt_criterion_layer.h"
 #include "batch_norm_param.h"
 
 typedef double Dtype;
@@ -110,6 +111,7 @@ void InitModel()
 	auto* output = new SingleParamNodeLayer<mode, Dtype>("output", o_weight, GraphAtt::NODE);
     
     auto* classnll = new ClassNLLCriterionLayer<mode, Dtype>("classnll", true);
+    auto* errcnt = new ErrCntCriterionLayer<mode, Dtype>("errcnt");
     
     gnn.AddParam(h1_weight); 
 	gnn.AddParam(h2_weight);
@@ -135,6 +137,7 @@ void InitModel()
     gnn.AddEdge(relu_2, output); 
            
     gnn.AddEdge(output, classnll);    
+    gnn.AddEdge(output, errcnt);    
 }
 
 void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int >& labels)
@@ -159,16 +162,6 @@ void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int 
     g_label.node_states->SparseDerived().CopyFrom(y_cpu);
 }
 
-Dtype GetErrCnt()
-{
-    auto& output_mat = gnn.layer_dict["output"]->graph_output->node_states->DenseDerived();
-    Dtype ans = 0;
-    for (size_t i = 0; i < output_mat.rows; ++i)
-        if (output_mat.GetRowMaxIdx(i) != (unsigned)y_cpu.data->col_idx[i])
-            ans++;
-    return ans;
-}
-
 int main(const int argc, const char** argv)
 {	
     LoadParams(argc, argv);    
@@ -186,9 +179,10 @@ int main(const int argc, const char** argv)
         {
                 LoadBatch(i, images_test, labels_test);
         		gnn.ForwardData({{"input", &g_input}}, TEST);                               								
-				auto loss_map = gnn.ForwardLabel({{"classnll", &g_label}});                
+				auto loss_map = gnn.ForwardLabel({{"classnll", &g_label},
+                                                  {"errcnt", &g_label}});                
 				loss += loss_map["classnll"];
-                err_rate += GetErrCnt();
+                err_rate += loss_map["errcnt"];
         }
         loss /= labels_test.size();
         err_rate /= labels_test.size();
