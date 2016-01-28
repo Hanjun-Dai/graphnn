@@ -36,29 +36,21 @@ public:
 			this->graph_output->edge_states->DenseDerived().Resize(prev_output->edge_states->rows, prev_output->edge_states->cols);
 		}
 		
-		if (this->at == GraphAtt::NODE || this->at == GraphAtt::NODE_EDGE)
-			Act(prev_output->node_states->DenseDerived(), this->graph_output->node_states->DenseDerived());
-		if (this->at == GraphAtt::EDGE || this->at == GraphAtt::NODE_EDGE)
-			Act(prev_output->edge_states->DenseDerived(), this->graph_output->edge_states->DenseDerived());        
+        auto& prev_state = GetImatState(prev_output, this->at)->DenseDerived();
+        auto& cur_state = GetImatState(this->graph_output, this->at)->DenseDerived();
+         
+        Act(prev_state, cur_state);        
     }
 
     virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override
     {
-		if (this->at == GraphAtt::NODE || this->at == GraphAtt::NODE_EDGE)
-		{
-			auto& prev_grad = prev_layer->graph_gradoutput->node_states->DenseDerived();			
-			auto& cur_grad = this->graph_gradoutput->node_states->DenseDerived();            
-            auto& prev_output = prev_layer->graph_output->node_states->DenseDerived();
-			auto& cur_output = this->graph_output->node_states->DenseDerived();
-            
-            prev_grad.Resize(cur_grad.rows, cur_grad.cols);
-            Derivative(prev_grad, prev_output, cur_output, cur_grad);
-		}
-		
-		if (this->at == GraphAtt::EDGE || this->at == GraphAtt::NODE_EDGE)
-		{
-			throw "not implemented";
-		}
+        auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, this->at)->DenseDerived();			
+		auto& cur_grad = GetImatState(this->graph_gradoutput, this->at)->DenseDerived();            
+        auto& prev_output = GetImatState(prev_layer->graph_output, this->at)->DenseDerived();
+		auto& cur_output = GetImatState(this->graph_output, this->at)->DenseDerived();
+                        
+        prev_grad.Resize(cur_grad.rows, cur_grad.cols);
+        Derivative(prev_grad, prev_output, cur_output, cur_grad);        
     }
     
     virtual void Act(DenseMat<mode, Dtype>& prev_out, DenseMat<mode, Dtype>& cur_out) = 0;

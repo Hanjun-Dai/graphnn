@@ -49,6 +49,21 @@ void GraphNN<mode, Dtype>::AddParam(IParam<mode, Dtype>* param)
 	param_dict[param->name] = param;
 }
 
+std::string Att2Str(GraphAtt at)
+{
+    switch (at)
+    {
+        case GraphAtt::NODE:
+            return "NODE";
+        case GraphAtt::EDGE:
+            return "EDGE";
+        case GraphAtt::NODE_EDGE:
+            return "NODE_EDGE";
+        default:
+            return "unknown";
+    }
+}
+
 template<MatMode mode, typename Dtype>
 void GraphNN<mode, Dtype>::InitializeGraph()
 {
@@ -59,7 +74,14 @@ void GraphNN<mode, Dtype>::InitializeGraph()
 	std::cerr << "initializing" << std::endl;
 	layer_graph.TopSort(sorted_edges);
 	for (size_t i = 0; i < sorted_edges.size(); ++i)
-		std::cerr << sorted_edges[i].first << "->" << sorted_edges[i].second << std::endl;
+    {
+        std::cerr << sorted_edges[i].first;
+        std::cerr << " (" << Att2Str(layer_dict[sorted_edges[i].first]->at) << ") ";
+        std::cerr << "-> " << sorted_edges[i].second; 
+        
+        std::cerr << " (" << Att2Str(layer_dict[sorted_edges[i].second]->at) << ") " << std::endl;
+    }
+		
 	initialized = true;
 	
 	if (visited)
