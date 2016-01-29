@@ -6,6 +6,7 @@
 #include <cassert>
 #include <vector>
 #include <thrust/device_vector.h>
+#define SOFTMAX_THREADS 128
 
 template<MatMode mode, typename Dtype>
 class SparseMat;

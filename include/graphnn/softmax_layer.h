@@ -3,25 +3,34 @@
 
 #include "i_act_layer.h"
 
+
 template<MatMode mode, typename Dtype>
-class SoftmaxLayer : public IActLayer<mode, Dtype>
+class SoftmaxLayer; 
+
+template<typename Dtype>
+class SoftmaxLayer<CPU, Dtype> : public IActLayer<CPU, Dtype>
 {
 public:
     SoftmaxLayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T)
-            : IActLayer<mode, Dtype>(_name, _at, _wt, _properr) {}
+            : IActLayer<CPU, Dtype>(_name, _at, _wt, _properr) {}
 
-    virtual void Act(DenseMat<mode, Dtype>& prev_out, DenseMat<mode, Dtype>& cur_out) override
-    {
-        if (&cur_out != &prev_out)
-            cur_out.CopyFrom(prev_out);
-        cur_out.Softmax();
-    }
+    virtual void Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out) override;
     
-    virtual void Derivative(DenseMat<mode, Dtype>& dst, DenseMat<mode, Dtype>& prev_output, 
-                            DenseMat<mode, Dtype>& cur_output, DenseMat<mode, Dtype>& cur_grad) override 
-                            {
-                                assert(false); // not implemented yet
-                            }                         
+    virtual void Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
+                            DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad) override;
+}; 
+
+template<typename Dtype>
+class SoftmaxLayer<GPU, Dtype> : public IActLayer<GPU, Dtype>
+{
+public:
+    SoftmaxLayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T)
+            : IActLayer<GPU, Dtype>(_name, _at, _wt, _properr) {}
+
+    virtual void Act(DenseMat<GPU, Dtype>& prev_out, DenseMat<GPU, Dtype>& cur_out) override;
+    
+    virtual void Derivative(DenseMat<GPU, Dtype>& dst, DenseMat<GPU, Dtype>& prev_output, 
+                            DenseMat<GPU, Dtype>& cur_output, DenseMat<GPU, Dtype>& cur_grad) override;
 }; 
 
 #endif

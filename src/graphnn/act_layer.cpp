@@ -45,6 +45,35 @@ template class ExpLayer<CPU, double>;
 
 // =========================================== softmax layer ================================================
 
+template<typename Dtype>
+void SoftmaxLayer<CPU, Dtype>::Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out)
+{
+        if (&cur_out != &prev_out)
+            cur_out.CopyFrom(prev_out);
+        cur_out.Softmax();
+}
+
+template<typename Dtype>
+void SoftmaxLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
+                               DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad)
+{
+    dst.CopyFrom(cur_grad);
+    
+    Dtype z;    
+    size_t offset = 0;
+    for (size_t i = 0; i < dst.rows; ++i)
+    {
+        z = MKLHelper_Dot(dst.cols, cur_grad.data + offset, cur_output.data + offset);
+        
+        for (size_t j = 0; j < dst.cols; ++j)
+            dst.data[offset + j] -= z;
+        
+        offset += dst.cols; 
+    }
+    
+    dst.EleWiseMul(cur_output);
+}
+
 template class SoftmaxLayer<CPU, float>;
 template class SoftmaxLayer<CPU, double>;
 

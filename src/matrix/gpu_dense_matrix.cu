@@ -8,7 +8,6 @@
 #include <cuda_runtime.h>
 #include <iostream>
 #define min(x, y) (x < y ? x : y)
-#define SOFTMAX_THREADS 128
 
 template<typename Dtype>
 DenseMat<GPU, Dtype>::~DenseMat()
