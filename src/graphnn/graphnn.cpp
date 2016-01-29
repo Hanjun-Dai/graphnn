@@ -120,7 +120,21 @@ void GraphNN<mode, Dtype>::ForwardData(std::map<std::string, GraphData<mode, Dty
 		k = name_idx_map[sorted_edges[i].second];
 		layer_dict[sorted_edges[i].second]->UpdateOutput(layer_dict[sorted_edges[i].first], visited[k] ? SvType::ADD2 : SvType::WRITE2, phase);              
 		visited[k] = true;
-        //std::cerr << layer_dict[sorted_edges[i].first]->name << " " << layer_dict[sorted_edges[i].second]->name << " " << layer_dict[sorted_edges[i].second]->graph_output->node_states->DenseDerived().Asum() << std::endl; 
+        if (false)
+        {
+            std::cerr << layer_dict[sorted_edges[i].first]->name << " " << layer_dict[sorted_edges[i].second]->name << " ";
+            auto* states = layer_dict[sorted_edges[i].second]->graph_output;            
+            if (states->node_states)
+                std::cerr << states->node_states->DenseDerived().Asum();
+            else
+                std::cerr << "null";
+            std::cerr << " ";
+            if (states->edge_states)
+                std::cerr << states->edge_states->DenseDerived().Asum();
+            else
+                std::cerr << "null";              
+            std::cerr << std::endl;                                      
+        } 
 	}
 }
 

@@ -131,7 +131,7 @@ void EdgeCentricPoolParam<mode, Dtype>::InitCPUWeight(GraphData<mode, Dtype>* g,
             for (int i = 0; i < graph->num_nodes; ++i)
             {
                 auto in_cnt = graph->in_edges->head[i].size();
-                cnt += (in_cnt - 1) * (in_cnt - 1); 
+                cnt += in_cnt * (in_cnt - 1); 
             }
             this->cpu_weight->ResizeSp(cnt, graph->num_edges + 1);            
             

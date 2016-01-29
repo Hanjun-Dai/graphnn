@@ -26,12 +26,10 @@ int main()
 {	
 	GPUHandle::Init(0);
 	        
-    DenseMat<mode, Dtype> a(1, 5);
+    DenseMat<mode, Dtype> a(100, 100);
     
-    a.Fill(14);    
-    a.Print2Screen();
-    cudaMemset(a.data + 1, 0, 3 * sizeof(Dtype));    
-    a.Print2Screen();
+    a.SetRandN(0, 0.01);
+    std::cerr << a.Norm2() << std::endl;
     
 	GPUHandle::Destroy();
 	return 0;

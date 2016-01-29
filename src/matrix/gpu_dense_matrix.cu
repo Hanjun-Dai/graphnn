@@ -35,6 +35,7 @@ DenseMat<GPU, Dtype>::DenseMat(size_t _rows, size_t _cols, unsigned int _streami
 	this->count = _rows * _cols;
 	mem_size = this->count + (this->count & 1);
 	MatUtils<GPU>::MallocArr(data, sizeof(Dtype) * mem_size);
+	cudaMemset(data, 0, sizeof(Dtype) * mem_size); 
         dev_ptr = thrust::device_pointer_cast(data);
         pointer_buf.clear();	
 	streamid = _streamid;
@@ -52,7 +53,8 @@ void DenseMat<GPU, Dtype>::Resize(size_t _newRows, size_t _newCols)
 		mem_size = this->count + (this->count & 1);
 		MatUtils<GPU>::DelArr(data);
 		MatUtils<GPU>::MallocArr(data, sizeof(Dtype) * mem_size);
-        dev_ptr = thrust::device_pointer_cast(data);	
+                dev_ptr = thrust::device_pointer_cast(data);
+                cudaMemset(data, 0, sizeof(Dtype) * mem_size);
 	}
 }
 
@@ -100,8 +102,7 @@ void DenseMat<GPU, Dtype>::SetRandN(Dtype mean, Dtype std, size_t _rows, size_t 
 	{
 		Resize(_rows, _cols);
 	}
-        cudaStreamSynchronize(GPUHandle::streams[streamid]);    
-	CudaHelper_SetRandNormal(GPUHandle::curandgenerator, data, this->count + (this->count & 1), mean, std);
+    SetRand(this->data, this->count, NormalRandomizer<Dtype>(mean, std), streamid);
 }
 
 template<typename Dtype>

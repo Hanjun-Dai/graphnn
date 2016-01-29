@@ -6,6 +6,21 @@
 #include "gpuhandle.h"
 
 template<typename Dtype>
+class NormalRandomizer
+{
+public:
+	NormalRandomizer(Dtype _mean, Dtype _std) : mean(_mean), std(_std) {}
+	__device__ inline Dtype operator()(curandState_t* state)
+	{
+        return curand_normal(state) * std + mean;
+	}
+    
+private:    
+    Dtype mean;
+    Dtype std;
+};
+
+template<typename Dtype>
 class BinomialRandomizer
 {
 public:
