@@ -15,6 +15,7 @@
 #include "classnll_criterion_layer.h"
 #include "err_cnt_criterion_layer.h"
 #include "batch_norm_param.h"
+#include "softmax_layer.h"
 
 typedef double Dtype;
 const MatMode mode = GPU;
@@ -135,7 +136,7 @@ void InitModel()
     gnn.AddEdge(h2, relu_2);
     //gnn.AddEdge(bn_layer_2, relu_2);
     gnn.AddEdge(relu_2, output); 
-           
+            
     gnn.AddEdge(output, classnll);    
     gnn.AddEdge(output, errcnt);    
 }

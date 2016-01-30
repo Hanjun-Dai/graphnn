@@ -203,6 +203,16 @@ inline void MKLHelper_InvSqrt(const MKL_INT n, double* a, double* y)
 	vdInvSqrt(n, a, y);
 }
 
+inline void MKLHelper_Inv(const MKL_INT n, float* a, float* y)
+{
+	vsInv(n, a, y);
+}
+
+inline void MKLHelper_Inv(const MKL_INT n, double* a, double* y)
+{
+	vdInv(n, a, y);
+}
+
 inline void MKLHelper_Square(const MKL_INT n, float* a, float* y)
 {
     vsSqr(n, a, y);

@@ -163,6 +163,12 @@ void DenseMat<GPU, Dtype>::Power(Dtype scalar)
 }
 
 template<typename Dtype>
+void DenseMat<GPU, Dtype>::Inv()
+{
+        UnaryOp(this->data, this->count, UnaryInv<Dtype>(), streamid); 
+}
+
+template<typename Dtype>
 void DenseMat<GPU, Dtype>::InvSqrt()
 {
         UnaryOp(this->data, this->count, UnaryInvSqrt<Dtype>(), streamid); 
@@ -180,7 +186,8 @@ __global__ void cunn_SoftMax_updateOutput_kernel(Dtype *orig_ptr, int batch_size
     int i_step = blockDim.x;
     Dtype z;
     // max?
-    buffer[threadIdx.x] = dst[i_start];
+    if (i_start < dim)
+        buffer[threadIdx.x] = dst[i_start];
     for (int i = i_start; i < i_end; i += i_step)
     {
         z = dst[i];
@@ -194,7 +201,7 @@ __global__ void cunn_SoftMax_updateOutput_kernel(Dtype *orig_ptr, int batch_size
     if (threadIdx.x == 0)
     {
         z = buffer[0];
-        for (int i = 1; i < blockDim.x; i++)
+        for (int i = 1; i < min(dim, blockDim.x); i++)
         {
             if(z < buffer[i])
                 z = buffer[i];
@@ -635,6 +642,42 @@ void DenseMat<GPU, Dtype>::ConcatCols(std::vector< DenseMat<GPU, Dtype>* >& src_
 }
 
 template<typename Dtype>
+__global__ void SparseEleWiseMulKernel(Dtype* dst, int* row_ptr, int* col_idx, Dtype* val, int n_cols, int numElements)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    
+    if (i < numElements) 
+    {
+        int cur_row = i / n_cols; 
+        int cur_col = i % n_cols;
+        
+        int l = row_ptr[cur_row], r = row_ptr[cur_row + 1] - 1, idx;
+        while (l <= r)
+        {
+            idx = (l + r) / 2;
+            if (col_idx[idx] < cur_col)
+                l = idx + 1;
+            else if (col_idx[idx] > cur_col)
+                r = idx - 1;
+            else {
+                dst[i] *= val[idx];
+                return; 
+            }
+        }
+        dst[i] = 0;
+    }
+}
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::EleWiseMul(SparseMat<GPU, Dtype>& src)
+{
+    assert(this->rows == src.rows && this->cols == src.cols);
+    int thread_num = min(c_uCudaThreadNum, this->count);    
+    int blocksPerGrid = (this->count + thread_num - 1) / thread_num;
+    SparseEleWiseMulKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[streamid] >>> (this->data, src.data->ptr, src.data->col_idx, src.data->val, this->cols, this->count);    
+}
+
+template<typename Dtype>
 void DenseMat<GPU, Dtype>::EleWiseMul(DenseMat<GPU, Dtype>& src)
 {
     assert(this->rows == src.rows && this->cols == src.cols);
@@ -905,6 +948,7 @@ void DenseMat<GPU, Dtype>::Deserialize(FILE* fid)
 template<typename Dtype>
 void DenseMat<GPU, Dtype>::Print2Screen() //debug only
 {
+    cudaStreamSynchronize(GPUHandle::streams[streamid]);   
 	Dtype* cpu_mem = new Dtype[this->count];
 	cudaMemcpy(cpu_mem, data, sizeof(Dtype) * this->count, cudaMemcpyDeviceToHost);
 	std::cerr << "========mat content========" << std::endl; 			

@@ -76,6 +76,7 @@ public:
 		void Sqrt();
 		void Square();
         void InvSqrt();
+        void Inv();
         void Exp();
         void Exp(DenseMat<CPU, Dtype>& src);
         void Sin();
@@ -113,6 +114,8 @@ public:
         
 		void EleWiseMul(DenseMat<CPU, Dtype>& src);
         void EleWiseMul(DenseMat<CPU, Dtype>& lhs, DenseMat<CPU, Dtype>& rhs);
+        void EleWiseMul(SparseMat<CPU, Dtype>& src);
+        
 		void ShuffleCols(DenseMat<CPU, Dtype>& src, const int* perm);
 		void ReduceCols(DenseMat<CPU, Dtype>& src);
 		
@@ -193,6 +196,7 @@ public:
 		void Power(Dtype scalar);
 		void Sqrt();
         void InvSqrt();
+        void Inv();
 		void Square();
         void Exp();
         void Exp(DenseMat<GPU, Dtype>& src);
@@ -231,6 +235,7 @@ public:
         void ConcatCols(std::vector< DenseMat<GPU, Dtype>* >& src_list);
 		void EleWiseMul(DenseMat<GPU, Dtype>& src);
         void EleWiseMul(DenseMat<GPU, Dtype>& lhs, DenseMat<GPU, Dtype>& rhs);
+        void EleWiseMul(SparseMat<GPU, Dtype>& src);
         void Mean(DenseMat<GPU, Dtype>& src);
 		void MulRowVec(DenseMat<GPU, Dtype>& src, DenseMat<GPU, Dtype>& x, Dtype beta = 0);
 		void MulRowVec(DenseMat<GPU, Dtype>& x);

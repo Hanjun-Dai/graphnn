@@ -103,6 +103,25 @@ private:
     Dtype scalar;    
 };
 
+//=================================== inv ======================================
+
+template<typename Dtype>
+class UnaryInv
+{
+public:
+    UnaryInv() {}
+    
+    __device__ inline void operator()(Dtype& dst)
+	{
+		dst = 1.0 / dst;
+	}
+    
+    __device__ inline void operator()(Dtype& dst, const Dtype& src)
+	{
+		dst = 1.0 / src;
+	}
+};
+
 //=================================== inv_sqrt ======================================
 
 template<typename Dtype>

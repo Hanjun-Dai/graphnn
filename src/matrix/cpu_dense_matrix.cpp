@@ -283,6 +283,12 @@ void DenseMat<CPU, Dtype>::Sqrt()
 }
 
 template<typename Dtype>
+void DenseMat<CPU, Dtype>::Inv()
+{
+    MKLHelper_Inv(this->count, data, data);
+}
+
+template<typename Dtype>
 void DenseMat<CPU, Dtype>::InvSqrt()
 {
     MKLHelper_InvSqrt(this->count, data, data);
@@ -455,6 +461,32 @@ void DenseMat<CPU, Dtype>::ConcatCols(std::vector< DenseMat<CPU, Dtype>* >& src_
         }            
     }
 }
+
+template<typename Dtype>
+void DenseMat<CPU, Dtype>::EleWiseMul(SparseMat<CPU, Dtype>& src)
+{
+	assert(this->rows == src.rows && this->cols == src.cols);
+    
+    int st, ed;
+    Dtype* pointer = this->data;
+    for (size_t i = 0; i < this->rows; ++i)
+    {
+        st = src.data->ptr[i];
+        ed = src.data->ptr[i + 1]; 
+        
+        for (size_t j = 0; j < this->cols; ++j)
+        {
+            if (st == ed || j != src.data->col_idx[st])
+                pointer[j] = 0;
+            else {
+                pointer[j] *= src.data->val[st];
+                st++;
+            }
+        }
+        pointer += this->cols;
+    }
+}
+
 
 template<typename Dtype>
 void DenseMat<CPU, Dtype>::EleWiseMul(DenseMat<CPU, Dtype>& src)

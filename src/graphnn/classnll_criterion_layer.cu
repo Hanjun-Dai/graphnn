@@ -45,7 +45,6 @@ template<MatMode mode, typename Dtype>
 ClassNLLCriterionLayer<mode, Dtype>::ClassNLLCriterionLayer(std::string _name, bool _need_softmax, PropErr _properr)
 								 : ICriterionLayer<mode, Dtype>(_name, _properr), need_softmax(_need_softmax)
 {
-        assert(need_softmax);        
 		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
         this->graph_output = nullptr;
 }
@@ -61,8 +60,16 @@ Dtype ClassNLLCriterionLayer<mode, Dtype>::GetLoss(GraphData<mode, Dtype>* graph
         auto& labels = graph_truth->node_states->SparseDerived(); 
         buf.Resize(labels.data->nnz, 1);                      
 		Dtype loss = GetLogLoss(top, labels, buf);
-        top.Axpy(-1.0, labels); // calc grad
-        top.Scale(1.0 / top.rows); // normalize by batch size
+        if (need_softmax)
+        {
+            top.Axpy(-1.0, labels); // calc grad
+            top.Scale(1.0 / top.rows); // normalize by batch size
+        } else 
+        {   
+            top.Inv();
+            top.EleWiseMul(labels);
+            top.Scale(-1.0 / top.rows); // normalize by batch size
+        }
         return loss;
 }
 
