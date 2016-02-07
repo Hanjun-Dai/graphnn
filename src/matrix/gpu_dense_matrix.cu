@@ -787,16 +787,15 @@ template<typename Dtype>
 void DenseMat<GPU, Dtype>::Axpby(Dtype a, DenseMat<GPU, Dtype>& x, Dtype b)
 {
     assert(x.count == this->count);
-    int thread_num = min(c_uCudaThreadNum, this->count);    
-    int blocksPerGrid = (this->count + thread_num - 1) / thread_num;
-    AxpbyKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[streamid] >>> (this->data, x.data, a, b, this->count); 
+    Scale(b);
+    Axpy(a, x); 
 }
 
 template<typename Dtype>
 void DenseMat<GPU, Dtype>::Axpy(Dtype alpha, DenseMat<GPU, Dtype>& x)
 {
 	assert(x.rows == this->rows && x.cols == this->cols);
-        cudaStreamSynchronize(GPUHandle::streams[streamid]);    
+    cudaStreamSynchronize(GPUHandle::streams[streamid]);    
 	CudaHelper_Axpy(GPUHandle::cublashandle, this->count, &alpha, x.data, data);	
 }
 
