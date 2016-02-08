@@ -25,7 +25,7 @@ public:
         if (sv == SvType::WRITE2)
             cur_output.CopyFrom(prev_states);
         else 
-            cur_output.ElewiseMul(prev_states);  
+            cur_output.EleWiseMul(prev_states);  
     }
     
     virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override
@@ -65,10 +65,10 @@ public:
             
             auto& another_state = GetImatState(it->second->graph_output, this->at)->DenseDerived();
             if (sv == SvType::WRITE2)
-                prev_grad.ElewiseMul(cur_grad, another_state);
+                prev_grad.EleWiseMul(cur_grad, another_state);
             else 
             {
-                buf.ElewiseMul(cur_grad, another_state);
+                buf.EleWiseMul(cur_grad, another_state);
                 prev_grad.Axpy(1.0, buf);
             }
         }
