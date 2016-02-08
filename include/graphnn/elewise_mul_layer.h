@@ -65,7 +65,9 @@ public:
             
             auto& another_state = GetImatState(it->second->graph_output, this->at)->DenseDerived();
             if (sv == SvType::WRITE2)
+            {                
                 prev_grad.EleWiseMul(cur_grad, another_state);
+            }
             else 
             {
                 buf.EleWiseMul(cur_grad, another_state);

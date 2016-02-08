@@ -499,7 +499,7 @@ template<typename Dtype>
 void DenseMat<CPU, Dtype>::EleWiseMul(DenseMat<CPU, Dtype>& lhs, DenseMat<CPU, Dtype>& rhs)
 {
 	assert(lhs.rows == rhs.rows && lhs.cols == rhs.cols);
-    Resize(lhs.rows, rhs.rows);
+    Resize(lhs.rows, lhs.cols);
 	MKLHelper_Mul(this->count, lhs.data, rhs.data, this->data);
 }
 
