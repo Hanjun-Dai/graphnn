@@ -18,6 +18,8 @@
 #include "cos_layer.h"
 #include "batch_norm_param.h"
 #include "softmax_layer.h"
+#include "const_trans_layer.h"
+#include "elewise_mul_layer.h"
 
 typedef float Dtype;
 using namespace std;

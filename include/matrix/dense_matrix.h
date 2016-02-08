@@ -120,7 +120,7 @@ public:
 		void ReduceCols(DenseMat<CPU, Dtype>& src);
 		
 		void GeaM(Dtype alpha, Trans transa, DenseMat<CPU, Dtype>& A, Dtype beta, Trans transb, DenseMat<CPU, Dtype>& B);
-		void Axpy(Dtype alpha, DenseMat<CPU, Dtype>& x);
+        void Axpy(Dtype alpha, DenseMat<CPU, Dtype>& x);
         void Axpy(Dtype alpha, SparseMat<CPU, Dtype>& x);
 		void Axpby(Dtype a, DenseMat<CPU, Dtype>& x, Dtype b);
 		size_t GetRowMaxIdx(size_t row_idx);

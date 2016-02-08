@@ -19,6 +19,8 @@ public:
     
 	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
     {
+        ILayer<mode, Dtype>::UpdateOutput(prev_layer, sv, phase);
+        
         auto& cur_output = GetImatState(this->graph_output, this->at)->DenseDerived();
 
 		Dtype beta;				
@@ -38,13 +40,6 @@ public:
                                                              
                 cur_output.Resize(num_states, param->OutSize());
             }
-            // we assume all the prev layers have the same graph structure;
-			this->graph_output->graph = prev_output->graph;
-
-            if (this->at == GraphAtt::NODE)
-                this->graph_output->edge_states = prev_output->edge_states; // edge state will remain the same
-            else // EDGE
-                this->graph_output->node_states = prev_output->node_states;
 		} else
 			beta = 1.0;
 		

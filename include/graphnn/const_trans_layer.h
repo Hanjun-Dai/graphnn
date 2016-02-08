@@ -16,23 +16,14 @@ public:
       
     virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
     {
+        ILayer<mode, Dtype>::UpdateOutput(prev_layer, sv, phase);
+        
         auto& cur_output = GetImatState(this->graph_output, this->at)->DenseDerived();      
-        auto* prev_output = prev_layer->graph_output;
-        auto& prev_states = GetImatState(prev_output, this->at)->DenseDerived();
-        Dtype beta;
-        if (sv == SvType::WRITE2)
-        {
-            beta = 0.0;
-            
-            this->graph_output->graph = prev_output->graph;
+        auto& prev_states = GetImatState(prev_layer->graph_output, this->at)->DenseDerived();        
+        Dtype beta = (sv == SvType::WRITE2) ? 0.0 : 1.0;
+        
+        if (beta == 0.0)
             cur_output.Resize(prev_states.rows, prev_states.cols);
-            
-            if (this->at == GraphAtt::NODE)
-                this->graph_output->edge_states = prev_output->edge_states; // edge state will remain the same
-            else // EDGE
-                this->graph_output->node_states = prev_output->node_states;
-        } else 
-            beta = 1.0;
                     
         cur_output.Axpby(a, prev_states, beta);
         cur_output.Add(b);
@@ -41,7 +32,7 @@ public:
 	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override
     {
         auto& cur_grad = GetImatState(this->graph_gradoutput, this->at)->DenseDerived();
-        auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, operand)->DenseDerived(); 
+        auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, this->at)->DenseDerived(); 
         
         Dtype beta;
         if (sv == SvType::WRITE2)
@@ -53,6 +44,8 @@ public:
             
         prev_grad.Axpby(a, cur_grad, beta);
     }
+    
+    const Dtype a, b;
 };
 
 #endif

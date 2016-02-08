@@ -31,7 +31,21 @@ public:
 		graph_gradoutput = nullptr;
 	}
 	
-	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) = 0;
+	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase)
+    {
+        auto* prev_output = prev_layer->graph_output;
+        if (sv == SvType::WRITE2)
+		{
+            // we assume all the prev layers have the same graph structure;
+			this->graph_output->graph = prev_output->graph;
+
+            if (this->at == GraphAtt::NODE)
+                this->graph_output->edge_states = prev_output->edge_states; // edge state will remain the same
+            else // EDGE
+                this->graph_output->node_states = prev_output->node_states;
+		}
+    }
+    
 	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) = 0;
 	virtual void AccDeriv(ILayer<mode, Dtype>* prev_layer) { }
 	
