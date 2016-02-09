@@ -280,6 +280,20 @@ void DenseMat<GPU, Dtype>::Identity(size_t dim)
     IdentityKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[streamid]>>>(this->data, this->cols); 
 }
 
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::Log(DenseMat<GPU, Dtype>& src)
+{
+    Resize(src.rows, src.cols);
+    UnaryOp(this->data, src.data, this->count, UnaryLog<Dtype>(), streamid);    
+}
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::Log()
+{
+    UnaryOp(this->data, this->count, UnaryLog<Dtype>(), streamid);
+}
+
 template<typename Dtype>
 void DenseMat<GPU, Dtype>::Exp(DenseMat<GPU, Dtype>& src)
 {
@@ -343,6 +357,13 @@ Dtype DenseMat<GPU, Dtype>::Asum()
 {
         cudaStreamSynchronize(GPUHandle::streams[streamid]);    
 	return CudaHelper_Asum(GPUHandle::cublashandle, this->count, data);
+}
+
+template<typename Dtype>
+Dtype DenseMat<GPU, Dtype>::Sum()
+{
+        cudaStreamSynchronize(GPUHandle::streams[streamid]); 
+        return thrust::reduce(dev_ptr, dev_ptr + this->count);
 }
 
 template<typename Dtype>
@@ -690,6 +711,21 @@ void DenseMat<GPU, Dtype>::EleWiseMul(DenseMat<GPU, Dtype>& lhs, DenseMat<GPU, D
     assert(lhs.rows == rhs.rows && lhs.cols == rhs.cols);
     Resize(lhs.rows, lhs.cols);
     BinaryOp(this->data, lhs.data, rhs.data, this->count, BinaryMul<Dtype>(), streamid);            
+}
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::EleWiseDiv(DenseMat<GPU, Dtype>& src)
+{
+    assert(this->rows == src.rows && this->cols == src.cols);
+    BinaryOp(this->data, src.data, this->count, BinaryDiv<Dtype>(), streamid);
+}
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::EleWiseDiv(DenseMat<GPU, Dtype>& lhs, DenseMat<GPU, Dtype>& rhs)
+{    
+    assert(lhs.rows == rhs.rows && lhs.cols == rhs.cols);
+    Resize(lhs.rows, lhs.cols);
+    BinaryOp(this->data, lhs.data, rhs.data, this->count, BinaryDiv<Dtype>(), streamid);            
 }
 		
 template<typename Dtype>

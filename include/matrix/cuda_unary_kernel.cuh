@@ -201,6 +201,24 @@ public:
 	}
 };
 
+//=================================== log ======================================
+template<typename Dtype>
+class UnaryLog
+{
+public:
+    UnaryLog() {}
+    
+    __device__ inline void operator()(Dtype& dst)
+	{
+		dst = cuda_log(dst);
+	}
+    
+    __device__ inline void operator()(Dtype& dst, const Dtype& src)
+	{
+		dst = cuda_log(src);
+	}
+};
+
 //=================================== sigmoid ======================================
 
 template<typename Dtype>

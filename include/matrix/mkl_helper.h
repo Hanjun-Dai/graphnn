@@ -173,6 +173,16 @@ inline void MKLHelper_Exp(const MKL_INT n, double* a, double* y)
 	vdExp(n, a, y);
 }
 
+inline void MKLHelper_Log(const MKL_INT n, float* a, float* y)
+{
+	vsLn(n, a, y);
+}
+
+inline void MKLHelper_Log(const MKL_INT n, double* a, double* y)
+{
+	vdLn(n, a, y);
+}
+
 inline void MKLHelper_Mul(const MKL_INT n, float* a, float* b, float* y)
 {
 	vsMul(n, a, b, y);
@@ -181,6 +191,16 @@ inline void MKLHelper_Mul(const MKL_INT n, float* a, float* b, float* y)
 inline void MKLHelper_Mul(const MKL_INT n, double* a, double* b, double* y)
 {
 	vdMul(n, a, b, y);
+}
+
+inline void MKLHelper_Div(const MKL_INT n, float* a, float* b, float* y)
+{
+	vsDiv(n, a, b, y);
+}
+
+inline void MKLHelper_Div(const MKL_INT n, double* a, double* b, double* y)
+{
+	vdDiv(n, a, b, y);
 }
 
 inline void MKLHelper_Sqrt(const MKL_INT n, float* a, float* y)

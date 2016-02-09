@@ -23,6 +23,26 @@ public:
 	}    
 };
 
+//=================================== mul ======================================
+
+template<typename Dtype>
+class BinaryDiv
+{
+public:
+	BinaryDiv() {}
+    
+	__device__ inline void operator()(Dtype& dst, const Dtype& lhs)
+	{
+		dst /= lhs;
+	}
+    
+    __device__ inline void operator()(Dtype& dst, const Dtype& lhs, const Dtype& rhs)
+	{
+		dst = lhs / rhs;
+	}    
+};
+
+
 //=================================== call interface ======================================
 
 template<typename Dtype, class BinaryEngine>

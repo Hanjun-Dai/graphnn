@@ -43,7 +43,6 @@ __device__ inline double cuda_log(const double& src)
         return log(src);
 }
 
-
 inline float CudaHelper_Norm2(cublasHandle_t& handle, int n, const float *x)
 {
 		float result;

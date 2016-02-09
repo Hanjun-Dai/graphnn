@@ -77,6 +77,8 @@ public:
 		void Square();
         void InvSqrt();
         void Inv();
+        void Log();
+        void Log(DenseMat<CPU, Dtype>& src);
         void Exp();
         void Exp(DenseMat<CPU, Dtype>& src);
         void Sin();
@@ -87,6 +89,7 @@ public:
 		Dtype Norm2();		
 		Dtype Asum();
 		Dtype Amax();
+        Dtype Sum();
         void Clip(Dtype max_abs);
         
         void Add(Dtype scalar);
@@ -111,6 +114,9 @@ public:
 		void ScatterCols(std::vector< DenseMat<CPU, Dtype>* >& dst_list);
 		void ConcatCols(DenseMat<CPU, Dtype>& src);
         void ConcatCols(std::vector< DenseMat<CPU, Dtype>* >& src_list);
+        
+        void EleWiseDiv(DenseMat<CPU, Dtype>& src);
+        void EleWiseDiv(DenseMat<CPU, Dtype>& lhs, DenseMat<CPU, Dtype>& rhs);
         
 		void EleWiseMul(DenseMat<CPU, Dtype>& src);
         void EleWiseMul(DenseMat<CPU, Dtype>& lhs, DenseMat<CPU, Dtype>& rhs);
@@ -198,6 +204,8 @@ public:
         void InvSqrt();
         void Inv();
 		void Square();
+        void Log();
+        void Log(DenseMat<GPU, Dtype>& src);
         void Exp();
         void Exp(DenseMat<GPU, Dtype>& src);
         void Sin();
@@ -208,6 +216,7 @@ public:
 		Dtype Norm2();
 		Dtype Asum();
 		Dtype Amax();
+        Dtype Sum();
         void Clip(Dtype max_abs);
         
         void Add(Dtype scalar);
@@ -233,6 +242,10 @@ public:
         void ScatterCols(std::vector< DenseMat<GPU, Dtype>* >& dst_list);
 		void ConcatCols(DenseMat<GPU, Dtype>& src);
         void ConcatCols(std::vector< DenseMat<GPU, Dtype>* >& src_list);
+        
+        void EleWiseDiv(DenseMat<GPU, Dtype>& src);
+        void EleWiseDiv(DenseMat<GPU, Dtype>& lhs, DenseMat<GPU, Dtype>& rhs);
+                
 		void EleWiseMul(DenseMat<GPU, Dtype>& src);
         void EleWiseMul(DenseMat<GPU, Dtype>& lhs, DenseMat<GPU, Dtype>& rhs);
         void EleWiseMul(SparseMat<GPU, Dtype>& src);

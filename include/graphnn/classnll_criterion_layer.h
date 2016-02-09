@@ -13,7 +13,8 @@ class ClassNLLCriterionLayer : public ICriterionLayer<mode, Dtype>
 {
 public:
 			ClassNLLCriterionLayer(std::string _name, bool _need_softmax, PropErr _properr = PropErr::T);
-			
+			ClassNLLCriterionLayer(std::string _name, bool _need_softmax, Dtype _lambda, PropErr _properr = PropErr::T);
+            
 			virtual Dtype GetLoss(GraphData<mode, Dtype>* graph_truth) override;
 			virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override;
             

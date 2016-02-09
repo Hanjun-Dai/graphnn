@@ -7,8 +7,12 @@ template<MatMode mode, typename Dtype>
 class ICriterionLayer : public ILayer<mode, Dtype>
 {
 public:
-		ICriterionLayer(std::string _name, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, GraphAtt::NODE, _properr) {}
-		
+		ICriterionLayer(std::string _name, PropErr _properr = PropErr::T) 
+            : ILayer<mode, Dtype>(_name, GraphAtt::NODE, _properr), lambda(1.0) {}
+            
+		ICriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T) 
+            : ILayer<mode, Dtype>(_name, GraphAtt::NODE, _properr), lambda(_lambda) {}
+        
 		virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
 		{
 				assert(sv == SvType::WRITE2);
@@ -16,7 +20,9 @@ public:
 				this->graph_output = prev_layer->graph_output;
 		}
 		
-		virtual Dtype GetLoss(GraphData<mode, Dtype>* graph_truth) = 0;				
+		virtual Dtype GetLoss(GraphData<mode, Dtype>* graph_truth) = 0;			
+        
+        Dtype lambda;	
 };
 
 #endif

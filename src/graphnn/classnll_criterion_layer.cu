@@ -43,7 +43,11 @@ Dtype GetLogLoss(DenseMat<CPU, Dtype>& pred, SparseMat<CPU, Dtype>& label, Dense
 
 template<MatMode mode, typename Dtype>
 ClassNLLCriterionLayer<mode, Dtype>::ClassNLLCriterionLayer(std::string _name, bool _need_softmax, PropErr _properr)
-								 : ICriterionLayer<mode, Dtype>(_name, _properr), need_softmax(_need_softmax)
+                                : ClassNLLCriterionLayer<mode, Dtype>(_name, _need_softmax, 1.0, _properr) {}
+
+template<MatMode mode, typename Dtype>
+ClassNLLCriterionLayer<mode, Dtype>::ClassNLLCriterionLayer(std::string _name, bool _need_softmax, Dtype _lambda, PropErr _properr)
+								 : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr), need_softmax(_need_softmax)
 {
 		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
         this->graph_output = nullptr;

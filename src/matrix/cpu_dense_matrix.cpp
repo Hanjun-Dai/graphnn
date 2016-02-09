@@ -238,6 +238,19 @@ void DenseMat<CPU, Dtype>::Softmax()
 }
 
 template<typename Dtype>
+void DenseMat<CPU, Dtype>::Log(DenseMat<CPU, Dtype>& src)
+{
+    Resize(src.rows, src.cols);
+    MKLHelper_Log(this->count, src.data, this->data);
+}
+
+template<typename Dtype>
+void DenseMat<CPU, Dtype>::Log()
+{
+    MKLHelper_Log(this->count, this->data, this->data);
+}
+
+template<typename Dtype>
 void DenseMat<CPU, Dtype>::Exp(DenseMat<CPU, Dtype>& src)
 {
     Resize(src.rows, src.cols);
@@ -310,6 +323,15 @@ template<typename Dtype>
 Dtype DenseMat<CPU, Dtype>::Asum()
 {
 	return MKLHelper_Asum(this->count, data);
+}
+
+template<typename Dtype>
+Dtype DenseMat<CPU, Dtype>::Sum()
+{
+    Dtype sum = 0;
+    for (size_t i = 0; i < this->count; ++i)
+        sum += this->data[i];
+    return sum;
 }
 
 template<typename Dtype>
@@ -487,6 +509,20 @@ void DenseMat<CPU, Dtype>::EleWiseMul(SparseMat<CPU, Dtype>& src)
     }
 }
 
+template<typename Dtype>
+void DenseMat<CPU, Dtype>::EleWiseDiv(DenseMat<CPU, Dtype>& src)
+{
+	assert(this->rows == src.rows && this->cols == src.cols);
+	MKLHelper_Div(this->count, this->data, src.data, this->data);
+}
+
+template<typename Dtype>
+void DenseMat<CPU, Dtype>::EleWiseDiv(DenseMat<CPU, Dtype>& lhs, DenseMat<CPU, Dtype>& rhs)
+{
+	assert(lhs.rows == rhs.rows && lhs.cols == rhs.cols);
+    Resize(lhs.rows, lhs.cols);
+	MKLHelper_Div(this->count, lhs.data, rhs.data, this->data);
+}
 
 template<typename Dtype>
 void DenseMat<CPU, Dtype>::EleWiseMul(DenseMat<CPU, Dtype>& src)
