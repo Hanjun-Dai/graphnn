@@ -19,13 +19,15 @@ public:
             }
             
 			virtual Dtype GetLoss(GraphData<mode, Dtype>* graph_truth) override
-            {
-                Dtype loss = 0.0;		
+            {		
 		        int batch_size = graph_truth->node_states->rows;
                 auto& node_diff = this->graph_gradoutput->node_states->DenseDerived();						
-                node_diff.GeaM(2.0 * this->lambda / batch_size, Trans::N, this->graph_output->node_states->DenseDerived(), -2.0 * this->lambda / batch_size, Trans::N, graph_truth->node_states->DenseDerived());
-                Dtype norm2 = node_diff.Norm2() / 2 / this->lambda * batch_size;
-                loss += norm2 * norm2;
+                node_diff.GeaM(1.0, Trans::N, this->graph_output->node_states->DenseDerived(), 1.0, Trans::N, graph_truth->node_states->DenseDerived());
+                Dtype norm2 = node_diff.Norm2();
+                Dtype loss = norm2 * norm2;
+                
+                if (this->properr == PropErr::T)
+                    node_diff.Scale(2.0 * this->lambda / batch_size);   
 		        return loss;
             }
             
