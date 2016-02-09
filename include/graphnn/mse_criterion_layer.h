@@ -23,10 +23,9 @@ public:
                 Dtype loss = 0.0;		
 		        int batch_size = graph_truth->node_states->rows;
                 auto& node_diff = this->graph_gradoutput->node_states->DenseDerived();						
-                node_diff.GeaM(2.0 * this->lambda / batch_size, Trans::N, this->graph_output->node_states->DenseDerived(), -2.0 / batch_size, Trans::N, graph_truth->node_states->DenseDerived());
+                node_diff.GeaM(2.0 * this->lambda / batch_size, Trans::N, this->graph_output->node_states->DenseDerived(), -2.0 * this->lambda / batch_size, Trans::N, graph_truth->node_states->DenseDerived());
                 Dtype norm2 = node_diff.Norm2() / 2 / this->lambda * batch_size;
                 loss += norm2 * norm2;
-                                        
 		        return loss;
             }
             
