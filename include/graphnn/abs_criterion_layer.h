@@ -12,7 +12,7 @@ public:
                 : ABSCriterionLayer(_name, 1.0, _properr) {}
                 
             ABSCriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T)
-                : ICriterionLayer(_name, _lambda, _properr) 
+                : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr) 
             {
                 this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
                 this->graph_output = nullptr;
