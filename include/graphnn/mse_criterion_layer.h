@@ -22,7 +22,7 @@ public:
             {		
 		        int batch_size = graph_truth->node_states->rows;
                 auto& node_diff = this->graph_gradoutput->node_states->DenseDerived();						
-                node_diff.GeaM(1.0, Trans::N, this->graph_output->node_states->DenseDerived(), 1.0, Trans::N, graph_truth->node_states->DenseDerived());
+                node_diff.GeaM(1.0, Trans::N, this->graph_output->node_states->DenseDerived(), -1.0, Trans::N, graph_truth->node_states->DenseDerived());
                 Dtype norm2 = node_diff.Norm2();
                 Dtype loss = norm2 * norm2;
                 
