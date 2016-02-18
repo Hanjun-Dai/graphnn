@@ -20,15 +20,11 @@ public:
 	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
     {
         ILayer<mode, Dtype>::UpdateOutput(prev_layer, sv, phase);
-        
         auto& cur_output = GetImatState(this->graph_output, this->at)->DenseDerived();
-
 		Dtype beta;				
 		auto* param = this->GetParam(prev_layer->name);
         auto operand = this->GetOperand(prev_layer->name);
-        
 		auto* prev_output = prev_layer->graph_output;
-		
 		if (sv == SvType::WRITE2)
 		{
 			beta = 0.0;
@@ -42,7 +38,6 @@ public:
             }
 		} else
 			beta = 1.0;
-		
 		param->InitializeBatch(prev_output, operand);
 		param->UpdateOutput(GetImatState(prev_output, operand),  
                             &cur_output, beta, phase);
@@ -96,6 +91,11 @@ public:
 	void AddParam(std::string prev_layer_name, IParam<mode, Dtype>* _param, GraphAtt _operand)
     {
         params_map[prev_layer_name] = std::make_pair(_param, _operand);
+    }
+    
+    virtual void Clear() override
+    {
+        params_map.clear();   
     }
 	
 	std::map< std::string, std::pair< IParam<mode, Dtype>*, GraphAtt > > params_map;	

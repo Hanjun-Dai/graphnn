@@ -43,12 +43,10 @@ void GraphStruct<T>::AddNode(int subg_id, T node)
 {
 		if (idx_map.count(node))
 			return;
-		
 		int cur_idx = idx_map.size();
 		idx_map[node] = cur_idx;
-		t_map[cur_idx] = node;	
+		t_map[cur_idx] = node;
 		subgraph->AddEntry(subg_id, cur_idx);
-		
 		if (cur_idx == num_nodes)
 		{
 			num_nodes++;
@@ -67,8 +65,12 @@ void GraphStruct<T>::Resize(unsigned _num_subgraph, unsigned _num_nodes)
         in_edges->Resize(num_nodes);
 		subgraph->Resize(num_subgraph);
 		degree_in.resize(num_nodes);
+        idx_map.clear();
+		t_map.clear();
 		for (size_t i = 0; i < degree_in.size(); ++i)
+        {
 			degree_in[i] = 0;
+        }
 }
 
 template<typename T>

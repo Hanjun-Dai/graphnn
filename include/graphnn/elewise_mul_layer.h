@@ -51,6 +51,11 @@ public:
         prev_layer_names[prev_layer->name] = prev_layer;
     }
     
+    virtual void Clear() override 
+    {
+        prev_layer_names.clear();
+    }
+    
     virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override
     {
         assert(prev_layer_names.size() == 2);

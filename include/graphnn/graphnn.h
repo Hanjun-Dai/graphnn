@@ -46,6 +46,8 @@ public:
             dst.CopyFrom(output);
         }
         
+        void CleanLayers();
+        
 		GraphStruct<std::string> layer_graph;
 		void InitializeGraph();
 private: 

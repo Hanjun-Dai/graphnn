@@ -41,7 +41,7 @@ public:
 				head.resize(ncap);
 			}
 			n = new_n;
-			for (int i = 0; i < n; ++i)
+			for (size_t i = 0; i < head.size(); ++i)
 				head[i].clear();
 		}
 		

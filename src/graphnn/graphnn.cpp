@@ -16,6 +16,18 @@ GraphNN<mode, Dtype>::GraphNN()
 }
 
 template<MatMode mode, typename Dtype>
+void GraphNN<mode, Dtype>::CleanLayers()
+{
+    for (auto it = layer_dict.begin(); it != layer_dict.end(); ++it)
+        it->second->Clear();
+	layer_dict.clear();
+	sorted_edges.clear();
+	layer_graph.Resize(1);
+	initialized = false;
+	name_idx_map.clear();
+}
+
+template<MatMode mode, typename Dtype>
 void GraphNN<mode, Dtype>::AddLayer(ILayer<mode, Dtype>* layer)
 {
 	if (layer_dict.count(layer->name) == 0)
@@ -67,12 +79,15 @@ std::string Att2Str(GraphAtt at)
 template<MatMode mode, typename Dtype>
 void GraphNN<mode, Dtype>::InitializeGraph()
 {
+    /*
     std::cerr << "================== list of params ==================" << std::endl;
     for (paramiter it = param_dict.begin(); it != param_dict.end(); ++it)
         std::cerr << it->second -> name << std::endl; 
     std::cerr << "================== end of param list ==================" << std::endl;
 	std::cerr << "initializing" << std::endl;
+    */
 	layer_graph.TopSort(sorted_edges);
+    /*
 	for (size_t i = 0; i < sorted_edges.size(); ++i)
     {
         std::cerr << sorted_edges[i].first;
@@ -81,7 +96,7 @@ void GraphNN<mode, Dtype>::InitializeGraph()
         
         std::cerr << " (" << Att2Str(layer_dict[sorted_edges[i].second]->at) << ") " << std::endl;
     }
-		
+	*/	
 	initialized = true;
 	
 	if (visited)
@@ -116,7 +131,7 @@ void GraphNN<mode, Dtype>::ForwardData(std::map<std::string, GraphData<mode, Dty
 	
 	int k;
 	for (size_t i = 0; i < sorted_edges.size(); ++i)
-	{
+	{      
 		k = name_idx_map[sorted_edges[i].second];
 		layer_dict[sorted_edges[i].second]->UpdateOutput(layer_dict[sorted_edges[i].first], visited[k] ? SvType::ADD2 : SvType::WRITE2, phase);              
 		visited[k] = true;
@@ -134,7 +149,7 @@ void GraphNN<mode, Dtype>::ForwardData(std::map<std::string, GraphData<mode, Dty
             else
                 std::cerr << "null";              
             std::cerr << std::endl;                                      
-        } 
+        }
 	}
 }
 

@@ -46,6 +46,8 @@ public:
 		}
     }
     
+    virtual void Clear() {}
+    
 	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) = 0;
 	virtual void AccDeriv(ILayer<mode, Dtype>* prev_layer) { }
 	
