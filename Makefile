@@ -1,6 +1,6 @@
 include core_makefile
 
-app_files := unit_test.cpp mnist.cpp 
+app_files := unit_test.cpp
 apps += $(subst .cpp,,$(app_files))
 app_path := $(GNN_HOME)/build/app
 
