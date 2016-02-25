@@ -1,7 +1,7 @@
 #ifndef NNGRAPH_H
 #define NNGRAPH_H
 
-#include "ilayer.h"
+#include "i_layer.h"
 #include "cppformat/format.h"
 
 template<MatMode mode, typename Dtype>
@@ -40,7 +40,7 @@ public:
                             Args&&... args)
     {
         assert(layer_dict.count(layer_name) == 0);        
-        ILayer<mode, Dtype>* layer = new LayerType<mode, Dtype>(this, std::forward<Args>(args)...);
+        ILayer<mode, Dtype>* layer = new LayerType<mode, Dtype>(layer_name, std::forward<Args>(args)...);
         layer_dict[layer_name] = layer;
         return layer;
     }

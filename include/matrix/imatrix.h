@@ -3,6 +3,7 @@
 
 #include "matrix_utils.h"
 #include "gpuhandle.h"
+#include <stdexcept>
 #define GPU_T(x) (x == Trans::N ? cublasOperation_t::CUBLAS_OP_N : cublasOperation_t::CUBLAS_OP_T)
 #define CUSP_T(x) (x == Trans::N ? CUSPARSE_OPERATION_NON_TRANSPOSE : CUSPARSE_OPERATION_TRANSPOSE)
 #define CPU_CharT(x) (x == Trans::N ? 'N' : 'T')

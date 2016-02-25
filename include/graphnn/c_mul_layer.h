@@ -7,14 +7,14 @@ template<MatMode mode, typename Dtype>
 class CMulLayer : public ILayer<mode, Dtype>
 {
 public:
-    CMulLayer(NNGraph<mode, Dtype>* _nn, PropErr _properr = PropErr::T)
-        : ILayer<mode, Dtype>(_nn, _properr) 
+    CMulLayer(std::string _name, PropErr _properr = PropErr::T)
+        : ILayer<mode, Dtype>(_name, _properr) 
     {
         this->state = new DenseMat<mode, Dtype>();
 		this->grad = new DenseMat<mode, Dtype>();
     }
     
-    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands) override
+    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
         
     }
