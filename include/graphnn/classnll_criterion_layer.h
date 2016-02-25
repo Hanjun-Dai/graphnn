@@ -4,6 +4,7 @@
 #include "i_criterion_layer.h"
 #include "dense_matrix.h"
 #include "sparse_matrix.h"
+#include "loss_func.h"
 
 template<MatMode mode, typename Dtype>
 class ClassNLLCriterionLayer : public ICriterionLayer<mode, Dtype>
@@ -15,17 +16,37 @@ public:
 			ClassNLLCriterionLayer(std::string _name, bool _need_softmax, Dtype _lambda, PropErr _properr = PropErr::T)
 				 : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr), need_softmax(_need_softmax)
             {
-                
-            }            
+                this->grad = new DenseMat<mode, Dtype>();
+            }
+            
+            static std::string str_type()
+            {
+                return "ClassNLL"; 
+            }
             
 			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
             {
-                return 0;
+                auto& top = this->grad->DenseDerived();
+                top.CopyFrom(this->state->DenseDerived());
+                if (need_softmax)
+                    top.Softmax();
+                auto& labels = ground_truth->SparseDerived();
+                Dtype loss = LossFunc<mode, Dtype>::GetLogLoss(top, labels);
+                if (need_softmax)
+                {
+                    top.Axpy(-1.0, labels); // calc grad
+                    top.Scale(1.0 / top.rows); // normalize by batch size
+                } else 
+                {   
+                    top.Inv();
+                    top.EleWiseMul(labels);
+                    top.Scale(-1.0 / top.rows); // normalize by batch size
+                }
+                return loss;                
             }
             
 protected:
             const bool need_softmax;
-            DenseMat<mode, Dtype> buf;
 };
 
 #endif

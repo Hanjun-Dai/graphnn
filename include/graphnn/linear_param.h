@@ -30,8 +30,33 @@ public:
             
 	        Reset(mean, std);
         }
-                		
-		virtual void Reset(Dtype mean, Dtype std);
+        
+        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Phase phase)
+        {
+            auto& weight = this->p["weight"]->value;
+            auto& bias = this->p["bias"]->value;
+            
+            if (input->GetMatType() == DENSE)
+                output->GeMM(input->DenseDerived(), weight, Trans::N, Trans::N, 1.0, 0.0);
+            else
+                output->SparseMM(input->SparseDerived(), weight, Trans::N, Trans::N, 1.0, 0.0);
+            
+            if (bo == BiasOption::BIAS)
+            {
+                output->AddRowVec(bias, 1.0);
+            }            
+        }
+           		
+		virtual void Reset(Dtype mean, Dtype std)
+        {
+            this->p["weight"]->value.SetRandN(mean, std, input_size, output_size);
+	        this->p["weight"]->grad.Zeros(input_size, output_size);
+	        if (bo == BiasOption::BIAS)
+            {
+                this->p["bias"]->value.Zeros(1, output_size);
+                this->p["bias"]->grad.Zeros(1, output_size);
+            }
+        }
 		
 		virtual size_t OutSize() override
 		{

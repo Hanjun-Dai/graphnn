@@ -15,10 +15,22 @@ public:
 		this->grad = new DenseMat<mode, Dtype>();
         this->param = _param;
     }
+
+    static std::string str_type()
+    {
+        return "Param"; 
+    }
     
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
+        assert(operands.size() == 1);
+        auto* prev_layer = operands[0];        
+        auto& cur_output = this->state->DenseDerived();
         
+        if (param->OutSize()) // if we can know the outputsize ahead
+            cur_output.Resize(prev_layer->state->rows, param->OutSize());
+        
+        param->UpdateOutput(prev_layer->state, &cur_output, phase);        
     }
     
     IParam<mode, Dtype>* param;        

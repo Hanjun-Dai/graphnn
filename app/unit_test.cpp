@@ -23,12 +23,6 @@ int main()
 	GPUHandle::Init(0);
 
     NNGraph<mode, Dtype> nn;
-        
-    IParam<mode, Dtype>* param = new IParam<mode, Dtype>();
-    ILayer<mode, Dtype>* lp, *lq;
-    param->OutSize();
-    auto* l1 = nn.cl< ParamLayer >("a", {lp, lq}, param);
-
 	GPUHandle::Destroy();
 	return 0;
 }

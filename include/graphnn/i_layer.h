@@ -22,11 +22,8 @@ public:
             {
             }
             
-    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase)
-    {
-        
-    }
-                
+    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) = 0;     
+                    
     std::string name;
     PropErr properr;
     IMatrix<mode, Dtype>* state, *grad;

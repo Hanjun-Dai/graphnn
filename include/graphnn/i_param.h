@@ -41,8 +41,9 @@ public:
 		
 		virtual void Deserialize(FILE* fid)
 		{			                        
-		}		
-		//virtual void UpdateOutput(IMatrix<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase) {}
+		}
+        
+        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Phase phase) = 0;		
 		//virtual void UpdateGradInput(IMatrix<mode, Dtype>* gradInput_graph, DenseMat<mode, Dtype>* gradOutput, Dtype beta) {}						
 		//virtual void AccDeriv(IMatrix<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* gradOutput) {}
                 

@@ -1,8 +1,35 @@
-#include "err_cnt_criterion_layer.h"
+#include "loss_func.h"
 #include <cmath>
 #include "cuda_helper.h"
 #define min(x, y) (x < y ? x : y)
 #define BLOCK_THREADS 128
+
+template<typename Dtype>
+__global__ void LogLossKernel(Dtype* dst, Dtype* pred, 
+                              int* row_ptr, int* col_idx, Dtype* val, 
+                              int nnz, int n_rows, int n_cols)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    if (i < nnz)
+    {
+        int row = get_sp_row_idx(i, row_ptr, n_rows);
+        dst[i] = cuda_log(pred[row * n_cols + col_idx[i]]) * val[i];
+    }
+}
+
+template<typename Dtype>
+Dtype LossFunc<GPU, Dtype>::GetLogLoss(DenseMat<GPU, Dtype>& pred, SparseMat<GPU, Dtype>& label)
+{
+        buf.Resize(label.data->nnz, 1);                 
+        int thread_num = min(c_uCudaThreadNum, label.data->nnz);
+        int blocksPerGrid = (label.data->nnz + thread_num - 1) / thread_num;
+        LogLossKernel <<< blocksPerGrid, thread_num >>> (buf.data, pred.data, 
+                                                         label.data->ptr, label.data->col_idx, label.data->val,
+                                                         label.data->nnz, pred.rows, pred.cols); 
+        Dtype loss = buf.Asum();
+        return loss; 
+}
 
 template<typename Dtype>
 __global__ void ErrCntKernel(Dtype *orig_ptr, Dtype* err_cnt, int* truth, int dim)
@@ -51,8 +78,9 @@ __global__ void ErrCntKernel(Dtype *orig_ptr, Dtype* err_cnt, int* truth, int di
 }
 
 template<typename Dtype>
-Dtype GetErrCnt(DenseMat<GPU, Dtype>& pred, SparseMat<GPU, Dtype>& label, DenseMat<GPU, Dtype>& buf)
-{        
+Dtype LossFunc<GPU, Dtype>::GetErrCnt(DenseMat<GPU, Dtype>& pred, SparseMat<GPU, Dtype>& label)
+{
+        buf.Resize(label.data->nnz, 1);        
         dim3 blocks(pred.rows, 1);
         dim3 threads(min(BLOCK_THREADS, pred.cols));
         
@@ -61,20 +89,5 @@ Dtype GetErrCnt(DenseMat<GPU, Dtype>& pred, SparseMat<GPU, Dtype>& label, DenseM
         return loss; 
 }
 
-template<typename Dtype>
-Dtype GetErrCnt(DenseMat<CPU, Dtype>& pred, SparseMat<CPU, Dtype>& label, DenseMat<CPU, Dtype>& buf)
-{
-        assert(pred.rows == buf.rows);
-        Dtype loss = 0.0;
-        for (size_t i = 0; i < pred.rows; ++i)
-        {
-            if (pred.GetRowMaxIdx(i) != (unsigned)label.data->col_idx[i])
-                loss++;
-        }
-        return loss;
-}
-
-template class ErrCntCriterionLayer<CPU, float>;
-template class ErrCntCriterionLayer<CPU, double>;
-template class ErrCntCriterionLayer<GPU, float>;
-template class ErrCntCriterionLayer<GPU, double>;
+template class LossFunc<GPU, float>;
+template class LossFunc<GPU, double>;

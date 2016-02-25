@@ -16,7 +16,7 @@
 #include "learner.h"
 
 typedef double Dtype;
-const MatMode mode = GPU;
+const MatMode mode = CPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
 int dev_id;
@@ -142,9 +142,9 @@ int main(const int argc, const char** argv)
         for (unsigned i = 0; i < labels_test.size(); i += batch_size)
         {
                 LoadBatch(i, images_test, labels_test);
-        		g.ForwardData({{"input", &input}}, TEST);                               								
+        		g.ForwardData({{"input", &input}}, TEST);      								
 				auto loss_map = g.ForwardLabel({{"classnll", &label},
-                                                  {"errcnt", &label}});                
+                                                  {"errcnt", &label}});
 				loss += loss_map["classnll"];
                 err_rate += loss_map["errcnt"];
         }
@@ -159,8 +159,8 @@ int main(const int argc, const char** argv)
                 auto loss_map = g.ForwardLabel({{"classnll", &label}});
 				loss = loss_map["classnll"] / batch_size;
                 
-                g.BackPropagation();
-                learner.Update();                                             
+                //g.BackPropagation();
+                //learner.Update();                                             
         }
     }
     

@@ -14,6 +14,11 @@ public:
 		this->grad = new DenseMat<mode, Dtype>();
     }
     
+    static std::string str_type()
+    {
+        return "CAdd"; 
+    }
+    
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
         
