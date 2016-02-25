@@ -1,7 +1,7 @@
 #ifndef IPARAM_H
 #define IPARAM_H
 
-#include "imatrix.h"
+#include "dense_matrix.h"
 #include <string>
 #include <map>
 
@@ -14,9 +14,7 @@ enum class BiasOption
 template<MatMode mode, typename Dtype>
 struct PP
 {
-        PP()
-        {
-        }
+        PP(){}
         
         PP(size_t rows, size_t cols)
         {

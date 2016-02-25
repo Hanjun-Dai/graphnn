@@ -97,7 +97,7 @@ void InitModel()
     auto* h1 = g.cl< ParamLayer >({input_layer}, h1_weight);    
     auto* relu_1 = g.cl< ReLULayer >({h1});     
     auto* h2 = g.cl< ParamLayer >({relu_1}, h2_weight);
-    auto* relu_2 = g.cl< ReLULayer >({h2});     
+    auto* relu_2 = g.cl< ReLULayer >({h2});
     auto* output = g.cl< ParamLayer >({relu_2}, o_weight);
     
     g.cl< ClassNLLCriterionLayer >("classnll", {output}, true);
@@ -131,7 +131,9 @@ int main(const int argc, const char** argv)
     
     LoadRaw(f_train_feat, f_train_label, images_train, labels_train);
     LoadRaw(f_test_feat, f_test_label, images_test, labels_test);
-        
+    
+    SGDLearner<mode, Dtype> learner(&model, lr);
+            
     Dtype loss, err_rate;       
     for (int epoch = 0; epoch < 10; ++epoch)
     {
@@ -140,11 +142,11 @@ int main(const int argc, const char** argv)
         for (unsigned i = 0; i < labels_test.size(); i += batch_size)
         {
                 LoadBatch(i, images_test, labels_test);
-        		//gnn.ForwardData({{"input", &g_input}}, TEST);                               								
-				//auto loss_map = gnn.ForwardLabel({{"classnll", &g_label},
-                //                                  {"errcnt", &g_label}});                
-				//loss += loss_map["classnll"];
-                //err_rate += loss_map["errcnt"];
+        		g.ForwardData({{"input", &input}}, TEST);                               								
+				auto loss_map = g.ForwardLabel({{"classnll", &label},
+                                                  {"errcnt", &label}});                
+				loss += loss_map["classnll"];
+                err_rate += loss_map["errcnt"];
         }
         loss /= labels_test.size();
         err_rate /= labels_test.size();
@@ -153,14 +155,14 @@ int main(const int argc, const char** argv)
         for (unsigned i = 0; i < labels_train.size(); i += batch_size)
         {
                 LoadBatch(i, images_train, labels_train);
-                //gnn.ForwardData({{"input", &g_input}}, TRAIN);
-                //auto loss_map = gnn.ForwardLabel({{"classnll", &g_label}});
-				//loss = loss_map["classnll"] / batch_size;
+                g.ForwardData({{"input", &input}}, TRAIN);
+                auto loss_map = g.ForwardLabel({{"classnll", &label}});
+				loss = loss_map["classnll"] / batch_size;
                 
-                //gnn.BackPropagation();
-		        //gnn.UpdateParams(lr, 0, 0);                                             
+                g.BackPropagation();
+                learner.Update();                                             
         }
-    }            
+    }
     
     GPUHandle::Destroy();
 	return 0;    

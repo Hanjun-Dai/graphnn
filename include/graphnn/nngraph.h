@@ -13,29 +13,20 @@ public:
         layer_dict.clear();
     }
     
-    void ForwardData(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase);      
+    void ForwardData(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase);   
+       
     std::map<std::string, Dtype> ForwardLabel(std::map<std::string, IMatrix<mode, Dtype>* > ground_truth);
             
     void BackPropagation();
     
-    void Add(ILayer<mode, Dtype>* layer, std::vector< ILayer<mode, Dtype>* > operands)
-    {
-        
-    }
-    
-    void AppendOperands()
-    {
-        
-    }
-    
     template<template <MatMode, typename> class LayerType, typename... Args>
-    ILayer<mode, Dtype>* cl(std::vector< ILayer<mode, Dtype>* > operands, Args&&... args)
+    inline ILayer<mode, Dtype>* cl(std::vector< ILayer<mode, Dtype>* > operands, Args&&... args)
     {
         return cl<LayerType>(fmt::sprintf("layer-%d", layer_dict.size()), operands, std::forward<Args>(args)...);
     }
     
     template<template <MatMode, typename> class LayerType, typename... Args>
-    ILayer<mode, Dtype>* cl(std::string layer_name, 
+    inline ILayer<mode, Dtype>* cl(std::string layer_name, 
                             std::vector< ILayer<mode, Dtype>* > operands, 
                             Args&&... args)
     {
