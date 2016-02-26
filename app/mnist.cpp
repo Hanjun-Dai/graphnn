@@ -159,7 +159,7 @@ int main(const int argc, const char** argv)
                 auto loss_map = g.ForwardLabel({{"classnll", &label}});
 				loss = loss_map["classnll"] / batch_size;
                 
-                //g.BackPropagation();
+                g.BackPropagation();
                 //learner.Update();                                             
         }
     }

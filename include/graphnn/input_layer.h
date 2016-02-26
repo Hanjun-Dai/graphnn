@@ -15,9 +15,8 @@ public:
         return "Input"; 
     }
 
-    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase)
-    {                 
-    } 
+    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override {}
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override {}
 };
 
 #endif

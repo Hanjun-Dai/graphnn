@@ -45,6 +45,15 @@ public:
                 return loss;                
             }
             
+            virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+            {
+                assert(operands.size() == 1 && cur_idx == 0);
+                
+                auto& prev_grad = operands[0]->grad->DenseDerived();
+                auto& cur_grad = this->grad->DenseDerived();
+                prev_grad.Axpy(1.0, cur_grad);                
+            }              
+                        
 protected:
             const bool need_softmax;
 };

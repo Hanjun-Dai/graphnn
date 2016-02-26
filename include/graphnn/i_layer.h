@@ -22,8 +22,20 @@ public:
             {
             }
             
-    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) = 0;     
-                    
+    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) = 0;
+    
+    void ClearGrad()
+    {
+        if (grad)
+            grad->DenseDerived().Zeros();
+    }
+    
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) = 0;
+    
+    virtual bool HasParam()
+    {
+        return false;
+    }                                
     std::string name;
     PropErr properr;
     IMatrix<mode, Dtype>* state, *grad;

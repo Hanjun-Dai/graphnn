@@ -21,6 +21,11 @@ public:
         return "Param"; 
     }
     
+    virtual bool HasParam() override
+    {
+        return true;
+    }
+       
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
         assert(operands.size() == 1);
@@ -31,6 +36,25 @@ public:
             cur_output.Resize(prev_layer->state->rows, param->OutSize());
         
         param->UpdateOutput(prev_layer->state, &cur_output, phase);        
+    }
+    
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+    {
+        assert(operands.size() == 1 && cur_idx == 0);
+        
+		auto& cur_grad = this->grad->DenseDerived();
+        auto* prev_layer = operands[0];
+        if (prev_grad.rows != cur_grad.rows && param->InSize()) // if we can know the inputsize ahead
+            prev_grad.Resize(cur_grad.rows, param->InSize());		
+                		
+        auto& prev_grad = prev_layer->grad->DenseDerived(); 
+		
+		param->UpdateGradInput(&prev_grad, &cur_grad);        
+    }
+    
+    void AccDeriv(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx)
+    {
+        
     }
     
     IParam<mode, Dtype>* param;        

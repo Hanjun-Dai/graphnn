@@ -21,8 +21,13 @@ public:
     
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
-        
+        throw std::runtime_error("not implemented");
     }    
+    
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+    {
+        throw std::runtime_error("not implemented");
+    }
 };
 
 #endif

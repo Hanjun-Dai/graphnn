@@ -95,6 +95,13 @@ void DenseMat<GPU, Dtype>::Zeros(size_t _rows, size_t _cols)
 }
 
 template<typename Dtype>
+void DenseMat<GPU, Dtype>::Zeros()
+{
+    if (this->count)
+	   cudaMemset(data, 0, this->count * sizeof(Dtype));
+}
+
+template<typename Dtype>
 void DenseMat<GPU, Dtype>::SetRandN(Dtype mean, Dtype std, size_t _rows, size_t _cols)
 {
 	if (_rows && _cols)

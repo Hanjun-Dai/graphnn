@@ -1,10 +1,16 @@
 #include "nngraph.h"
 #include <cstring>
+#include "param_layer.h"
 #include "i_criterion_layer.h"
 
 template<MatMode mode, typename Dtype>
 void NNGraph<mode, Dtype>::ForwardData(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase)
 {
+    if (phase == TRAIN)
+    {
+        for (auto item : layer_dict)
+            item.second->ClearGrad();
+    }
     // feed data
     for (auto it = input.begin(); it != input.end(); ++it)
     {
@@ -41,8 +47,29 @@ std::map<std::string, Dtype> NNGraph<mode, Dtype>::ForwardLabel(std::map<std::st
 
 template<MatMode mode, typename Dtype>
 void NNGraph<mode, Dtype>::BackPropagation()
-{
-    
+{    	
+    for (auto it = ordered_layers.rbegin(); it != ordered_layers.rend(); ++it)
+    {
+        auto* cur_layer = layer_dict[it->first];
+        auto& operands = it->second;
+        
+        if (cur_layer->properr != PropErr::T)
+			continue;
+        if (!has_grad[ name_idx_map[cur_layer->name] ])
+            continue;
+        
+        for (size_t i = 0; i < operands.size(); ++i)
+        {
+            auto* prev_layer = operands[i];
+            if (prev_layer->properr == PropErr::T)
+            {
+                cur_layer->BackPropErr(operands, i);
+                has_grad[ name_idx_map[prev_layer->name] ] = true;
+            }
+            if (cur_layer->HasParam())
+                dynamic_cast<ParamLayer<mode, Dtype>*>(cur_layer)->AccDeriv(operands, i);
+        }                          
+    }    
 }
 
 template class NNGraph<CPU, float>;

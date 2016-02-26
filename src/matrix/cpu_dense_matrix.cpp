@@ -176,6 +176,13 @@ void DenseMat<CPU, Dtype>::Zeros(size_t _rows, size_t _cols)
 	memset(data, 0, sizeof(Dtype) * this->count);
 }
 
+template<typename Dtype>			
+void DenseMat<CPU, Dtype>::Zeros()
+{
+	if (this->count)
+	   memset(data, 0, sizeof(Dtype) * this->count);
+}
+
 template<typename Dtype>
 void DenseMat<CPU, Dtype>::Add(Dtype scalar)
 {

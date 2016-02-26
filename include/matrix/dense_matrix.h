@@ -69,6 +69,7 @@ public:
 		
         void Identity(size_t dim = 0);        
 		void Zeros(size_t _rows, size_t _cols);
+        void Zeros();
 		void Fill(Dtype scalar);
 		void Scale(Dtype scalar);		
 		void Power(Dtype scalar);        
@@ -197,6 +198,7 @@ public:
 		void Softmax();
         void Identity(size_t dim = 0);
 		void Zeros(size_t _rows, size_t _cols);
+        void Zeros();
 		void Fill(Dtype scalar);
 		void Scale(Dtype scalar);
 		void Power(Dtype scalar);

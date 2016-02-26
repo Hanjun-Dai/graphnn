@@ -29,6 +29,11 @@ public:
                 return loss;
             }
             
+            virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+            {
+                throw std::runtime_error("no grad in this layer");
+            }                
+                        
 protected:
 };
 

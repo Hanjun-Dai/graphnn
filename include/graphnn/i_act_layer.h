@@ -33,6 +33,19 @@ public:
         Act(prev_state->DenseDerived(), this->state->DenseDerived());             
     }
     
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+    {
+        assert(operands.size() == 1 && cur_idx == 0);
+        
+        auto& prev_grad = operands[0]->grad->DenseDerived();			
+		auto& cur_grad = this->grad->DenseDerived();            
+        auto& prev_output = operands[0]->state->DenseDerived();
+		auto& cur_output = this->state->DenseDerived();
+                                
+        prev_grad.Resize(cur_grad.rows, cur_grad.cols);
+        Derivative(prev_grad, prev_output, cur_output, cur_grad);        
+    }    
+    
     virtual void Act(DenseMat<mode, Dtype>& prev_out, DenseMat<mode, Dtype>& cur_out) = 0;
     virtual void Derivative(DenseMat<mode, Dtype>& dst, DenseMat<mode, Dtype>& prev_output, 
                             DenseMat<mode, Dtype>& cur_output, DenseMat<mode, Dtype>& cur_grad) = 0;
