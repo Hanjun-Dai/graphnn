@@ -126,9 +126,8 @@ void DenseMat<CPU, Dtype>::SetRandN(Dtype mean, Dtype std, size_t _rows, size_t 
 	{
 		Resize(_rows, _cols);
 	}	
-	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
-    // warning: no seed 
-	std::default_random_engine generator(0);
+	auto seed = std::chrono::system_clock::now().time_since_epoch().count();    
+	std::default_random_engine generator(seed);
 	std::normal_distribution<Dtype> distribution(mean, std);
 	for (int i = 0; i < this->count; ++i)
 		data[i] = distribution(generator);

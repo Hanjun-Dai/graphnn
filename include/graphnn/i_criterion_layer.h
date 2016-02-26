@@ -8,7 +8,7 @@ class ICriterionLayer : public ILayer<mode, Dtype>
 {
 public:
 		ICriterionLayer(std::string _name, PropErr _properr = PropErr::T) 
-            : ILayer<mode, Dtype>(_name, _properr), lambda(1.0) {}
+            : ICriterionLayer<mode, Dtype>(_name, 1.0, _properr) {}
             
 		ICriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T) 
             : ILayer<mode, Dtype>(_name, _properr), lambda(_lambda) {}

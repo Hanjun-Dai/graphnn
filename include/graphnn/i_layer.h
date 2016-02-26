@@ -20,6 +20,7 @@ public:
     ILayer(std::string _name, PropErr _properr = PropErr::T) 
             : name(_name), properr(_properr)
             {
+                this->state = this->grad = nullptr;
             }
             
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) = 0;    

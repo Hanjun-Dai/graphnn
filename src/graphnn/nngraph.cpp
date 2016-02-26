@@ -70,7 +70,7 @@ void NNGraph<mode, Dtype>::BackPropagation()
             if (cur_layer->HasParam())
                 dynamic_cast<ParamLayer<mode, Dtype>*>(cur_layer)->AccDeriv(operands, i);
         }                          
-    }    
+    }        
 }
 
 template class NNGraph<CPU, float>;

@@ -26,5 +26,22 @@ public:
         virtual void Update() override;                          
 };
 
+template<MatMode mode, typename Dtype>
+class MomentumSGDLearner : ILearner<mode, Dtype>
+{
+public:
+        explicit MomentumSGDLearner(Model<mode, Dtype>* m, 
+                                    Dtype _init_lr, 
+                                    Dtype _momentum = 0.9, 
+                                    Dtype _l2_penalty = 0)
+                : ILearner<mode, Dtype>(m, _init_lr, _l2_penalty), momentum(_momentum) 
+                {
+                    acc_grad_dict.clear();
+                }
+        
+        virtual void Update() override;                          
+        Dtype momentum;
+        std::map<std::string, std::shared_ptr< DenseMat<mode, Dtype> > > acc_grad_dict;
+};
 
 #endif

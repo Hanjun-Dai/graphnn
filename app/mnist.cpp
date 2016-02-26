@@ -15,8 +15,8 @@
 #include "model.h"
 #include "learner.h"
 
-typedef float Dtype;
-const MatMode mode = CPU;
+typedef double Dtype;
+const MatMode mode = GPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
 int dev_id;
@@ -106,18 +106,21 @@ void InitModel()
 
 void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int >& labels)
 {
-    x_cpu.Resize(batch_size, 784);
-    y_cpu.Resize(batch_size, 10);
-    y_cpu.ResizeSp(batch_size, batch_size + 1); 
+    unsigned cur_bsize = batch_size;
+    if (idx_st + batch_size > images.size())
+        cur_bsize = images.size() - idx_st;
+    x_cpu.Resize(cur_bsize, 784);
+    y_cpu.Resize(cur_bsize, 10);
+    y_cpu.ResizeSp(cur_bsize, cur_bsize + 1); 
     
-    for (unsigned i = 0; i < batch_size; ++i)
+    for (unsigned i = 0; i < cur_bsize; ++i)
     {
         memcpy(x_cpu.data + i * 784, images[i + idx_st], sizeof(Dtype) * 784); 
         y_cpu.data->ptr[i] = i;
         y_cpu.data->val[i] = 1.0;
         y_cpu.data->col_idx[i] = labels[i + idx_st];  
     }
-    y_cpu.data->ptr[batch_size] = batch_size;
+    y_cpu.data->ptr[cur_bsize] = cur_bsize;
     
     input.CopyFrom(x_cpu);
     label.CopyFrom(y_cpu);
@@ -133,7 +136,7 @@ int main(const int argc, const char** argv)
     LoadRaw(f_train_feat, f_train_label, images_train, labels_train);
     LoadRaw(f_test_feat, f_test_label, images_test, labels_test);
     
-    SGDLearner<mode, Dtype> learner(&model, lr, 0);
+    MomentumSGDLearner<mode, Dtype> learner(&model, lr, 0.9, 0);
             
     Dtype loss, err_rate;       
     for (int epoch = 0; epoch < 10; ++epoch)
@@ -161,7 +164,7 @@ int main(const int argc, const char** argv)
 				loss = loss_map["classnll"] / batch_size;
                 
                 g.BackPropagation();
-                learner.Update();                                             
+                learner.Update();
         }
     }
     

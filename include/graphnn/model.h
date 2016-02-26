@@ -31,7 +31,7 @@ public:
             return param;           
         }
                
-        std::vector< PP<mode, Dtype>* >& GetDiffParams()
+        std::map< std::string, PP<mode, Dtype>* >& GetDiffParams()
         {
             if (!flatten)
                 DiffParams2List();
@@ -45,7 +45,7 @@ public:
             {
                 for (auto& weight_pair : param_pair.second->p)
                 {
-                    param_list.push_back(weight_pair.second);
+                    param_list[param_pair.first + "-" + weight_pair.first] = weight_pair.second;
                 }
             }
         }
@@ -54,7 +54,7 @@ private:
         std::map< std::string, IDiffParam<mode, Dtype>* > diff_params;
         std::map< std::string, IConstParam<mode, Dtype>* > const_params;
         bool flatten;                  
-        std::vector< PP<mode, Dtype>* > param_list;
+        std::map< std::string, PP<mode, Dtype>* > param_list;
 };
 
 #endif
