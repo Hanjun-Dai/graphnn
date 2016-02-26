@@ -7,12 +7,7 @@ void SGDLearner<mode, Dtype>::Update()
             
     for (auto* param : param_list)
     {
-        if (this->l2_penalty == 0)
-        {
-               
-        } else {
-                               
-        }
+        param->value.Axpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
     }    
 }
 

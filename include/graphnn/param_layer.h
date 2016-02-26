@@ -8,12 +8,11 @@ template<MatMode mode, typename Dtype>
 class ParamLayer : public ILayer<mode, Dtype>
 {
 public:
-    ParamLayer(std::string _name, IParam<mode, Dtype>* _param, PropErr _properr = PropErr::T)
-        : ILayer<mode, Dtype>(_name, _properr) 
+    ParamLayer(std::string _name, std::vector< IParam<mode, Dtype>* > _params, PropErr _properr = PropErr::T)
+        : ILayer<mode, Dtype>(_name, _properr), params(_params) 
     {
         this->state = new DenseMat<mode, Dtype>();
 		this->grad = new DenseMat<mode, Dtype>();
-        this->param = _param;
     }
 
     static std::string str_type()
@@ -25,39 +24,34 @@ public:
     {
         return true;
     }
-       
+    
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
-        assert(operands.size() == 1);
-        auto* prev_layer = operands[0];        
         auto& cur_output = this->state->DenseDerived();
-        
-        if (param->OutSize()) // if we can know the outputsize ahead
-            cur_output.Resize(prev_layer->state->rows, param->OutSize());
-        
-        param->UpdateOutput(prev_layer->state, &cur_output, phase);        
+        for (size_t i = 0; i < operands.size(); ++i)
+        {
+            params[i]->UpdateOutput(operands[i]->state, &cur_output, i == 0 ? 0.0 : 1.0, phase);
+        }
     }
     
     virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
     {
-        assert(operands.size() == 1 && cur_idx == 0);
-        
-		auto& cur_grad = this->grad->DenseDerived();
-        auto* prev_layer = operands[0];
-        if (prev_grad.rows != cur_grad.rows && param->InSize()) // if we can know the inputsize ahead
-            prev_grad.Resize(cur_grad.rows, param->InSize());		
-                		
-        auto& prev_grad = prev_layer->grad->DenseDerived(); 
+        auto& cur_grad = this->grad->DenseDerived();
+        auto& prev_grad = operands[cur_idx]->grad->DenseDerived(); 
 		
-		param->UpdateGradInput(&prev_grad, &cur_grad);        
-    }
+		params[cur_idx]->UpdateGradInput(&prev_grad, &cur_grad);            
+    }    
     
     void AccDeriv(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx)
     {
-        
+        if (params[cur_idx]->IsDiff())
+        {
+            dynamic_cast<IDiffParam<mode, Dtype>*>(params[cur_idx])->AccDeriv(operands[cur_idx]->state,
+                                                                              &this->grad->DenseDerived());
+        }        
     }
     
-    IParam<mode, Dtype>* param;        
+    std::vector< IParam<mode, Dtype>* > params;
 };
 
 #endif

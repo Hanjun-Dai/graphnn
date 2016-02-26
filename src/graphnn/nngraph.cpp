@@ -6,11 +6,6 @@
 template<MatMode mode, typename Dtype>
 void NNGraph<mode, Dtype>::ForwardData(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase)
 {
-    if (phase == TRAIN)
-    {
-        for (auto item : layer_dict)
-            item.second->ClearGrad();
-    }
     // feed data
     for (auto it = input.begin(); it != input.end(); ++it)
     {
@@ -32,9 +27,9 @@ std::map<std::string, Dtype> NNGraph<mode, Dtype>::ForwardLabel(std::map<std::st
 {
     std::map<std::string, Dtype> loss;
     has_grad.resize(ordered_layers.size());
-    for (bool&& g : has_grad)
-        g = false;
-    
+    for (size_t i = 0; i < has_grad.size(); ++i)
+        has_grad[i] = false;
+        
     for (auto it = ground_truth.begin(); it != ground_truth.end(); ++it)
     {
         auto* criterion_layer = dynamic_cast<ICriterionLayer<mode, Dtype>*>(layer_dict[it->first]);
@@ -61,10 +56,16 @@ void NNGraph<mode, Dtype>::BackPropagation()
         for (size_t i = 0; i < operands.size(); ++i)
         {
             auto* prev_layer = operands[i];
+            auto prev_id = name_idx_map[prev_layer->name];
             if (prev_layer->properr == PropErr::T)
             {
+                // if we haven't backprop the error to this layer
+                if (! has_grad[ prev_id ])
+                {
+                    has_grad[prev_id] = true;
+                    prev_layer->grad->DenseDerived().Zeros(prev_layer->state->rows, prev_layer->state->cols);
+                }
                 cur_layer->BackPropErr(operands, i);
-                has_grad[ name_idx_map[prev_layer->name] ] = true;
             }
             if (cur_layer->HasParam())
                 dynamic_cast<ParamLayer<mode, Dtype>*>(cur_layer)->AccDeriv(operands, i);

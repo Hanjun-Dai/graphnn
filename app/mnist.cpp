@@ -15,7 +15,7 @@
 #include "model.h"
 #include "learner.h"
 
-typedef double Dtype;
+typedef float Dtype;
 const MatMode mode = CPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
@@ -94,11 +94,11 @@ void InitModel()
     auto* o_weight = model.add_diff< LinearParam >(1024, 10, 0, 0.01);
     
     auto* input_layer = g.cl< InputLayer >("input", {});
-    auto* h1 = g.cl< ParamLayer >({input_layer}, h1_weight);    
+    auto* h1 = g.cl< ParamLayer >({input_layer}, {h1_weight});    
     auto* relu_1 = g.cl< ReLULayer >({h1});     
-    auto* h2 = g.cl< ParamLayer >({relu_1}, h2_weight);
+    auto* h2 = g.cl< ParamLayer >({relu_1}, {h2_weight});
     auto* relu_2 = g.cl< ReLULayer >({h2});
-    auto* output = g.cl< ParamLayer >({relu_2}, o_weight);
+    auto* output = g.cl< ParamLayer >({relu_2}, {o_weight});
     
     g.cl< ClassNLLCriterionLayer >("classnll", {output}, true);
     g.cl< ErrCntCriterionLayer >("errcnt", {output});
@@ -127,12 +127,13 @@ int main(const int argc, const char** argv)
 {	
     LoadParams(argc, argv);    
 	GPUHandle::Init(dev_id);
+    
     InitModel();
     
     LoadRaw(f_train_feat, f_train_label, images_train, labels_train);
     LoadRaw(f_test_feat, f_test_label, images_test, labels_test);
     
-    SGDLearner<mode, Dtype> learner(&model, lr);
+    SGDLearner<mode, Dtype> learner(&model, lr, 0);
             
     Dtype loss, err_rate;       
     for (int epoch = 0; epoch < 10; ++epoch)
@@ -160,7 +161,7 @@ int main(const int argc, const char** argv)
 				loss = loss_map["classnll"] / batch_size;
                 
                 g.BackPropagation();
-                //learner.Update();                                             
+                learner.Update();                                             
         }
     }
     

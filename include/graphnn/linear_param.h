@@ -31,22 +31,45 @@ public:
 	        Reset(mean, std);
         }
         
-        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Phase phase)
+        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
         {
             auto& weight = this->p["weight"]->value;
             auto& bias = this->p["bias"]->value;
             
+            if (beta == 0)
+                output->Resize(input->rows, weight.cols);
+                
             if (input->GetMatType() == DENSE)
-                output->GeMM(input->DenseDerived(), weight, Trans::N, Trans::N, 1.0, 0.0);
+                output->GeMM(input->DenseDerived(), weight, Trans::N, Trans::N, 1.0, beta);
             else
-                output->SparseMM(input->SparseDerived(), weight, Trans::N, Trans::N, 1.0, 0.0);
+                output->SparseMM(input->SparseDerived(), weight, Trans::N, Trans::N, 1.0, beta);
             
             if (bo == BiasOption::BIAS)
             {
                 output->AddRowVec(bias, 1.0);
             }            
         }
-           		
+        
+        virtual void UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput) override
+        {
+            gradInput->GeMM(*gradOutput, this->p["weight"]->value, Trans::N, Trans::T, 1.0, 1.0);
+        }
+                        
+		virtual void AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput) override
+        {
+            if (input->GetMatType() == DENSE)
+                this->p["weight"]->grad.GeMM(input->DenseDerived(), *gradOutput, Trans::T, Trans::N, 1.0, 1.0);
+            else
+                this->p["weight"]->grad.SparseMM(input->SparseDerived(), *gradOutput, Trans::T, Trans::N, 1.0, 1.0);
+            
+            if (bo == BiasOption::BIAS)
+            {
+                bias_multiplier.Resize(1, input->rows);
+                bias_multiplier.Fill(1.0);
+                this->p["bias"]->grad.GeMM(bias_multiplier, *gradOutput, Trans::N, Trans::N, 1.0, 1.0);
+            }           
+        }
+                  		
 		virtual void Reset(Dtype mean, Dtype std)
         {
             this->p["weight"]->value.SetRandN(mean, std, input_size, output_size);
@@ -63,11 +86,6 @@ public:
 			return output_size;
 		}
         
-		virtual size_t InSize() override
-		{
-			return input_size;
-		}
-        		
 protected:
         BiasOption bo; 
 		size_t input_size, output_size;

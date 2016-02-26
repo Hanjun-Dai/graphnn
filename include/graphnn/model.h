@@ -41,7 +41,13 @@ public:
         void DiffParams2List()
         {
             param_list.clear();
-            
+            for (auto& param_pair : diff_params)
+            {
+                for (auto& weight_pair : param_pair.second->p)
+                {
+                    param_list.push_back(weight_pair.second);
+                }
+            }
         }
         
 private:

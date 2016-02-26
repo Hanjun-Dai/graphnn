@@ -43,19 +43,15 @@ public:
 		{			                        
 		}
         
-        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Phase phase) = 0;		
-		//virtual void UpdateGradInput(IMatrix<mode, Dtype>* gradInput_graph, DenseMat<mode, Dtype>* gradOutput, Dtype beta) {}						
-		//virtual void AccDeriv(IMatrix<mode, Dtype>* input_graph, DenseMat<mode, Dtype>* gradOutput) {}
+        virtual bool IsDiff() = 0;
+        
+        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase) = 0;		
+		virtual void UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput) = 0;
                 
 		virtual size_t OutSize() 
         { 
             throw std::runtime_error("not implemented");
-        }
-        
-		virtual size_t InSize() 
-        { 
-            throw std::runtime_error("not implemented"); 
-        }
+        }        
         
         std::string name;        
 };
@@ -70,7 +66,12 @@ public:
             {
                 p.clear();
             }
-            
+        virtual bool IsDiff() override
+        {
+            return true;
+        }
+		virtual void AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput) = 0;
+                
         std::map<std::string, PP<mode, Dtype>*> p;
 };
 
@@ -84,6 +85,10 @@ public:
             {
                 
             }    
+        virtual bool IsDiff()
+        {
+            return false;
+        }            
 };
 
 #endif

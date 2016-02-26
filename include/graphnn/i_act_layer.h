@@ -17,7 +17,8 @@ public:
 	IActLayer(std::string _name, WriteType _wt, PropErr _properr = PropErr::T) 
         : ILayer<mode, Dtype>(_name, _properr), wt(_wt)
     {
-        
+        this->state = new DenseMat<mode, Dtype>();
+        this->grad = new DenseMat<mode, Dtype>();
     }
     
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
