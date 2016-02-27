@@ -46,13 +46,10 @@ public:
         virtual bool IsDiff() = 0;
         
         virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase) = 0;		
-		virtual void UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput) = 0;
+		virtual void UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput, Dtype beta) = 0;
                 
-		virtual size_t OutSize() 
-        { 
-            throw std::runtime_error("not implemented");
-        }        
-        
+        virtual void ResetOutput(const IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output) = 0;
+                        
         std::string name;        
 };
 
@@ -85,7 +82,9 @@ public:
             {
                 
             }    
-        virtual bool IsDiff()
+            
+        virtual void InitConst(void* side_info) = 0;            
+        virtual bool IsDiff() override
         {
             return false;
         }            

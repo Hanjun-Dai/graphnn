@@ -16,7 +16,7 @@
 #include "learner.h"
 
 typedef double Dtype;
-const MatMode mode = GPU;
+const MatMode mode = CPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
 int dev_id;

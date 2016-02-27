@@ -12,12 +12,12 @@ void ReLULayer<CPU, Dtype>::Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dt
 
 template<typename Dtype>
 void ReLULayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
-                            DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad)
+                            DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad, Dtype beta)
 {
-        dst.CopyFrom(cur_grad);
+        dst.Scale(beta);
         for (int i = 0; i < dst.count; ++i)
-            if (cur_output.data[i] <= 0.0)
-                dst.data[i] = 0.0;
+            if (cur_output.data[i] > 0.0)
+                dst.data[i] += cur_grad.data[i];
 }
 
 template class ReLULayer<CPU, float>;

@@ -45,13 +45,16 @@ public:
                 return loss;                
             }
             
-            virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+            virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
             {
                 assert(operands.size() == 1 && cur_idx == 0);
                 
                 auto& prev_grad = operands[0]->grad->DenseDerived();
                 auto& cur_grad = this->grad->DenseDerived();
-                prev_grad.Axpy(1.0, cur_grad);                
+                if (beta == 0)
+                    prev_grad.CopyFrom(cur_grad);
+                else
+                    prev_grad.Axpby(1.0, cur_grad, beta);                
             }              
                         
 protected:

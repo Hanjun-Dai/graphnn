@@ -21,12 +21,30 @@ public:
     
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
-        throw std::runtime_error("not implemented");
+        assert(operands.size());
+        auto& cur_output = this->state->DenseDerived();
+        
+        for (size_t i = 0; i < operands.size(); ++i)
+        {
+            auto& prev_state = operands[i]->state->DenseDerived();
+            
+            if (i == 0)
+                cur_output.CopyFrom(prev_state);
+            else 
+                cur_output.Axpy(1.0, prev_state);    
+        }            
     }    
     
-    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
     {
-        throw std::runtime_error("not implemented");
+        assert(cur_idx >= 0 && cur_idx < operands.size());
+        auto& cur_grad = this->grad->DenseDerived();                
+		auto& prev_grad = operands[cur_idx]->grad->DenseDerived();
+		        
+        if (beta == 0)
+            prev_grad.CopyFrom(cur_grad);
+        else
+            prev_grad.Axpby(1.0, cur_grad, beta);
     }
 };
 

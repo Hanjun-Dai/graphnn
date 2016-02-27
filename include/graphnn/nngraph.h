@@ -29,6 +29,20 @@ public:
         InsertLayer(layer, {});
     }
     
+    inline void PrintComputationalGraph()
+    {
+        for (size_t i = 0; i < ordered_layers.size(); ++i)
+        {
+            auto* cur_layer = layer_dict[ordered_layers[i].first];
+            auto& operands = ordered_layers[i].second;
+            
+            std::cerr << "( ";
+            for (auto* layer : operands)
+                std::cerr << layer->name << " ";
+            std::cerr << ") -> " << cur_layer->name << std::endl;
+        }
+    }
+    
     inline void InsertLayer(ILayer<mode, Dtype>* layer, std::vector< ILayer<mode, Dtype>* > operands)
     {
         assert(layer_dict.count(layer->name) == 0);

@@ -22,7 +22,7 @@ public:
     virtual void Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out) override;
     
     virtual void Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
-                            DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad) override;     
+                            DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad, Dtype beta) override;     
 };
 
 template<typename Dtype>
@@ -41,7 +41,7 @@ public:
     virtual void Act(DenseMat<GPU, Dtype>& prev_out, DenseMat<GPU, Dtype>& cur_out) override; 
     
     virtual void Derivative(DenseMat<GPU, Dtype>& dst, DenseMat<GPU, Dtype>& prev_output, 
-                            DenseMat<GPU, Dtype>& cur_output, DenseMat<GPU, Dtype>& cur_grad) override;    
+                            DenseMat<GPU, Dtype>& cur_output, DenseMat<GPU, Dtype>& cur_grad, Dtype beta) override;    
 };
 
 #endif

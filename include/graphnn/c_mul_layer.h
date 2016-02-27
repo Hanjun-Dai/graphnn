@@ -24,7 +24,7 @@ public:
         throw std::runtime_error("not implemented");
     }
     
-    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
     {
         throw std::runtime_error("not implemented");
     }    

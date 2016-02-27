@@ -15,24 +15,25 @@ void ReLULayer<GPU, Dtype>::Act(DenseMat<GPU, Dtype>& prev_out, DenseMat<GPU, Dt
 }
 
 template<typename Dtype>
-__global__ void ReLUDerivKernel(Dtype *d, Dtype *c, int numElements)
+__global__ void ReLUDerivKernel(Dtype *dst, Dtype *out, Dtype* cur_grad, int numElements)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    if (i < numElements)
+    if (i < numElements && out[i] > 0)
     {
-        d[i] = c[i] > 0 ? d[i] : 0;
+        dst[i] += cur_grad[i];
     }
 }
 
 template<typename Dtype>
 void ReLULayer<GPU, Dtype>::Derivative(DenseMat<GPU, Dtype>& dst, DenseMat<GPU, Dtype>& prev_output, 
-                            DenseMat<GPU, Dtype>& cur_output, DenseMat<GPU, Dtype>& cur_grad)
+                            DenseMat<GPU, Dtype>& cur_output, DenseMat<GPU, Dtype>& cur_grad, Dtype beta)
 {
-    dst.CopyFrom(cur_grad);
+    dst.Scale(beta);
+    
     int thread_num = min(c_uCudaThreadNum, dst.count);    
     int blocksPerGrid = (dst.count + thread_num - 1) / thread_num;
-    ReLUDerivKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[dst.streamid] >>>(dst.data, cur_output.data, dst.count);
+    ReLUDerivKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[dst.streamid] >>>(dst.data, cur_output.data, cur_grad.data, dst.count);
 }
 
 template class ReLULayer<GPU, float>;

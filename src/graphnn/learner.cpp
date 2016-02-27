@@ -24,7 +24,7 @@ void MomentumSGDLearner<mode, Dtype>::Update()
     auto& param_list = this->model->GetDiffParams();
             
     for (auto& param_pair : param_list)
-    {
+    {        
         auto& name = param_pair.first;
         auto* param = param_pair.second;        
         if (momentum > 0)

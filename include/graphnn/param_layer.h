@@ -30,16 +30,18 @@ public:
         auto& cur_output = this->state->DenseDerived();
         for (size_t i = 0; i < operands.size(); ++i)
         {
+            if (i == 0)
+                params[i]->ResetOutput(operands[i]->state, &cur_output); 
             params[i]->UpdateOutput(operands[i]->state, &cur_output, i == 0 ? 0.0 : 1.0, phase);
         }
     }
     
-    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
     {
         auto& cur_grad = this->grad->DenseDerived();
         auto& prev_grad = operands[cur_idx]->grad->DenseDerived(); 
 		
-		params[cur_idx]->UpdateGradInput(&prev_grad, &cur_grad);            
+		params[cur_idx]->UpdateGradInput(&prev_grad, &cur_grad, beta);
     }    
     
     void AccDeriv(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx)

@@ -54,18 +54,20 @@ void NNGraph<mode, Dtype>::BackPropagation()
             continue;
         
         for (size_t i = 0; i < operands.size(); ++i)
-        {
+        {            
             auto* prev_layer = operands[i];
             auto prev_id = name_idx_map[prev_layer->name];
             if (prev_layer->properr == PropErr::T)
             {
+                Dtype beta = 1.0;
                 // if we haven't backprop the error to this layer
                 if (! has_grad[ prev_id ])
                 {
+                    beta = 0.0;
                     has_grad[prev_id] = true;
                     prev_layer->grad->DenseDerived().Zeros(prev_layer->state->rows, prev_layer->state->cols);
                 }
-                cur_layer->BackPropErr(operands, i);
+                cur_layer->BackPropErr(operands, i, beta);
             }
             if (cur_layer->HasParam())
                 dynamic_cast<ParamLayer<mode, Dtype>*>(cur_layer)->AccDeriv(operands, i);

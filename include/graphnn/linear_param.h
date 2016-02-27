@@ -31,14 +31,15 @@ public:
 	        Reset(mean, std);
         }
         
+        virtual void ResetOutput(const IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output) override
+        {
+            output->Zeros(input->rows, this->p["weight"]->value.cols);
+        }
+        
         virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
         {
             auto& weight = this->p["weight"]->value;
-            auto& bias = this->p["bias"]->value;
-            
-            if (beta == 0)
-                output->Resize(input->rows, weight.cols);
-                
+                            
             if (input->GetMatType() == DENSE)
                 output->GeMM(input->DenseDerived(), weight, Trans::N, Trans::N, 1.0, beta);
             else
@@ -46,13 +47,14 @@ public:
             
             if (bo == BiasOption::BIAS)
             {
+                auto& bias = this->p["bias"]->value;
                 output->AddRowVec(bias, 1.0);
             }            
         }
         
-        virtual void UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput) override
+        virtual void UpdateGradInput(DenseMat<mode, Dtype>* gradInput, DenseMat<mode, Dtype>* gradOutput, Dtype beta) override
         {
-            gradInput->GeMM(*gradOutput, this->p["weight"]->value, Trans::N, Trans::T, 1.0, 1.0);
+            gradInput->GeMM(*gradOutput, this->p["weight"]->value, Trans::N, Trans::T, 1.0, beta);
         }
                         
 		virtual void AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput) override
@@ -81,11 +83,6 @@ public:
             }
         }
 		
-		virtual size_t OutSize() override
-		{
-			return output_size;
-		}
-        
 protected:
         BiasOption bo; 
 		size_t input_size, output_size;
