@@ -89,19 +89,19 @@ void LoadRaw(const char* f_image, const char* f_label, std::vector< Dtype* >& im
 
 void InitModel()
 {
-    auto* h1_weight = model.add_diff< LinearParam >("w_h1", dim, 1024, 0, 0.01);
-    auto* h2_weight = model.add_diff< LinearParam >("w_h2", 1024, 1024, 0, 0.01);
-    auto* o_weight = model.add_diff< LinearParam >("w_o", 1024, 10, 0, 0.01);
+    auto* h1_weight = add_diff< LinearParam >(model, "w_h1", dim, 1024, 0, 0.01);
+    auto* h2_weight = add_diff< LinearParam >(model, "w_h2", 1024, 1024, 0, 0.01);
+    auto* o_weight = add_diff< LinearParam >(model, "w_o", 1024, 10, 0, 0.01);
     
-    auto* input_layer = g.cl< InputLayer >("input", {});
-    auto* h1 = g.cl< ParamLayer >({input_layer}, {h1_weight});    
-    auto* relu_1 = g.cl< ReLULayer >({h1});     
-    auto* h2 = g.cl< ParamLayer >({relu_1}, {h2_weight});
-    auto* relu_2 = g.cl< ReLULayer >({h2});
-    auto* output = g.cl< ParamLayer >({relu_2}, {o_weight});
+    auto* input_layer = cl< InputLayer >("input", g, {});
+    auto* h1 = cl< ParamLayer >(g, {input_layer}, {h1_weight});    
+    auto* relu_1 = cl< ReLULayer >(g, {h1});     
+    auto* h2 = cl< ParamLayer >(g, {relu_1}, {h2_weight});
+    auto* relu_2 = cl< ReLULayer >(g, {h2});
+    auto* output = cl< ParamLayer >(g, {relu_2}, {o_weight});
     
-    g.cl< ClassNLLCriterionLayer >("classnll", {output}, true);
-    g.cl< ErrCntCriterionLayer >("errcnt", {output});
+    cl< ClassNLLCriterionLayer >("classnll", g, {output}, true);
+    cl< ErrCntCriterionLayer >("errcnt", g, {output});
 }
 
 void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int >& labels)

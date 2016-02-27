@@ -17,17 +17,13 @@ public:
             diff_params.clear();
             const_params.clear();
             param_list.clear();
-        }
+        }      
         
-        template<template <MatMode, typename> class ParamType, typename... Args>    
-        IDiffParam<mode, Dtype>* add_diff(std::string param_name, Args&&... args)
+        inline void AddParam(IDiffParam<mode, Dtype>* param)
         {
             flatten = false;
-            assert(diff_params.count(param_name) == 0);
-            
-            IDiffParam<mode, Dtype>* param = new ParamType<mode, Dtype>(param_name, std::forward<Args>(args)...);
-            diff_params[param_name] = param;
-            return param;           
+            assert(diff_params.count(param->name) == 0);     
+            diff_params[param->name] = param;       
         }
                
         std::map< std::string, PP<mode, Dtype>* >& GetDiffParams()
@@ -51,9 +47,16 @@ public:
         
         std::map< std::string, IDiffParam<mode, Dtype>* > diff_params;
         std::map< std::string, IConstParam<mode, Dtype>* > const_params;
-private:        
         bool flatten;                  
         std::map< std::string, PP<mode, Dtype>* > param_list;
 };
+
+template<template <MatMode, typename> class ParamType, MatMode mode, typename Dtype, typename... Args>    
+IDiffParam<mode, Dtype>* add_diff(Model<mode, Dtype>& model, std::string param_name, Args&&... args)
+{
+        auto* param = new ParamType<mode, Dtype>(param_name, std::forward<Args>(args)...);
+        model.AddParam(param);                                            
+        return param;
+}
 
 #endif

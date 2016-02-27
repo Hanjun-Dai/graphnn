@@ -35,47 +35,7 @@ public:
         layer_dict[layer->name] = layer;
         name_idx_map[layer->name] = ordered_layers.size();
         ordered_layers.push_back(std::make_pair(layer->name, operands));        
-    }
-    
-    template<template <MatMode, typename> class LayerType, typename... Args>
-    inline ILayer<mode, Dtype>* cl(std::vector< ILayer<mode, Dtype>* > operands, Args&&... args)
-    {
-        return cl<LayerType>(fmt::sprintf("%s-layer-%d", LayerType<mode, Dtype>::str_type(), layer_dict.size()), 
-                             operands, 
-                             std::forward<Args>(args)...);
-    }
-    
-    template<template <MatMode, typename> class LayerType, typename... Args>
-    inline ILayer<mode, Dtype>* cl(std::string layer_name, 
-                            std::vector< ILayer<mode, Dtype>* > operands, 
-                            Args&&... args)
-    {        
-        auto* layer = new LayerType<mode, Dtype>(layer_name, std::forward<Args>(args)...);
-        InsertLayer(layer, operands);
-        return layer;   
-    }
-    
-    template<template <MatMode, typename> class LayerType, typename... Args>
-    inline ILayer<mode, Dtype>* cl(std::vector< ILayer<mode, Dtype>* > operands,
-                                   std::vector< IParam<mode, Dtype>* > params, 
-                                   Args&&... args)
-    {        
-        return cl<LayerType>(fmt::sprintf("%s-layer-%d", LayerType<mode, Dtype>::str_type(), layer_dict.size()),
-                             operands, 
-                             params,                               
-                             std::forward<Args>(args)...);
-    }
-    // workaround for deducting list
-    template<template <MatMode, typename> class LayerType, typename... Args>
-    inline ILayer<mode, Dtype>* cl(std::string layer_name,
-                                   std::vector< ILayer<mode, Dtype>* > operands,
-                                   std::vector< IParam<mode, Dtype>* > params, 
-                                   Args&&... args)
-    {
-        auto* layer = new LayerType<mode, Dtype>(layer_name, params, std::forward<Args>(args)...);
-        InsertLayer(layer, operands);
-        return layer;
-    }                  
+    }                          
     
     template<MatMode anotherMode>
     void GetState(std::string layer_name, DenseMat<anotherMode, Dtype>& dst)
@@ -90,5 +50,52 @@ public:
     std::vector< std::pair<std::string, std::vector< ILayer<mode, Dtype>* > > > ordered_layers;
     std::vector< bool > has_grad;    
 };
+
+template<template <MatMode, typename> class LayerType, MatMode mode, typename Dtype, typename... Args>
+inline ILayer<mode, Dtype>* cl(NNGraph<mode, Dtype>& gnn,
+                               std::vector< ILayer<mode, Dtype>* > operands, Args&&... args)
+{
+        return cl<LayerType>(fmt::sprintf("%s-layer-%d", LayerType<mode, Dtype>::str_type(), gnn.layer_dict.size()),
+                             gnn, 
+                             operands, 
+                             std::forward<Args>(args)...);
+}
+    
+template<template <MatMode, typename> class LayerType, MatMode mode, typename Dtype, typename... Args>
+inline ILayer<mode, Dtype>* cl(const std::string layer_name, 
+                               NNGraph<mode, Dtype>& gnn,                                
+                               std::vector< ILayer<mode, Dtype>* > operands, 
+                               Args&&... args)
+{        
+        auto* layer = new LayerType<mode, Dtype>(layer_name, std::forward<Args>(args)...);
+        gnn.InsertLayer(layer, operands);
+        return layer;
+}
+
+template<template <MatMode, typename> class LayerType, MatMode mode, typename Dtype, typename... Args>
+inline ILayer<mode, Dtype>* cl(NNGraph<mode, Dtype>& gnn, 
+                               std::vector< ILayer<mode, Dtype>* > operands,
+                               std::vector< IParam<mode, Dtype>* > params, 
+                               Args&&... args)
+{        
+        return cl<LayerType>(fmt::sprintf("%s-layer-%d", LayerType<mode, Dtype>::str_type(), gnn.layer_dict.size()),
+                             gnn, 
+                             operands, 
+                             params,                               
+                             std::forward<Args>(args)...);
+}
+
+// workaround for deducting list
+template<template <MatMode, typename> class LayerType, MatMode mode, typename Dtype, typename... Args>
+inline ILayer<mode, Dtype>* cl(const std::string layer_name,
+                               NNGraph<mode, Dtype>& gnn,
+                               std::vector< ILayer<mode, Dtype>* > operands,
+                               std::vector< IParam<mode, Dtype>* > params, 
+                               Args&&... args)
+{
+        auto* layer = new LayerType<mode, Dtype>(layer_name, params, std::forward<Args>(args)...);
+        gnn.InsertLayer(layer, operands);
+        return layer;
+}
 
 #endif

@@ -14,10 +14,9 @@ public:
                 : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr) 
             {
                 this->grad = new DenseMat<mode, Dtype>();
-                this->graph_output = nullptr;
             }
                         			
-			virtual Dtype IMatrix(IMatrix<mode, Dtype>* ground_truth) override
+			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
             {
                 Dtype loss = 0.0;
                 auto& node_diff = this->grad->DenseDerived();			
