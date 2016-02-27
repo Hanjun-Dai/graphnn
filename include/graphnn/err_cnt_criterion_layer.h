@@ -1,25 +1,40 @@
 #ifndef ERR_CNT_CRITERION_LAYER_H
 #define ERR_CNT_CRITERION_LAYER_H
 
-#include "icriterion_layer.h"
+#include "i_criterion_layer.h"
 #include "dense_matrix.h"
 #include "sparse_matrix.h"
-
-
-template<MatMode mode, typename Dtype>
-Dtype GetErrCNT(DenseMat<mode, Dtype>& pred, SparseMat<mode, Dtype>& label, DenseMat<mode, Dtype>& buf); 
+#include "loss_func.h"
 
 template<MatMode mode, typename Dtype>
 class ErrCntCriterionLayer : public ICriterionLayer<mode, Dtype>
 {
 public:
-			ErrCntCriterionLayer(std::string _name);
-			
-			virtual Dtype GetLoss(GraphData<mode, Dtype>* graph_truth) override;
-			virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override {}
+			ErrCntCriterionLayer(std::string _name)
+                : ICriterionLayer<mode, Dtype>(_name, PropErr::N)
+                {
+                    
+                }           
+                     
+            static std::string str_type()
+            {
+                return "ErrCnt"; 
+            }
             
+			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
+            {
+                auto& pred = this->state->DenseDerived();
+                auto& labels = ground_truth->SparseDerived();          
+                Dtype loss = LossFunc<mode, Dtype>::GetErrCnt(pred, labels);
+                return loss;
+            }
+            
+            virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
+            {
+                throw std::runtime_error("no grad in this layer");
+            }                
+                        
 protected:
-            DenseMat<mode, Dtype> buf;
 };
 
 #endif

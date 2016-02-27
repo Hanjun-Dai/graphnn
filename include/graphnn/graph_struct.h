@@ -1,3 +1,4 @@
+
 #ifndef GRAPH_STRUCT_H
 #define GRAPH_STRUCT_H
 
@@ -51,29 +52,7 @@ private:
 		int ncap;		
 };
 
-template<typename T>
 class GraphStruct
-{
-public:
-	GraphStruct();
-	~GraphStruct();
-	
-	void AddEdge(int idx, T x, T y);	
-	void AddNode(int subg_id, T n_idx);
-	void Resize(unsigned _num_subgraph, unsigned _num_nodes = 0);
-	void TopSort(std::vector<std::pair<T, T> >& sorted_edges);
-	
-    LinkedTable< std::pair<int, int> > *out_edges, *in_edges;
-	LinkedTable< int >* subgraph;
-	unsigned num_nodes, num_edges, num_subgraph;
-		
-	std::vector<int> degree_in;
-	std::map<T, int> idx_map;
-	std::map<int, T> t_map;
-};
-
-template<>
-class GraphStruct<int>
 {
 public:
 	GraphStruct()

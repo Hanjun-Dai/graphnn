@@ -1,7 +1,7 @@
 #ifndef I_ACT_LAYER_H
 #define I_ACT_LAYER_H
 
-#include "ilayer.h"
+#include "i_layer.h"
 
 enum class WriteType
 {
@@ -14,70 +14,43 @@ class IActLayer : public ILayer<mode, Dtype>
 {
 public:
 	
-	IActLayer(std::string _name, GraphAtt _at, WriteType _wt, PropErr _properr = PropErr::T) : ILayer<mode, Dtype>(_name, _at, _properr), wt(_wt)
+	IActLayer(std::string _name, WriteType _wt, PropErr _properr = PropErr::T) 
+        : ILayer<mode, Dtype>(_name, _properr), wt(_wt)
     {
-        this->graph_output = new GraphData<mode, Dtype>(DENSE);		
-		this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
+        this->state = new DenseMat<mode, Dtype>();
+        this->grad = new DenseMat<mode, Dtype>();
     }
-
-    virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override
+    
+    virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
-        assert(sv == SvType::WRITE2);
-        auto* prev_output = prev_layer->graph_output;
-		this->graph_output->graph = prev_output->graph;
-		
-		if (this->wt == WriteType::INPLACE)
-		{
-			this->graph_output->node_states = prev_output->node_states;
-			this->graph_output->edge_states = prev_output->edge_states; 
-		} else 
-		{
-			this->graph_output->node_states->DenseDerived().Resize(prev_output->node_states->rows, prev_output->node_states->cols);
-			this->graph_output->edge_states->DenseDerived().Resize(prev_output->edge_states->rows, prev_output->edge_states->cols);
-		}
-		
-        auto& prev_state = GetImatState(prev_output, this->at)->DenseDerived();
-        auto& cur_state = GetImatState(this->graph_output, this->at)->DenseDerived();
-         
-        Act(prev_state, cur_state);        
+        assert(operands.size() == 1);
+        auto* prev_state = operands[0]->state;
+        
+        if (wt == WriteType::INPLACE)
+            this->state = prev_state;
+        else 
+            this->state->DenseDerived().Resize(prev_state->rows, prev_state->cols);
+        
+        Act(prev_state->DenseDerived(), this->state->DenseDerived());             
     }
-
-    virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override
+    
+    virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
     {
-        auto& prev_grad = GetImatState(prev_layer->graph_gradoutput, this->at)->DenseDerived();			
-		auto& cur_grad = GetImatState(this->graph_gradoutput, this->at)->DenseDerived();            
-        auto& prev_output = GetImatState(prev_layer->graph_output, this->at)->DenseDerived();
-		auto& cur_output = GetImatState(this->graph_output, this->at)->DenseDerived();
-                        
-        prev_grad.Resize(cur_grad.rows, cur_grad.cols);
-        Derivative(prev_grad, prev_output, cur_output, cur_grad);        
+        assert(operands.size() == 1 && cur_idx == 0);
+        
+        auto& prev_grad = operands[0]->grad->DenseDerived();			
+		auto& cur_grad = this->grad->DenseDerived();            
+        auto& prev_output = operands[0]->state->DenseDerived();
+		auto& cur_output = this->state->DenseDerived();
+                                
+        Derivative(prev_grad, prev_output, cur_output, cur_grad, beta);        
     }
     
     virtual void Act(DenseMat<mode, Dtype>& prev_out, DenseMat<mode, Dtype>& cur_out) = 0;
-    virtual void Derivative(DenseMat<mode, Dtype>& dst, DenseMat<mode, Dtype>& prev_output, DenseMat<mode, Dtype>& cur_output, DenseMat<mode, Dtype>& cur_grad) = 0;
-	
+    virtual void Derivative(DenseMat<mode, Dtype>& dst, DenseMat<mode, Dtype>& prev_output, 
+                            DenseMat<mode, Dtype>& cur_output, DenseMat<mode, Dtype>& cur_grad, Dtype beta) = 0;
+                                    
 	WriteType wt;
 };
 
-/*
-template<MatMode mode, typename Dtype>
-class SigmoidLayer : public IActLayer<mode, Dtype>
-{
-public:
-	typedef typename std::map<std::string, ILayer<mode, Dtype>* >::iterator layeriter;		
-	SigmoidLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T);
-	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override;
-	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override;
-};
-
-template<MatMode mode, typename Dtype>
-class SoftmaxLayer : public IActLayer<mode, Dtype>
-{
-public:
-	typedef typename std::map<std::string, ILayer<mode, Dtype>* >::iterator layeriter;
-	SoftmaxLayer(std::string _name, WriteType _wt, GraphAtt _at, PropErr _properr = PropErr::T);
-	virtual void UpdateOutput(ILayer<mode, Dtype>* prev_layer, SvType sv, Phase phase) override;
-	virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override;
-};
-*/
 #endif

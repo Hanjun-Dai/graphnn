@@ -1,7 +1,7 @@
 #ifndef MSE_CRITERION_LAYER_H
 #define MSE_CRITERION_LAYER_H
 
-#include "icriterion_layer.h"
+#include "i_criterion_layer.h"
 #include "dense_matrix.h"
 
 template<MatMode mode, typename Dtype>
@@ -14,32 +14,32 @@ public:
 			MSECriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T)
                 : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr)
             {
-                this->graph_gradoutput = new GraphData<mode, Dtype>(DENSE);
-                this->graph_output = nullptr;
+                this->grad = new DenseMat<mode, Dtype>();
             }
             
-			virtual Dtype GetLoss(GraphData<mode, Dtype>* graph_truth) override
+			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
             {		
-		        int batch_size = graph_truth->node_states->rows;
-                auto& node_diff = this->graph_gradoutput->node_states->DenseDerived();						
-                node_diff.GeaM(1.0, Trans::N, this->graph_output->node_states->DenseDerived(), -1.0, Trans::N, graph_truth->node_states->DenseDerived());
+                auto& node_diff = this->grad->DenseDerived();						
+                node_diff.GeaM(1.0, Trans::N, this->state->DenseDerived(), -1.0, Trans::N, ground_truth->DenseDerived());
                 Dtype norm2 = node_diff.Norm2();
                 Dtype loss = norm2 * norm2;
                 
                 if (this->properr == PropErr::T)
-                    node_diff.Scale(2.0 * this->lambda / batch_size);   
+                    node_diff.Scale(2.0 * this->lambda / ground_truth->rows);   
 		        return loss;
             }
             
-			virtual void BackPropErr(ILayer<mode, Dtype>* prev_layer, SvType sv) override
+			virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
             {
-                auto& cur_grad = this->graph_gradoutput->node_states->DenseDerived();
-		        auto& prev_grad = prev_layer->graph_gradoutput->node_states->DenseDerived();
+                assert(operands.size() == 1 && cur_idx == 0);
+                
+                auto& cur_grad = this->grad->DenseDerived();
+		        auto& prev_grad = operands[0]->grad->DenseDerived();
 		
-		        if (sv == SvType::WRITE2)
+                if (beta == 0)
                     prev_grad.CopyFrom(cur_grad);
-		        else // add2
-			        prev_grad.Axpy(1.0, cur_grad);	
+                else
+                    prev_grad.Axpby(1.0, cur_grad, beta);	
             }
 };
 
