@@ -24,13 +24,17 @@ public:
             
     void BackPropagation();
     
-    inline ILayer<mode, Dtype>* InsertLayer(ILayer<mode, Dtype>* layer, std::vector< ILayer<mode, Dtype>* > operands)
+    inline void InsertLayer(ILayer<mode, Dtype>* layer)
+    {
+        InsertLayer(layer, {});
+    }
+    
+    inline void InsertLayer(ILayer<mode, Dtype>* layer, std::vector< ILayer<mode, Dtype>* > operands)
     {
         assert(layer_dict.count(layer->name) == 0);
         layer_dict[layer->name] = layer;
         name_idx_map[layer->name] = ordered_layers.size();
-        ordered_layers.push_back(std::make_pair(layer->name, operands));
-        return layer;
+        ordered_layers.push_back(std::make_pair(layer->name, operands));        
     }
     
     template<template <MatMode, typename> class LayerType, typename... Args>
@@ -47,7 +51,8 @@ public:
                             Args&&... args)
     {        
         auto* layer = new LayerType<mode, Dtype>(layer_name, std::forward<Args>(args)...);
-        return InsertLayer(layer, operands);   
+        InsertLayer(layer, operands);
+        return layer;   
     }
     
     template<template <MatMode, typename> class LayerType, typename... Args>
@@ -68,8 +73,17 @@ public:
                                    Args&&... args)
     {
         auto* layer = new LayerType<mode, Dtype>(layer_name, params, std::forward<Args>(args)...);
-        return InsertLayer(layer, operands);
-    }                                   
+        InsertLayer(layer, operands);
+        return layer;
+    }                  
+    
+    template<MatMode anotherMode>
+    void GetState(std::string layer_name, DenseMat<anotherMode, Dtype>& dst)
+    {
+        assert(layer_dict.count(layer_name));
+        auto& output = layer_dict[layer_name]->state->DenseDerived();
+        dst.CopyFrom(output);
+    }
     
     std::map< std::string, unsigned > name_idx_map;
     std::map< std::string, ILayer<mode, Dtype>* > layer_dict;

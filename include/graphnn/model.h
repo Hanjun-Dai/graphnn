@@ -20,10 +20,9 @@ public:
         }
         
         template<template <MatMode, typename> class ParamType, typename... Args>    
-        IDiffParam<mode, Dtype>* add_diff(Args&&... args)
+        IDiffParam<mode, Dtype>* add_diff(std::string param_name, Args&&... args)
         {
             flatten = false;
-            auto param_name = fmt::sprintf("diff-param-%d", diff_params.size());
             assert(diff_params.count(param_name) == 0);
             
             IDiffParam<mode, Dtype>* param = new ParamType<mode, Dtype>(param_name, std::forward<Args>(args)...);
@@ -50,9 +49,9 @@ public:
             }
         }
         
-private:
         std::map< std::string, IDiffParam<mode, Dtype>* > diff_params;
         std::map< std::string, IConstParam<mode, Dtype>* > const_params;
+private:        
         bool flatten;                  
         std::map< std::string, PP<mode, Dtype>* > param_list;
 };

@@ -89,9 +89,9 @@ void LoadRaw(const char* f_image, const char* f_label, std::vector< Dtype* >& im
 
 void InitModel()
 {
-    auto* h1_weight = model.add_diff< LinearParam >(dim, 1024, 0, 0.01);
-    auto* h2_weight = model.add_diff< LinearParam >(1024, 1024, 0, 0.01);
-    auto* o_weight = model.add_diff< LinearParam >(1024, 10, 0, 0.01);
+    auto* h1_weight = model.add_diff< LinearParam >("w_h1", dim, 1024, 0, 0.01);
+    auto* h2_weight = model.add_diff< LinearParam >("w_h2", 1024, 1024, 0, 0.01);
+    auto* o_weight = model.add_diff< LinearParam >("w_o", 1024, 10, 0, 0.01);
     
     auto* input_layer = g.cl< InputLayer >("input", {});
     auto* h1 = g.cl< ParamLayer >({input_layer}, {h1_weight});    
