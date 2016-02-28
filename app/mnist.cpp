@@ -9,14 +9,15 @@
 #include "param_layer.h"
 #include "linear_param.h"
 #include "input_layer.h"
+#include "softmax_layer.h"
 #include "relu_layer.h"
 #include "classnll_criterion_layer.h"
 #include "err_cnt_criterion_layer.h"
 #include "model.h"
 #include "learner.h"
 
-typedef double Dtype;
-const MatMode mode = CPU;
+typedef float Dtype;
+const MatMode mode = GPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
 int dev_id;

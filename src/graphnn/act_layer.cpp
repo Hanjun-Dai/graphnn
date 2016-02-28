@@ -1,5 +1,6 @@
 #include "relu_layer.h"
 #include "sigmoid_layer.h"
+#include "softmax_layer.h"
 #include "mkl_helper.h"
 #include "dense_matrix.h"
 
@@ -44,3 +45,39 @@ void SigmoidLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CP
 
 template class SigmoidLayer<CPU, float>;
 template class SigmoidLayer<CPU, double>;
+
+// =========================================== softmax layer ================================================
+
+template<typename Dtype>
+void SoftmaxLayer<CPU, Dtype>::Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out)
+{
+        if (&cur_out != &prev_out)
+            cur_out.CopyFrom(prev_out);
+        cur_out.Softmax();
+}
+
+template<typename Dtype>
+void SoftmaxLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
+                               DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad, Dtype beta)
+{
+    buf.CopyFrom(cur_grad);
+    
+    Dtype z;    
+    size_t offset = 0;
+    for (size_t i = 0; i < buf.rows; ++i)
+    {
+        z = MKLHelper_Dot(buf.cols, cur_grad.data + offset, cur_output.data + offset);
+        
+        for (size_t j = 0; j < buf.cols; ++j)
+            buf.data[offset + j] -= z;
+        
+        offset += buf.cols; 
+    }
+    
+    buf.EleWiseMul(cur_output);
+    
+    dst.Axpby(1.0, buf, beta);
+}
+
+template class SoftmaxLayer<CPU, float>;
+template class SoftmaxLayer<CPU, double>;
