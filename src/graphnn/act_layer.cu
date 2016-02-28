@@ -1,4 +1,5 @@
 #include "relu_layer.h"
+#include "sigmoid_layer.h"
 #include "dense_matrix.h"
 #include "cuda_helper.h"
 #include "cuda_unary_kernel.cuh"
@@ -38,3 +39,36 @@ void ReLULayer<GPU, Dtype>::Derivative(DenseMat<GPU, Dtype>& dst, DenseMat<GPU, 
 
 template class ReLULayer<GPU, float>;
 template class ReLULayer<GPU, double>;
+
+// =========================================== sigmoid layer ================================================
+
+template<typename Dtype>
+void SigmoidLayer<GPU, Dtype>::Act(DenseMat<GPU, Dtype>& prev_out, DenseMat<GPU, Dtype>& cur_out)
+{
+    UnaryOp(cur_out.data, prev_out.data, prev_out.count, UnarySigmoid<Dtype>(), cur_out.streamid);
+}
+
+template<typename Dtype>
+__global__ void SigmoidDerivKernel(Dtype *dst, Dtype* cur_grad, Dtype* cur_output, int numElements)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    if (i < numElements)
+    {
+        dst[i] += cur_grad[i] * cur_output[i] * (1 - cur_output[i]);
+    }
+}
+
+template<typename Dtype>
+void SigmoidLayer<GPU, Dtype>::Derivative(DenseMat<GPU, Dtype>& dst, DenseMat<GPU, Dtype>& prev_output, 
+                            DenseMat<GPU, Dtype>& cur_output, DenseMat<GPU, Dtype>& cur_grad, Dtype beta)
+{
+    dst.Scale(beta);
+    
+    int thread_num = min(c_uCudaThreadNum, dst.count);    
+    int blocksPerGrid = (dst.count + thread_num - 1) / thread_num;
+    SigmoidDerivKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[dst.streamid] >>>(dst.data, cur_grad.data, cur_output.data, dst.count);
+}
+
+template class SigmoidLayer<GPU, float>;
+template class SigmoidLayer<GPU, double>;

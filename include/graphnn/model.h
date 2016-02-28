@@ -23,13 +23,15 @@ public:
         {
             flatten = false;
             assert(diff_params.count(param->name) == 0);     
-            diff_params[param->name] = param;       
+            diff_params[param->name] = param;
+            all_params[param->name] = param;       
         }
         
         inline void AddParam(IConstParam<mode, Dtype>* param)
         {
             assert(const_params.count(param->name) == 0);
             const_params[param->name] = param;
+            all_params[param->name] = param;
         }
         
         inline void SetupConstParams(std::map<std::string, void*> arg_dict)
@@ -62,8 +64,9 @@ public:
         
         std::map< std::string, IDiffParam<mode, Dtype>* > diff_params;
         std::map< std::string, IConstParam<mode, Dtype>* > const_params;
+        std::map< std::string, IParam<mode, Dtype>*> all_params;
         bool flatten;                  
-        std::map< std::string, PP<mode, Dtype>* > param_list;
+        std::map< std::string, PP<mode, Dtype>* > param_list;        
 };
 
 template<template <MatMode, typename> class ParamType, MatMode mode, typename Dtype, typename... Args>    
