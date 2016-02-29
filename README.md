@@ -37,18 +37,16 @@ Tested under Ubuntu 14.04
     make
     make install
     
-#### Build package
+#### Build static library
 
-    edit core_makefile
-    set GNN_HOME to the root folder of this package
     make
     
 #### Run example
 
 ##### Run mnist
 
-    Download and uncompress the data from http://yann.lecun.com/exdb/mnist/
-    setup the path in run_exp.sh under the package root folder
+    cd examples/mnist
+    make
     ./run_exp.sh
     
     
