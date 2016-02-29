@@ -1,8 +1,11 @@
-//#include "nn_common.h"
+#include "nn_common.h"
 #include <set>
 
 void InitModel()
 {
+    init_const_dict["n2n"] = &graph;
+	init_const_dict["e2n"] = &graph;
+	init_const_dict["subgraph_pool"] = &graph;
 /*    
 	const Dtype init_scale = 0.01;
 	
@@ -74,7 +77,6 @@ void InitModel()
 
 int main(int argc, const char** argv)
 {
-    /*
 	cfg::LoadParams(argc, argv);			
 
 	GPUHandle::Init(cfg::dev_id);	
@@ -95,13 +97,11 @@ int main(int argc, const char** argv)
 	}
 	std::cerr << "dimension of node feature: " << cfg::node_dim << std::endl;
 
-	GetBatch(train_idx, 1, 1);
-
 	InitModel();
 
     MainLoop(); 
 	
 	GPUHandle::Destroy();
-    */
+    
 	return 0;
 }

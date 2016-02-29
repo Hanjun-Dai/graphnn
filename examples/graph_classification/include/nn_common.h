@@ -12,6 +12,8 @@
 #include "cppformat/format.h"
 #include "relu_layer.h"
 #include "c_add_layer.h"
+#include "learner.h"
+#include "model.h"
 #include "classnll_criterion_layer.h"
 #include "err_cnt_criterion_layer.h"
 const MatMode mode = CPU;
@@ -21,8 +23,12 @@ std::vector<int> labels;
 std::vector<int> train_idx, test_idx;
 
 NNGraph<mode, Dtype> gnn;
+Model<mode, Dtype> model;
+MomentumSGDLearner<mode, Dtype>* learner;
+std::map<std::string, void*> init_const_dict;
 DenseMat<CPU, Dtype> x_cpu;
 SparseMat<CPU, Dtype> y_cpu;
+GraphStruct graph;
 
 DenseMat<mode, Dtype> input;
 SparseMat<mode, Dtype> label;
@@ -47,8 +53,8 @@ inline void GetBatch(const std::vector<int>& idx_list, unsigned st, unsigned num
 		prefix_sum[i] = prefix_sum[i - 1]; // shift
 	prefix_sum[0] = 0;	
 	
-	g_input.graph->Resize(num, node_cnt);
-	g_label.graph->Resize(1, num);
+	graph.Resize(num, node_cnt);
+    
 	x_cpu.Zeros(node_cnt, cfg::node_dim);
 	y_cpu.Resize(num, cfg::num_class);
 	y_cpu.ResizeSp(num, num + 1); 
@@ -62,7 +68,7 @@ inline void GetBatch(const std::vector<int>& idx_list, unsigned st, unsigned num
 		{
 			ptr[g.node_label[j]] = 1.0;
 			ptr += cfg::node_dim;
-			g_input.graph->AddNode(i - st, prefix_sum[i - st] + j);
+			graph.AddNode(i - st, prefix_sum[i - st] + j);
 		}
 	}
 	
@@ -77,7 +83,7 @@ inline void GetBatch(const std::vector<int>& idx_list, unsigned st, unsigned num
 			for (size_t k = 0; k < g.adj.head[j].size(); ++k)
 			{
 				y = prefix_sum[i - st] + g.adj.head[j][k];
-				g_input.graph->AddEdge(cur_edge, x, y);	
+				graph.AddEdge(cur_edge, x, y);	
 				cur_edge++;
 			}
 		}
@@ -92,20 +98,21 @@ inline void GetBatch(const std::vector<int>& idx_list, unsigned st, unsigned num
     }
     y_cpu.data->ptr[num] = num;
 
-	g_input.node_states->DenseDerived().CopyFrom(x_cpu);
-	g_label.node_states->SparseDerived().CopyFrom(y_cpu);
+	input.CopyFrom(x_cpu);
+	label.CopyFrom(y_cpu);    
 }
 
 void MainLoop()
 {
-	DenseMat<CPU, Dtype> output_buf;
-	int max_iter = (long long)cfg::max_epoch; // * (long long)train_idx.size() / cfg::batch_size;
+    learner = new MomentumSGDLearner<mode, Dtype>(&model, cfg::lr, cfg::momentum, cfg::l2_penalty);
+    
+	int max_iter = (long long)cfg::max_epoch * (long long)train_idx.size() / cfg::batch_size;
 	unsigned cur_pos = 0;
 	int init_iter = cfg::iter;
 	if (init_iter > 0)
 	{
 		std::cerr << fmt::sprintf("loading model for iter=%d", init_iter) << std::endl;
-		gnn.Load(fmt::sprintf("%s/iter_%d.model", cfg::save_dir, init_iter));
+		//gnn.Load(fmt::sprintf("%s/iter_%d.model", cfg::save_dir, init_iter));
 	}
 	
 	Dtype nll, err;
@@ -118,8 +125,9 @@ void MainLoop()
 			for (unsigned i = 0; i < test_idx.size(); i += cfg::batch_size)
 			{
 				GetBatch(test_idx, i, cfg::batch_size);
-				gnn.ForwardData({{"input", &g_input}}, TEST);
-				auto loss_map = gnn.ForwardLabel({{"classnll", &g_label}, {"errcnt", &g_label}});
+                model.SetupConstParams(init_const_dict); 
+				gnn.ForwardData({{"input", &input}}, TEST);
+				auto loss_map = gnn.ForwardLabel({{"classnll", &label}, {"errcnt", &label}});
 				nll += loss_map["classnll"];
 			 	err += loss_map["errcnt"];
 			}
@@ -131,7 +139,7 @@ void MainLoop()
 		if (cfg::iter % cfg::save_interval == 0 && cfg::iter != init_iter)
 		{			
 			printf("saving model for iter=%d\n", cfg::iter);			
-			gnn.Save(fmt::sprintf("%s/iter_%d.model", cfg::save_dir, cfg::iter));
+			//gnn.Save(fmt::sprintf("%s/iter_%d.model", cfg::save_dir, cfg::iter));
 		}
 		
 		if (cur_pos + cfg::batch_size > train_idx.size())
@@ -141,8 +149,9 @@ void MainLoop()
 		}
 	
 		GetBatch(train_idx, cur_pos, cfg::batch_size);
-		gnn.ForwardData({{"input", &g_input}}, TRAIN);
-		auto loss_map = gnn.ForwardLabel({{"classnll", &g_label}, {"errcnt", &g_label}});
+        model.SetupConstParams(init_const_dict); 
+		gnn.ForwardData({{"input", &input}}, TRAIN);
+		auto loss_map = gnn.ForwardLabel({{"classnll", &label}, {"errcnt", &label}});
 		
     	if (cfg::iter % cfg::report_interval == 0)
 		{
@@ -150,7 +159,7 @@ void MainLoop()
 		}
 		
 		gnn.BackPropagation();
-		gnn.UpdateParams(cfg::lr, cfg::l2_penalty, cfg::momentum);
+        learner->Update();
 	}
 }
 
