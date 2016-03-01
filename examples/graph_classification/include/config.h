@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <cstring>
 
-typedef double Dtype;
+typedef float Dtype;
 
 struct cfg
 {

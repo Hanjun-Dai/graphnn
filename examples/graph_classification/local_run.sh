@@ -1,18 +1,18 @@
 #!/bin/bash
 
-DATA=MUTAG
+DATA=ENZYMES
 
-DATA_ROOT=$HOME/Research/molecule_learning/data/graph_kernel/$DATA
-RESULT_ROOT=$HOME/scratch/results/graph_kernel/$DATA
+DATA_ROOT=data/$DATA
+RESULT_ROOT=results
 
 tool=kernel_mean_field
 
 LV=3
-CONV_SIZE=16
+CONV_SIZE=64
 FP_LEN=0
-n_hidden=32
+n_hidden=64
 bsize=50
-learning_rate=0.01
+learning_rate=0.001
 max_iter=200000
 cur_iter=0
 dev_id=0

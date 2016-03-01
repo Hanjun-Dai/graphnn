@@ -1,4 +1,5 @@
 build/
-data/
+**/mnist/data/
 saved*/
 debug*
+results/
