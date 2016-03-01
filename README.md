@@ -48,5 +48,12 @@ Tested under Ubuntu 14.04
     cd examples/mnist
     make
     ./run_exp.sh
+
+##### Run graph classification
+
+    cd examples/graph_classification
+    make
+    ./local_run.sh
     
+    The 5 datasets under the data/ folder are commonly used in graph kernel. 
     
