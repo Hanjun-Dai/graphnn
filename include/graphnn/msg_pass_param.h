@@ -113,7 +113,7 @@ public:
                 for (int j = 0; j < graph->num_subgraph; ++j)
                     assert(graph->subgraph->head[j][i] == j * node_per_graph + i); 
             
-            output->Zeros(graph->num_subgraph, graph->num_nodes / graph->num_subgraph * input->cols);
+            output->Zeros(graph->num_subgraph, node_per_graph * input->cols);
         }
              				 		
 		virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase) override
