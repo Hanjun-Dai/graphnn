@@ -37,10 +37,10 @@ template class IMessagePassParam<CPU, float>;
 template class IMessagePassParam<GPU, double>;
 template class IMessagePassParam<GPU, float>;
 
-// =============================== Node2NodePoolParam =========================================
+// =============================== Node2NodeMsgParam =========================================
 
 template<MatMode mode, typename Dtype>
-void Node2NodePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
+void Node2NodeMsgParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 {
         this->cpu_weight->Resize(graph->num_nodes, graph->num_nodes);		
 		this->cpu_weight->ResizeSp(graph->num_edges, graph->num_nodes + 1);
@@ -62,15 +62,15 @@ void Node2NodePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 		data->ptr[graph->num_nodes] = nnz;
 }
 
-template class Node2NodePoolParam<CPU, double>;
-template class Node2NodePoolParam<CPU, float>;
-template class Node2NodePoolParam<GPU, double>;
-template class Node2NodePoolParam<GPU, float>;
+template class Node2NodeMsgParam<CPU, double>;
+template class Node2NodeMsgParam<CPU, float>;
+template class Node2NodeMsgParam<GPU, double>;
+template class Node2NodeMsgParam<GPU, float>;
 
-// =============================== Edge2NodePoolParam =========================================
+// =============================== Edge2NodeMsgParam =========================================
 
 template<MatMode mode, typename Dtype>
-void Edge2NodePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
+void Edge2NodeMsgParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 {
 		this->cpu_weight->Resize(graph->num_nodes, graph->num_edges);
 		this->cpu_weight->ResizeSp(graph->num_edges, graph->num_nodes + 1);
@@ -92,15 +92,15 @@ void Edge2NodePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 		data->ptr[graph->num_nodes] = nnz;       
 }
 
-template class Edge2NodePoolParam<CPU, double>;
-template class Edge2NodePoolParam<CPU, float>;
-template class Edge2NodePoolParam<GPU, double>;
-template class Edge2NodePoolParam<GPU, float>;
+template class Edge2NodeMsgParam<CPU, double>;
+template class Edge2NodeMsgParam<CPU, float>;
+template class Edge2NodeMsgParam<GPU, double>;
+template class Edge2NodeMsgParam<GPU, float>;
 
-// =============================== Node2EdgePoolParam =========================================
+// =============================== Node2EdgeMsgParam =========================================
 
 template<MatMode mode, typename Dtype>
-void Node2EdgePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
+void Node2EdgeMsgParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 {
         int nnz = 0;
         this->cpu_weight->Resize(graph->num_edges, graph->num_nodes);
@@ -118,15 +118,15 @@ void Node2EdgePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
         assert(nnz == data->nnz);             
 }
 
-template class Node2EdgePoolParam<CPU, double>;
-template class Node2EdgePoolParam<CPU, float>;
-template class Node2EdgePoolParam<GPU, double>;
-template class Node2EdgePoolParam<GPU, float>;
+template class Node2EdgeMsgParam<CPU, double>;
+template class Node2EdgeMsgParam<CPU, float>;
+template class Node2EdgeMsgParam<GPU, double>;
+template class Node2EdgeMsgParam<GPU, float>;
 
-// =============================== Edge2EdgePoolParam =========================================
+// =============================== Edge2EdgeMsgParam =========================================
 
 template<MatMode mode, typename Dtype>
-void Edge2EdgePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
+void Edge2EdgeMsgParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 {
         int nnz = 0;
         this->cpu_weight->Resize(graph->num_edges, graph->num_edges);
@@ -158,14 +158,14 @@ void Edge2EdgePoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
         assert(data->nnz == cnt);
 }
 
-template class Edge2EdgePoolParam<CPU, double>;
-template class Edge2EdgePoolParam<CPU, float>;
-template class Edge2EdgePoolParam<GPU, double>;
-template class Edge2EdgePoolParam<GPU, float>;
-// =============================== SubgraphPoolParam =========================================
+template class Edge2EdgeMsgParam<CPU, double>;
+template class Edge2EdgeMsgParam<CPU, float>;
+template class Edge2EdgeMsgParam<GPU, double>;
+template class Edge2EdgeMsgParam<GPU, float>;
+// =============================== SubgraphMsgParam =========================================
 
 template<MatMode mode, typename Dtype>
-void SubgraphPoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
+void SubgraphMsgParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 {		
 		this->cpu_weight->Resize(graph->num_subgraph, graph->num_nodes);		
 		this->cpu_weight->ResizeSp(graph->num_nodes, graph->num_subgraph + 1);
@@ -188,7 +188,7 @@ void SubgraphPoolParam<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 }
 
 
-template class SubgraphPoolParam<CPU, double>;
-template class SubgraphPoolParam<CPU, float>;
-template class SubgraphPoolParam<GPU, double>;
-template class SubgraphPoolParam<GPU, float>;
+template class SubgraphMsgParam<CPU, double>;
+template class SubgraphMsgParam<CPU, float>;
+template class SubgraphMsgParam<GPU, double>;
+template class SubgraphMsgParam<GPU, float>;

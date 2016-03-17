@@ -1,0 +1,40 @@
+#ifndef GRAPH_POOL_PARAM_H
+#define GRAPH_POOL_PARAM_H
+
+#include "msg_pass_param.h"
+#include "graph_struct.h"
+#include "sparse_matrix.h"
+
+template<MatMode mode, typename Dtype>
+class NodeAvgPoolParam : public IMessagePassParam<mode, Dtype>
+{
+public:
+		NodeAvgPoolParam(std::string _name)
+            : IMessagePassParam<mode, Dtype>(_name) {} 
+            
+protected:
+        virtual void InitCPUWeight(GraphStruct* graph) override;
+};
+
+template<MatMode mode, typename Dtype>
+class NodeMaxPoolParam; 
+
+template<typename Dtype>
+class NodeMaxPoolParam<CPU, Dtype> : public IConstParam<CPU, Dtype>
+{
+public:
+        NodeMaxPoolParam(std::string _name)
+            : IConstParam<CPU, Dtype>(_name) {}
+            
+protected:
+                
+};
+
+template<typename Dtype>
+class NodeMaxPoolParam<GPU, Dtype> : public IConstParam<GPU, Dtype>
+{
+public:
+    
+};
+
+#endif

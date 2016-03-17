@@ -43,10 +43,10 @@ protected:
 };
 
 template<MatMode mode, typename Dtype>
-class Node2NodePoolParam : public IMessagePassParam<mode, Dtype>
+class Node2NodeMsgParam : public IMessagePassParam<mode, Dtype>
 {
 public:
-		Node2NodePoolParam(std::string _name)
+		Node2NodeMsgParam(std::string _name)
             : IMessagePassParam<mode, Dtype>(_name) {} 
             
 protected:
@@ -54,10 +54,10 @@ protected:
 };
 
 template<MatMode mode, typename Dtype>
-class Edge2NodePoolParam : public IMessagePassParam<mode, Dtype>
+class Edge2NodeMsgParam : public IMessagePassParam<mode, Dtype>
 {
 public:
-		Edge2NodePoolParam(std::string _name)
+		Edge2NodeMsgParam(std::string _name)
             : IMessagePassParam<mode, Dtype>(_name) {} 
             
 protected:
@@ -65,10 +65,10 @@ protected:
 };
 
 template<MatMode mode, typename Dtype>
-class Node2EdgePoolParam : public IMessagePassParam<mode, Dtype>
+class Node2EdgeMsgParam : public IMessagePassParam<mode, Dtype>
 {
 public:
-		Node2EdgePoolParam(std::string _name)
+		Node2EdgeMsgParam(std::string _name)
             : IMessagePassParam<mode, Dtype>(_name) {} 
             
 protected:
@@ -76,10 +76,10 @@ protected:
 };
 
 template<MatMode mode, typename Dtype>
-class Edge2EdgePoolParam : public IMessagePassParam<mode, Dtype>
+class Edge2EdgeMsgParam : public IMessagePassParam<mode, Dtype>
 {
 public:
-		Edge2EdgePoolParam(std::string _name)
+		Edge2EdgeMsgParam(std::string _name)
             : IMessagePassParam<mode, Dtype>(_name) {} 
             
 protected:
@@ -87,10 +87,10 @@ protected:
 };
 
 template<MatMode mode, typename Dtype>
-class SubgraphPoolParam : public IMessagePassParam<mode, Dtype>
+class SubgraphMsgParam : public IMessagePassParam<mode, Dtype>
 {
 public:
-		SubgraphPoolParam(std::string _name) 
+		SubgraphMsgParam(std::string _name) 
             : IMessagePassParam<mode, Dtype>(_name) {}
         
 protected:
