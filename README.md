@@ -2,7 +2,7 @@
 
 #### Prerequisites
 
-Tested under Ubuntu 14.04
+Tested under Ubuntu 14.04 and Mac OSX 10.10.5
 
 ##### Download and install cuda from https://developer.nvidia.com/cuda-toolkit
 
@@ -39,6 +39,8 @@ Tested under Ubuntu 14.04
     
 #### Build static library
 
+    cp make_common.example make_common
+    modify configurations in make_common file
     make
     
 #### Run example
