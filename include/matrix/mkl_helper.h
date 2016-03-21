@@ -125,18 +125,18 @@ inline void MKLHelper_GeMM(const CBLAS_LAYOUT Layout, const CBLAS_TRANSPOSE tran
 	cblas_dgemm(Layout, transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
 }
 
-inline void MKLHelper_CSRMM(const char trans, const MKL_INT m, const MKL_INT n, const MKL_INT k, const float alpha, 
-							const char *matdescra, const float *val, const MKL_INT *indx, const MKL_INT *pntrb, const MKL_INT *pntre, 
-							const float *b, const MKL_INT ldb, const float beta, float *c, const MKL_INT ldc)
+inline void MKLHelper_CSRMM(char trans, MKL_INT m, MKL_INT n, MKL_INT k, float alpha, 
+							char *matdescra, float *val, MKL_INT *indx, MKL_INT *pntrb, MKL_INT *pntre, 
+						    float *b, MKL_INT ldb, float beta, float *c, MKL_INT ldc)
 {
 	mkl_scsrmm(&trans, &m, &n, &k, &alpha,
 			matdescra, val, indx, pntrb, pntre, 
 			b, &ldb, &beta, c, &ldc);
 }
 
-inline void MKLHelper_CSRMM(const char trans, const MKL_INT m, const MKL_INT n, const MKL_INT k, const double alpha, 
-							const char *matdescra, const double *val, const MKL_INT *indx, const MKL_INT *pntrb, const MKL_INT *pntre, 
-							const double *b, const MKL_INT ldb, const double beta, double *c, const MKL_INT ldc)
+inline void MKLHelper_CSRMM(char trans, MKL_INT m, MKL_INT n, MKL_INT k, double alpha, 
+							char *matdescra, double *val, MKL_INT *indx, MKL_INT *pntrb, MKL_INT *pntre, 
+							double *b, MKL_INT ldb, double beta, double *c, MKL_INT ldc)
 {
 	mkl_dcsrmm(&trans, &m, &n, &k, &alpha,
 			matdescra, val, indx, pntrb, pntre, 

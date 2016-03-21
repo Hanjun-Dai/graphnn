@@ -1,8 +1,11 @@
 dir_guard = @mkdir -p $(@D)
 
+CUDA_HOME := /usr/local/cuda
+MKL_ROOT := /opt/intel/mkl
+
 FIND := gfind
 CXX := g++
-NVCC := nvcc
+NVCC := $(CUDA_HOME)/bin/nvcc
 CXXFLAGS += -Wall -O2 -std=c++11
 LDFLAGS += -lm -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand -lcusparse -lmkl_rt -lcppformat -lwht
 CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \

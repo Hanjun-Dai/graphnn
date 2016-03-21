@@ -5,8 +5,8 @@ CXXFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += -std=c++11 --use_fast_math
 
-cu_files := $(shell find src/ -name "*.cu" -printf "%P\n")
-cpp_files := $(shell find src/ -name "*.cpp" -printf "%P\n")
+cu_files := $(shell $(FIND) src/ -name "*.cu" -printf "%P\n")
+cpp_files := $(shell $(FIND) src/ -name "*.cpp" -printf "%P\n")
 
 cu_obj_files := $(subst .cu,.o,$(cu_files))
 cxx_obj_files := $(subst .cpp,.o,$(cpp_files))
@@ -32,7 +32,7 @@ $(obj_build_root)/cuda/%.o: src/%.cu
 		
 $(obj_build_root)/cxx/%.o: src/%.cpp
 	$(dir_guard)
-	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^)
 
 clean:
 	rm -rf build
