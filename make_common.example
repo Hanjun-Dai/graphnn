@@ -1,5 +1,6 @@
 dir_guard = @mkdir -p $(@D)
 
+FIND := gfind
 CXX := g++
 NVCC := nvcc
 CXXFLAGS += -Wall -O2 -std=c++11
