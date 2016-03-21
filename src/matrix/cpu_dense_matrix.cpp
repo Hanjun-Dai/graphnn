@@ -713,7 +713,7 @@ void DenseMat<CPU, Dtype>::SparseMM(SparseMat<CPU, Dtype>& A, DenseMat<CPU, Dtyp
 	GetDims(A.rows, A.cols, transa, B.rows, B.cols, transb, m, n, k);
 	Resize(m, n);
 	MKLHelper_CSRMM(CPU_CharT(transa), A.rows, this->cols, A.cols, alpha,
-				"GLNC", A.data->val, A.data->col_idx, A.data->ptr, A.data->ptr + 1,
+				(char*)"GLNC", A.data->val, A.data->col_idx, A.data->ptr, A.data->ptr + 1,
 				B.data, B.cols, 
 				beta, data, this->cols);
 }
