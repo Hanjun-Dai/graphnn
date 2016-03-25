@@ -73,10 +73,10 @@ public:
        
         void Save(std::string filename)
         {
-            FILE* fid = fopen(filename.c_str(), "rb");
+            FILE* fid = fopen(filename.c_str(), "wb");
             
             for (auto it = diff_params.begin(); it != diff_params.end(); ++it)
-                it->second->Seriaize(fid); 
+                it->second->Serialize(fid); 
                 
             fclose(fid);            
         }
