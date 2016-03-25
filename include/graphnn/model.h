@@ -61,6 +61,25 @@ public:
                 }
             }
         }
+        void Load(std::string filename)
+        {
+            FILE* fid = fopen(filename.c_str(), "rb");
+            
+            for (auto it = diff_params.begin(); it != diff_params.end(); ++it)
+                it->second->Deserialize(fid); 
+                
+            fclose(fid);
+        }
+       
+        void Save(std::string filename)
+        {
+            FILE* fid = fopen(filename.c_str(), "rb");
+            
+            for (auto it = diff_params.begin(); it != diff_params.end(); ++it)
+                it->second->Seriaize(fid); 
+                
+            fclose(fid);            
+        }
         
         std::map< std::string, IDiffParam<mode, Dtype>* > diff_params;
         std::map< std::string, IConstParam<mode, Dtype>* > const_params;

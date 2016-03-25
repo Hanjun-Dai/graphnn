@@ -35,13 +35,9 @@ public:
 		{
 		}
 		
-		virtual void Serialize(FILE* fid) 
-		{			
-		}
+		virtual void Serialize(FILE* fid) = 0;
 		
-		virtual void Deserialize(FILE* fid)
-		{			                        
-		}
+		virtual void Deserialize(FILE* fid) = 0; 
         
         virtual bool IsDiff() = 0;
         
@@ -67,6 +63,25 @@ public:
         {
             return true;
         }
+        
+        virtual void Serialize(FILE* fid) override
+        {
+            for (auto it = p.begin(); it != p.end(); ++it)
+            {
+                it->second->value.Serialize(fid);
+                it->second->grad.Serialize(fid);
+            }            
+        }
+		
+		virtual void Deserialize(FILE* fid) override
+        {
+            for (auto it = p.begin(); it != p.end(); ++it)
+            {
+                it->second->value.Deserialize(fid);
+                it->second->grad.Deserialize(fid);
+            }
+        }
+        
 		virtual void AccDeriv(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* gradOutput) = 0;
                 
         std::map<std::string, PP<mode, Dtype>*> p;
@@ -83,6 +98,10 @@ public:
                 
             }    
             
+        virtual void Serialize(FILE* fid) override {}
+		
+		virtual void Deserialize(FILE* fid) override {}
+        
         virtual void InitConst(void* side_info) = 0;            
         virtual bool IsDiff() override
         {
