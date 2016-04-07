@@ -15,7 +15,7 @@ public:
         layer_dict.clear();
         ordered_layers.clear();
         name_idx_map.clear();
-        has_grad.clear();
+        hash.clear();
     }
     
     void FeedForward(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase);   
@@ -62,7 +62,7 @@ public:
     std::map< std::string, unsigned > name_idx_map;
     std::map< std::string, ILayer<mode, Dtype>* > layer_dict;
     std::vector< std::pair<std::string, std::vector< ILayer<mode, Dtype>* > > > ordered_layers;
-    std::vector< bool > has_grad;    
+    std::vector< bool > hash;    
 };
 
 template<template <MatMode, typename> class LayerType, MatMode mode, typename Dtype, typename... Args>

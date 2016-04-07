@@ -6,10 +6,15 @@
 template<MatMode mode, typename Dtype>
 void NNGraph<mode, Dtype>::FeedForward(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase)
 {
+    hash.resize(ordered_layers.size());
+    for (size_t i = 0; i < hash.size(); ++i)
+        hash[i] = false;
+        
     // feed data
     for (auto it = input.begin(); it != input.end(); ++it)
     {
         layer_dict[it->first]->state = it->second;
+        hash[name_idx_map[it->first]] = true;
     }
     
     // feed-forward
@@ -17,8 +22,17 @@ void NNGraph<mode, Dtype>::FeedForward(std::map<std::string, IMatrix<mode, Dtype
     {     
         auto* cur_layer = layer_dict[ordered_layers[i].first];
         auto& operands = ordered_layers[i].second;
-        
-        cur_layer->UpdateOutput(operands, phase);        
+        bool ready = true;
+        for (auto* layer : operands)
+        {
+            auto idx = name_idx_map[layer->name];
+            ready &= hash[idx];
+        }
+        hash[name_idx_map[cur_layer->name]] = ready;
+        if (ready)            
+            cur_layer->UpdateOutput(operands, phase);
+        else if (phase != TEST)
+            std::runtime_error("wrong computation flow");         
     }    
 }
 
@@ -44,9 +58,9 @@ std::map<std::string, Dtype> NNGraph<mode, Dtype>::GetLoss()
 template<MatMode mode, typename Dtype>
 void NNGraph<mode, Dtype>::BackPropagation()
 {    	
-    has_grad.resize(ordered_layers.size());
-    for (size_t i = 0; i < has_grad.size(); ++i)
-        has_grad[i] = false;
+    hash.resize(ordered_layers.size());
+    for (size_t i = 0; i < hash.size(); ++i)
+        hash[i] = false;
                         
     for (auto it = ordered_layers.rbegin(); it != ordered_layers.rend(); ++it)
     {
@@ -55,10 +69,10 @@ void NNGraph<mode, Dtype>::BackPropagation()
         
         if (cur_layer->properr != PropErr::T)
 			continue;
-        if (!has_grad[ name_idx_map[cur_layer->name] ])
+        if (!hash[ name_idx_map[cur_layer->name] ])
         {
             if (cur_layer->IsSupervised())
-                has_grad[ name_idx_map[cur_layer->name] ] = true;
+                hash[ name_idx_map[cur_layer->name] ] = true;
             else continue;
         }
         
@@ -70,10 +84,10 @@ void NNGraph<mode, Dtype>::BackPropagation()
             {
                 Dtype beta = 1.0;
                 // if we haven't backprop the error to this layer
-                if (! has_grad[ prev_id ])
+                if (! hash[ prev_id ])
                 {
                     beta = 0.0;
-                    has_grad[prev_id] = true;
+                    hash[prev_id] = true;
                     prev_layer->grad->DenseDerived().Zeros(prev_layer->state->rows, prev_layer->state->cols);
                 }
                 cur_layer->BackPropErr(operands, i, beta);
