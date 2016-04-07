@@ -8,8 +8,8 @@ void InitModel()
     
 	const Dtype init_scale = 0.01;
 	
-	auto* n2nsum_param = add_const<Node2NodePoolParam>(model, "n2n");
-	auto* subgsum_param = add_const<SubgraphPoolParam>(model, "subgraph_pool");
+	auto* n2nsum_param = add_const<Node2NodeMsgParam>(model, "n2n");
+	auto* subgsum_param = add_const<SubgraphMsgParam>(model, "subgraph_pool");
 	
     auto* w_n2l = add_diff< LinearParam >(model, "input-node-to-latent", cfg::node_dim, cfg::conv_size, 0, init_scale, BiasOption::NONE);
     auto* p_node_conv = add_diff< LinearParam >(model, "linear-node-conv", cfg::conv_size, cfg::conv_size, 0, init_scale, BiasOption::NONE);  
@@ -17,7 +17,8 @@ void InitModel()
 	auto* h1_weight = add_diff<LinearParam>(model, "h1_weight", cfg::conv_size, cfg::n_hidden, 0, init_scale);
 	auto* h2_weight = add_diff<LinearParam>(model, "h2_weight", cfg::n_hidden, cfg::num_class, 0, init_scale);
 
-	auto* node_input = cl<InputLayer>("input", gnn, {});
+	auto* node_input = cl<InputLayer>("data", gnn, {});
+	auto* label_layer = cl<InputLayer>("label", gnn, {});
     auto* input_message = cl<ParamLayer>(gnn, {node_input}, {w_n2l}); 
 	auto* input_potential_layer = cl<ReLULayer>(gnn, {input_message}); 
 
@@ -43,8 +44,8 @@ void InitModel()
 	
 	auto* output = cl<ParamLayer>("output", gnn, {reluact_out_nn}, {h2_weight});
 	
-    cl<ClassNLLCriterionLayer>("classnll", gnn, {output}, true);
-    cl<ErrCntCriterionLayer>("errcnt", gnn, {output});
+    cl<ClassNLLCriterionLayer>("classnll", gnn, {output, label_layer}, true);
+    cl<ErrCntCriterionLayer>("errcnt", gnn, {output, label_layer});
 }
 
 int main(int argc, const char** argv)

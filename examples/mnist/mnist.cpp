@@ -16,8 +16,8 @@
 #include "model.h"
 #include "learner.h"
 
-typedef float Dtype;
-const MatMode mode = CPU;
+typedef double Dtype;
+const MatMode mode = GPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
 int dev_id;
@@ -94,15 +94,17 @@ void InitModel()
     auto* h2_weight = add_diff< LinearParam >(model, "w_h2", 1024, 1024, 0, 0.01);
     auto* o_weight = add_diff< LinearParam >(model, "w_o", 1024, 10, 0, 0.01);
     
-    auto* input_layer = cl< InputLayer >("input", g, {});
-    auto* h1 = cl< ParamLayer >(g, {input_layer}, {h1_weight});    
+    auto* data_layer = cl< InputLayer >("data", g, {});
+    auto* label_layer = cl< InputLayer >("label", g, {});
+
+    auto* h1 = cl< ParamLayer >(g, {data_layer}, {h1_weight});    
     auto* relu_1 = cl< ReLULayer >(g, {h1});     
     auto* h2 = cl< ParamLayer >(g, {relu_1}, {h2_weight});
     auto* relu_2 = cl< ReLULayer >(g, {h2});
     auto* output = cl< ParamLayer >(g, {relu_2}, {o_weight});
     
-    cl< ClassNLLCriterionLayer >("classnll", g, {output}, true);
-    cl< ErrCntCriterionLayer >("errcnt", g, {output});
+    cl< ClassNLLCriterionLayer >("classnll", g, {output, label_layer}, true);
+    cl< ErrCntCriterionLayer >("errcnt", g, {output, label_layer});
 }
 
 void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int >& labels)
@@ -147,9 +149,9 @@ int main(const int argc, const char** argv)
         for (unsigned i = 0; i < labels_test.size(); i += batch_size)
         {
                 LoadBatch(i, images_test, labels_test);
-        		g.ForwardData({{"input", &input}}, TEST);      								
-				auto loss_map = g.ForwardLabel({{"classnll", &label},
-                                                  {"errcnt", &label}});
+        		g.FeedForward({{"data", &input}, {"label", &label}}, TEST);      								
+				auto loss_map = g.GetLoss();
+
 				loss += loss_map["classnll"];
                 err_rate += loss_map["errcnt"];
         }
@@ -160,9 +162,7 @@ int main(const int argc, const char** argv)
         for (unsigned i = 0; i < labels_train.size(); i += batch_size)
         {
                 LoadBatch(i, images_train, labels_train);
-                g.ForwardData({{"input", &input}}, TRAIN);
-                auto loss_map = g.ForwardLabel({{"classnll", &label}});
-				loss = loss_map["classnll"] / batch_size;
+                g.FeedForward({{"data", &input}, {"label", &label}}, TRAIN);
                 
                 g.BackPropagation();
                 learner.Update();

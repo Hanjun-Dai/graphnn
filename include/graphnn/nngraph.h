@@ -18,9 +18,9 @@ public:
         has_grad.clear();
     }
     
-    void ForwardData(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase);   
+    void FeedForward(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase);   
        
-    std::map<std::string, Dtype> ForwardLabel(std::map<std::string, IMatrix<mode, Dtype>* > ground_truth);
+    std::map<std::string, Dtype> GetLoss();
             
     void BackPropagation();
     

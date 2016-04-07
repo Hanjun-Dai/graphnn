@@ -30,7 +30,13 @@ public:
     virtual bool HasParam()
     {
         return false;
-    }                                
+    }
+    
+    virtual bool IsSupervised()
+    {
+        return false;
+    }                
+                    
     std::string name;
     PropErr properr;
     IMatrix<mode, Dtype>* state, *grad;

@@ -15,17 +15,16 @@ public:
             {
                 this->grad = new DenseMat<mode, Dtype>();
             }
-                        			
-			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
-            {
-                Dtype loss = 0.0;
-                auto& node_diff = this->grad->DenseDerived();			
-                node_diff.GeaM(1.0, Trans::N, this->state->DenseDerived(), -1.0, Trans::N, ground_truth->DenseDerived());
-                loss += node_diff.Asum();
-                        
-		        return loss;                
-            }
             
+            virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
+            {
+                assert(operands.size() == 2);
+                
+                auto& node_diff = this->grad->DenseDerived();			
+                node_diff.GeaM(1.0, Trans::N, operands[0]->state->DenseDerived(), -1.0, Trans::N, operands[1]->state->DenseDerived());
+                this->loss = node_diff.Asum();
+            }
+                                                			
 			virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
             {
                 throw std::runtime_error("not impltemented");

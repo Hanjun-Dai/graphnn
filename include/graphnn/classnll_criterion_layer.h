@@ -24,14 +24,16 @@ public:
                 return "ClassNLL"; 
             }
             
-			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
+            virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
             {
                 auto& top = this->grad->DenseDerived();
-                top.CopyFrom(this->state->DenseDerived());
+                top.CopyFrom(operands[0]->state->DenseDerived());
                 if (need_softmax)
                     top.Softmax();
-                auto& labels = ground_truth->SparseDerived();
-                Dtype loss = LossFunc<mode, Dtype>::GetLogLoss(top, labels);
+                auto& labels = operands[1]->state->SparseDerived();
+                
+                this->loss = LossFunc<mode, Dtype>::GetLogLoss(top, labels);
+                
                 if (need_softmax)
                 {
                     top.Axpy(-1.0, labels); // calc grad
@@ -42,12 +44,11 @@ public:
                     top.EleWiseMul(labels);
                     top.Scale(-1.0 / top.rows); // normalize by batch size
                 }
-                return loss;                
             }
             
             virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
             {
-                assert(operands.size() == 1 && cur_idx == 0);
+                assert(operands.size() == 2 && cur_idx == 0);
                 
                 auto& prev_grad = operands[0]->grad->DenseDerived();
                 auto& cur_grad = this->grad->DenseDerived();

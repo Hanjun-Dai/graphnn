@@ -21,12 +21,11 @@ public:
                 return "ErrCnt"; 
             }
             
-			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
+			virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
             {
-                auto& pred = this->state->DenseDerived();
-                auto& labels = ground_truth->SparseDerived();          
-                Dtype loss = LossFunc<mode, Dtype>::GetErrCnt(pred, labels);
-                return loss;
+                auto& pred = operands[0]->state->DenseDerived();
+                auto& labels = operands[1]->state->SparseDerived();          
+                this->loss = LossFunc<mode, Dtype>::GetErrCnt(pred, labels);
             }
             
             virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override

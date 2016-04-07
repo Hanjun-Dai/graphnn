@@ -126,8 +126,8 @@ void MainLoop()
 			{
 				GetBatch(test_idx, i, cfg::batch_size);
                 model.SetupConstParams(init_const_dict); 
-				gnn.ForwardData({{"input", &input}}, TEST);
-				auto loss_map = gnn.ForwardLabel({{"classnll", &label}, {"errcnt", &label}});
+				gnn.FeedForward({{"data", &input}, {"label", &label}}, TEST);
+				auto loss_map = gnn.GetLoss();
 				nll += loss_map["classnll"];
 			 	err += loss_map["errcnt"];
 			}
@@ -150,8 +150,8 @@ void MainLoop()
 	
 		GetBatch(train_idx, cur_pos, cfg::batch_size);
         model.SetupConstParams(init_const_dict); 
-		gnn.ForwardData({{"input", &input}}, TRAIN);
-		auto loss_map = gnn.ForwardLabel({{"classnll", &label}, {"errcnt", &label}});
+		gnn.FeedForward({{"data", &input}, {"label", &label}}, TRAIN);
+		auto loss_map = gnn.GetLoss();
 		
     	if (cfg::iter % cfg::report_interval == 0)
 		{

@@ -17,21 +17,20 @@ public:
                 this->grad = new DenseMat<mode, Dtype>();
             }
             
-			virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) override
+			virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
             {		
                 auto& node_diff = this->grad->DenseDerived();						
-                node_diff.GeaM(1.0, Trans::N, this->state->DenseDerived(), -1.0, Trans::N, ground_truth->DenseDerived());
+                node_diff.GeaM(1.0, Trans::N, operands[0]->state->DenseDerived(), -1.0, Trans::N, operands[1]->state->DenseDerived());
                 Dtype norm2 = node_diff.Norm2();
-                Dtype loss = norm2 * norm2;
+                this->loss = norm2 * norm2;
                 
                 if (this->properr == PropErr::T)
-                    node_diff.Scale(2.0 * this->lambda / ground_truth->rows);   
-		        return loss;
+                    node_diff.Scale(2.0 * this->lambda / operands[1]->state->rows);
             }
             
 			virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
             {
-                assert(operands.size() == 1 && cur_idx == 0);
+                assert(operands.size() == 2 && cur_idx == 0);
                 
                 auto& cur_grad = this->grad->DenseDerived();
 		        auto& prev_grad = operands[0]->grad->DenseDerived();

@@ -11,17 +11,22 @@ public:
             : ICriterionLayer<mode, Dtype>(_name, 1.0, _properr) {}
             
 		ICriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T) 
-            : ILayer<mode, Dtype>(_name, _properr), lambda(_lambda) {}
-        
-        virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase)
+            : ILayer<mode, Dtype>(_name, _properr), lambda(_lambda), loss(0.0) {}
+               
+		Dtype GetLoss()
         {
-            assert(operands.size() == 1); 
-            this->state = operands[0]->state;
-        } 
+            return loss;    
+        }			
         
-		virtual Dtype GetLoss(IMatrix<mode, Dtype>* ground_truth) = 0;			
+        virtual bool IsSupervised() override
+        {
+            return true;
+        }
         
         Dtype lambda;
+        
+protected:        
+        Dtype loss;
 };
 
 #endif

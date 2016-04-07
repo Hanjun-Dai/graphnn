@@ -4,7 +4,7 @@
 #include "i_criterion_layer.h"
 
 template<MatMode mode, typename Dtype>
-void NNGraph<mode, Dtype>::ForwardData(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase)
+void NNGraph<mode, Dtype>::FeedForward(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase)
 {
     // feed data
     for (auto it = input.begin(); it != input.end(); ++it)
@@ -23,19 +23,20 @@ void NNGraph<mode, Dtype>::ForwardData(std::map<std::string, IMatrix<mode, Dtype
 }
 
 template<MatMode mode, typename Dtype>
-std::map<std::string, Dtype> NNGraph<mode, Dtype>::ForwardLabel(std::map<std::string, IMatrix<mode, Dtype>* > ground_truth)
+std::map<std::string, Dtype> NNGraph<mode, Dtype>::GetLoss()
 {
     std::map<std::string, Dtype> loss;
-    has_grad.resize(ordered_layers.size());
-    for (size_t i = 0; i < has_grad.size(); ++i)
-        has_grad[i] = false;
-        
-    for (auto it = ground_truth.begin(); it != ground_truth.end(); ++it)
+            
+    for (auto it = ordered_layers.rbegin(); it != ordered_layers.rend(); ++it)
     {
-        auto* criterion_layer = dynamic_cast<ICriterionLayer<mode, Dtype>*>(layer_dict[it->first]);
+        auto* cur_layer = layer_dict[it->first];
+        
+        if (!cur_layer->IsSupervised())
+            continue;
+        
+        auto* criterion_layer = dynamic_cast<ICriterionLayer<mode, Dtype>*>(cur_layer);
         assert(criterion_layer);
-        loss[it->first] = criterion_layer->GetLoss(it->second);         
-        has_grad[name_idx_map[it->first]] = (criterion_layer->properr == PropErr::T);
+        loss[it->first] = criterion_layer->GetLoss(); 
     }
     return loss;
 }
@@ -43,6 +44,10 @@ std::map<std::string, Dtype> NNGraph<mode, Dtype>::ForwardLabel(std::map<std::st
 template<MatMode mode, typename Dtype>
 void NNGraph<mode, Dtype>::BackPropagation()
 {    	
+    has_grad.resize(ordered_layers.size());
+    for (size_t i = 0; i < has_grad.size(); ++i)
+        has_grad[i] = false;
+                        
     for (auto it = ordered_layers.rbegin(); it != ordered_layers.rend(); ++it)
     {
         auto* cur_layer = layer_dict[it->first];
@@ -51,7 +56,11 @@ void NNGraph<mode, Dtype>::BackPropagation()
         if (cur_layer->properr != PropErr::T)
 			continue;
         if (!has_grad[ name_idx_map[cur_layer->name] ])
-            continue;
+        {
+            if (cur_layer->IsSupervised())
+                has_grad[ name_idx_map[cur_layer->name] ] = true;
+            else continue;
+        }
         
         for (size_t i = 0; i < operands.size(); ++i)
         {            
