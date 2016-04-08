@@ -22,12 +22,15 @@ void NNGraph<mode, Dtype>::FeedForward(std::map<std::string, IMatrix<mode, Dtype
     {     
         auto* cur_layer = layer_dict[ordered_layers[i].first];
         auto& operands = ordered_layers[i].second;
+        if (operands.size() == 0 && ! hash[name_idx_map[cur_layer->name]])
+            continue;
+        
         bool ready = true;
         for (auto* layer : operands)
         {
             auto idx = name_idx_map[layer->name];
             ready &= hash[idx];
-        }
+        }        
         hash[name_idx_map[cur_layer->name]] = ready;
         if (ready)            
             cur_layer->UpdateOutput(operands, phase);
