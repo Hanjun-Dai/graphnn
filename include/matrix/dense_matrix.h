@@ -87,6 +87,8 @@ public:
         void Cos();
         void Cos(DenseMat<CPU, Dtype>& src);
         
+        Dtype Dot(DenseMat<CPU, Dtype>& rhs);
+        Dtype AsScalar();
 		Dtype Norm2();		
 		Dtype Asum();
 		Dtype Amax();
@@ -215,6 +217,8 @@ public:
         void Cos();
         void Cos(DenseMat<GPU, Dtype>& src);
         
+        Dtype Dot(DenseMat<GPU, Dtype>& rhs);
+        Dtype AsScalar();
 		Dtype Norm2();
 		Dtype Asum();
 		Dtype Amax();

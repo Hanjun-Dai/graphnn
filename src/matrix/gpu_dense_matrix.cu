@@ -373,6 +373,24 @@ Dtype DenseMat<GPU, Dtype>::Sum()
         return thrust::reduce(dev_ptr, dev_ptr + this->count);
 }
 
+
+template<typename Dtype>
+Dtype DenseMat<GPU, Dtype>::Dot(DenseMat<GPU, Dtype>& rhs)
+{
+        assert(this->count == rhs.count);
+        return CudaHelper_Dot(GPUHandle::cublashandle, this->count, this->data, rhs.data);
+}
+
+template<typename Dtype>
+Dtype DenseMat<GPU, Dtype>::AsScalar()
+{
+        cudaStreamSynchronize(GPUHandle::streams[streamid]); 
+        assert(this->rows == this->cols && this->cols == 1);
+        Dtype result;
+        cudaMemcpy(&result, this->data, sizeof(Dtype), cudaMemcpyDeviceToHost);
+        return result;
+}
+
 template<typename Dtype>
 __global__ void ClipKernel(Dtype *dst, Dtype max_abs, int numElements)
 {

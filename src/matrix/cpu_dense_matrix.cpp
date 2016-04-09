@@ -342,6 +342,21 @@ Dtype DenseMat<CPU, Dtype>::Sum()
 }
 
 template<typename Dtype>
+Dtype DenseMat<CPU, Dtype>::Dot(DenseMat<CPU, Dtype>& rhs)
+{
+    assert(this->count == rhs.count);
+    
+    return MKLHelper_Dot(this->count, this->data, rhs.data);
+}
+
+template<typename Dtype>
+Dtype DenseMat<CPU, Dtype>::AsScalar()
+{
+    assert(this->rows == this->cols && this->cols == 1);
+    return this->data[0];
+}
+
+template<typename Dtype>
 void DenseMat<CPU, Dtype>::Clip(Dtype max_abs)
 {
     assert(max_abs >= 0);

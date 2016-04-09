@@ -96,7 +96,7 @@ void NNGraph<mode, Dtype>::BackPropagation()
                 cur_layer->BackPropErr(operands, i, beta);
             }
             if (cur_layer->HasParam())
-                dynamic_cast<ParamLayer<mode, Dtype>*>(cur_layer)->AccDeriv(operands, i);
+                dynamic_cast<IParametric<mode, Dtype>*>(cur_layer)->AccDeriv(operands, i);
         }                          
     }        
 }

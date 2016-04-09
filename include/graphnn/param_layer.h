@@ -5,7 +5,7 @@
 #include "i_param.h"
 
 template<MatMode mode, typename Dtype>
-class ParamLayer : public ILayer<mode, Dtype>
+class ParamLayer : public ILayer<mode, Dtype>, public IParametric<mode, Dtype>
 {
 public:
     ParamLayer(std::string _name, std::vector< IParam<mode, Dtype>* > _params, PropErr _properr = PropErr::T)
@@ -44,7 +44,7 @@ public:
 		params[cur_idx]->UpdateGradInput(&prev_grad, &cur_grad, beta);
     }    
     
-    void AccDeriv(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx)
+    virtual void AccDeriv(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) override
     {
         if (params[cur_idx]->IsDiff())
         {

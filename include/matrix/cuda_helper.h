@@ -43,6 +43,20 @@ __device__ inline double cuda_log(const double& src)
         return log(src);
 }
 
+inline float CudaHelper_Dot(cublasHandle_t& handle, int n, const float *x, const float* y)
+{
+        float result;
+        cublasSdot(handle, n, x, 1, y, 1, &result);
+        return result;
+}
+
+inline double CudaHelper_Dot(cublasHandle_t& handle, int n, const double *x, const double* y)
+{
+        double result;
+        cublasDdot(handle, n, x, 1, y, 1, &result);
+        return result;
+}
+
 inline float CudaHelper_Norm2(cublasHandle_t& handle, int n, const float *x)
 {
 		float result;

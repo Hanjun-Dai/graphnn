@@ -42,4 +42,11 @@ public:
     IMatrix<mode, Dtype>* state, *grad;
 };
 
+template<MatMode mode, typename Dtype>
+class IParametric
+{
+public:
+        virtual void AccDeriv(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx) = 0;
+};
+
 #endif
