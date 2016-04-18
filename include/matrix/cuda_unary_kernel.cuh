@@ -5,6 +5,28 @@
 #include "gpuhandle.h"
 #include "cuda_helper.h"
 
+//=================================== power ======================================
+
+template<typename Dtype>
+class UnaryPow
+{
+public:
+	UnaryPow(Dtype _scalar) : scalar(_scalar) {}
+    
+	__device__ inline void operator()(Dtype& dst)
+	{
+		dst = cuda_pow(dst, scalar);
+	}
+    
+    __device__ inline void operator()(Dtype& dst, const Dtype& src)
+	{
+		dst = cuda_pow(src, scalar);
+	}
+    
+private:
+    Dtype scalar;    
+};
+
 //=================================== scale ======================================
 
 template<typename Dtype>

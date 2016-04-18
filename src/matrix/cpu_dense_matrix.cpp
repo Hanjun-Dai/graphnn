@@ -216,7 +216,7 @@ void DenseMat<CPU, Dtype>::Scale(Dtype scalar)
 template<typename Dtype>
 void DenseMat<CPU, Dtype>::Power(Dtype scalar)
 {
-	throw "not implemented";
+	MKLHelper_PowerX(this->count, this->data, scalar, this->data);
 }
 
 template<typename Dtype>

@@ -243,4 +243,14 @@ inline void MKLHelper_Square(const MKL_INT n, double* a, double* y)
     vdSqr(n, a, y);
 }
 
+inline void MKLHelper_PowerX(const MKL_INT n, float* a, float b, float* y)
+{
+    vsPowx(n, a, b, y);
+}
+
+inline void MKLHelper_PowerX(const MKL_INT n, double* a, double b, double* y)
+{
+    vdPowx(n, a, b, y);
+}
+
 #endif

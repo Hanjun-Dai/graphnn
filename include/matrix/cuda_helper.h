@@ -23,6 +23,16 @@ __device__ inline int get_sp_row_idx(int i, int* row_ptr, int n_rows)
     return row;
 }
 
+__device__ inline float cuda_pow(const float& x, const float& y)
+{
+        return powf(x, y);
+}
+
+__device__ inline double cuda_pow(const double& x, const double& y)
+{
+        return pow(x, y);
+}
+
 __device__ inline float cuda_exp(const float& src)
 {
         return expf(src);

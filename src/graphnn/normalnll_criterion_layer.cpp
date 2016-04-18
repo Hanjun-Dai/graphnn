@@ -46,18 +46,41 @@ void NormalNLLCriterionLayer<mode, Dtype>::UpdateOutput(std::vector< ILayer<mode
 template<MatMode mode, typename Dtype>
 void NormalNLLCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta)
 {
-    assert(operands.size() == 3 && cur_idx < 3);
-    
+    assert(operands.size() == 3 && cur_idx <= 1);
+            
     auto& diff = this->grad->DenseDerived();
+    auto& buf = this->state->DenseDerived();
     auto& prev_grad = operands[cur_idx]->grad->DenseDerived();
+    auto& sigma = operands[1]->state->DenseDerived();    
     
     // d/d_mu
     if (cur_idx == 0)
     {
-            
+        buf.CopyFrom(diff);
+        buf.EleWiseDiv(sigma);
+        buf.EleWiseDiv(sigma);
+        
+        if (beta == 0)
+            prev_grad.CopyFrom(buf);
+        else
+            prev_grad.Axpby(1.0, buf, beta);       
     } else // d/d_sigma
     {
+        // 1/sigma
+        buf.CopyFrom(sigma);
+        buf.Inv();
         
+        if (beta == 0)
+            prev_grad.CopyFrom(buf);
+        else
+            prev_grad.Axpby(1.0, buf, beta);
+        
+        // (x - mu) ^2 / sigma^3    
+        buf.Power(3);
+        buf.EleWiseMul(diff);
+        buf.EleWiseMul(diff);
+        
+        prev_grad.Axpy(-1.0, buf);
     }
 }
 

@@ -166,7 +166,7 @@ void DenseMat<GPU, Dtype>::Scale(Dtype scalar)
 template<typename Dtype>
 void DenseMat<GPU, Dtype>::Power(Dtype scalar)
 {
-	throw "not implemented";
+        UnaryOp(this->data, this->count, UnaryPow<Dtype>(scalar), streamid);
 }
 
 template<typename Dtype>
