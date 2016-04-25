@@ -1,10 +1,10 @@
-#include "normalnll_criterion_layer.h"
+#include "mvn_diag_nll_criterion_layer.h"
 #include "dense_matrix.h"
 
 #define pi 3.14159265358979
 
 template<MatMode mode, typename Dtype>
-NormalNLLCriterionLayer<mode, Dtype>::NormalNLLCriterionLayer(std::string _name, Dtype _lambda, PropErr _properr)
+MVNDianNLLCriterionLayer<mode, Dtype>::MVNDianNLLCriterionLayer(std::string _name, Dtype _lambda, PropErr _properr)
         : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr)
 {
     this->grad = new DenseMat<mode, Dtype>();
@@ -12,7 +12,7 @@ NormalNLLCriterionLayer<mode, Dtype>::NormalNLLCriterionLayer(std::string _name,
 }        
         
 template<MatMode mode, typename Dtype>
-void NormalNLLCriterionLayer<mode, Dtype>::UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase)
+void MVNDianNLLCriterionLayer<mode, Dtype>::UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase)
 {
     assert(operands.size() == 3);
     auto& mu = operands[0]->state->DenseDerived();
@@ -44,7 +44,7 @@ void NormalNLLCriterionLayer<mode, Dtype>::UpdateOutput(std::vector< ILayer<mode
 }
 
 template<MatMode mode, typename Dtype>
-void NormalNLLCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta)
+void MVNDianNLLCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta)
 {
     assert(operands.size() == 3 && cur_idx <= 1);
             
@@ -59,6 +59,7 @@ void NormalNLLCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode,
         buf.CopyFrom(diff);
         buf.EleWiseDiv(sigma);
         buf.EleWiseDiv(sigma);
+        buf.Scale(this->lambda / buf.rows);
         
         if (beta == 0)
             prev_grad.CopyFrom(buf);
@@ -71,7 +72,10 @@ void NormalNLLCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode,
         buf.Inv();
         
         if (beta == 0)
+        {
             prev_grad.CopyFrom(buf);
+            prev_grad.Scale(this->lambda / buf.rows);
+        }
         else
             prev_grad.Axpby(1.0, buf, beta);
         
@@ -80,11 +84,11 @@ void NormalNLLCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode,
         buf.EleWiseMul(diff);
         buf.EleWiseMul(diff);
         
-        prev_grad.Axpy(-1.0, buf);
+        prev_grad.Axpy(-this->lambda / buf.rows, buf);
     }
 }
 
-template class NormalNLLCriterionLayer<CPU, float>;
-template class NormalNLLCriterionLayer<CPU, double>;
-template class NormalNLLCriterionLayer<GPU, float>;
-template class NormalNLLCriterionLayer<GPU, double>;
+template class MVNDianNLLCriterionLayer<CPU, float>;
+template class MVNDianNLLCriterionLayer<CPU, double>;
+template class MVNDianNLLCriterionLayer<GPU, float>;
+template class MVNDianNLLCriterionLayer<GPU, double>;

@@ -24,6 +24,8 @@ public:
     virtual void Derivative(DenseMat<mode, Dtype>& dst, DenseMat<mode, Dtype>& prev_output, 
                             DenseMat<mode, Dtype>& cur_output, DenseMat<mode, Dtype>& cur_grad, Dtype beta) override
     {
+        assert(beta == 0);
+        
         dst.CopyFrom(cur_grad);
         dst.EleWiseMul(cur_output);
     }                                 
