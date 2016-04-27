@@ -1,17 +1,17 @@
-#ifndef ENTROPY_LOSS_CRITERION_LAYER_H
-#define ENTROPY_LOSS_CRITERION_LAYER_H
+#ifndef MAX_ENTROPY_CRITERION_LAYER_H
+#define MAX_ENTROPY_CRITERION_LAYER_H
 
 #include "i_criterion_layer.h"
 
 template<MatMode mode, typename Dtype>
-class EntropyLossCriterionLayer : public ICriterionLayer<mode, Dtype>
+class MaxEntropyCriterionLayer : public ICriterionLayer<mode, Dtype>
 {
 public:
         
-			EntropyLossCriterionLayer(std::string _name, PropErr _properr = PropErr::T)
-                : EntropyLossCriterionLayer<mode, Dtype>(_name, 1.0, _properr) {}
+			MaxEntropyCriterionLayer(std::string _name, PropErr _properr = PropErr::T)
+                : MaxEntropyCriterionLayer<mode, Dtype>(_name, 1.0, _properr) {}
                 
-			EntropyLossCriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T);
+			MaxEntropyCriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T);
                         
             static std::string str_type()
             {

@@ -39,7 +39,7 @@ $(obj_build_root)/cxx/%.o: src/%.cpp
 	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^)
 
-$(test_build_root)/%: test/%.cpp
+$(test_build_root)/%: test/%.cpp $(gnn_lib)
 	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.cpp, $^) -L$(lib_dir) -lgnn $(LDFLAGS)
 

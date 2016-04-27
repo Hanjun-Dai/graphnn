@@ -98,7 +98,9 @@ public:
         void Add(Dtype scalar);
 		void AddRowVec(DenseMat<CPU, Dtype>& x, Dtype alpha);		
 		void AddColVec(DenseMat<CPU, Dtype>& x, Dtype alpha);
-        void Mean(DenseMat<CPU, Dtype>& src); 
+        void Mean(DenseMat<CPU, Dtype>& src);
+        
+        void GetColsFrom(DenseMat<CPU, Dtype>& src, size_t col_start, size_t col_cnt); 
         
 		void MulRowVec(DenseMat<CPU, Dtype>& src, DenseMat<CPU, Dtype>& x, Dtype beta = 0);
         void MulRowVec(DenseMat<CPU, Dtype>& x);
@@ -116,7 +118,7 @@ public:
 		}
 		void ScatterCols(std::vector< DenseMat<CPU, Dtype>* >& dst_list);
 		void ConcatCols(DenseMat<CPU, Dtype>& src);
-        void ConcatCols(std::vector< DenseMat<CPU, Dtype>* >& src_list);
+        void ConcatCols(std::vector< DenseMat<CPU, Dtype>* > src_list);
         
         void EleWiseDiv(DenseMat<CPU, Dtype>& src);
         void EleWiseDiv(DenseMat<CPU, Dtype>& lhs, DenseMat<CPU, Dtype>& rhs);
@@ -233,7 +235,8 @@ public:
 		void AddColVec(DenseMat<GPU, Dtype>& x, Dtype alpha);
 		
 		void AddSubmat(DenseMat<GPU, Dtype>& src, size_t row_start, size_t col_start, Dtype beta);
-		
+		void GetColsFrom(DenseMat<GPU, Dtype>& src, size_t col_start, size_t col_cnt); 
+        
 		void SubmatAdd(size_t row_start, size_t col_start, SparseMat<GPU, Dtype>& src, Dtype beta);
 		void SubmatAdd(size_t row_start, size_t col_start, DenseMat<GPU, Dtype>& src, Dtype beta);
 		void SubmatAdd(size_t row_start, size_t col_start, IMatrix<GPU, Dtype>* src, Dtype beta)
@@ -247,7 +250,7 @@ public:
 		}
         void ScatterCols(std::vector< DenseMat<GPU, Dtype>* >& dst_list);
 		void ConcatCols(DenseMat<GPU, Dtype>& src);
-        void ConcatCols(std::vector< DenseMat<GPU, Dtype>* >& src_list);
+        void ConcatCols(std::vector< DenseMat<GPU, Dtype>* > src_list);
         
         void EleWiseDiv(DenseMat<GPU, Dtype>& src);
         void EleWiseDiv(DenseMat<GPU, Dtype>& lhs, DenseMat<GPU, Dtype>& rhs);

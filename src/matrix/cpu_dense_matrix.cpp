@@ -490,18 +490,24 @@ void DenseMat<CPU, Dtype>::ConcatCols(DenseMat<CPU, Dtype>& src)
 }
 
 template<typename Dtype>
-void DenseMat<CPU, Dtype>::ConcatCols(std::vector< DenseMat<CPU, Dtype>* >& src_list)
+void DenseMat<CPU, Dtype>::ConcatCols(std::vector< DenseMat<CPU, Dtype>* > src_list)
 {
     assert(src_list.size() > 0);
-    assert(src_list.size() * src_list[0]->cols == this->cols);
-    
-    size_t dst_offset = 0, src_cols = src_list[0]->cols;
+    size_t new_rows = src_list[0]->rows, new_cols = src_list[0]->cols; 
+    for (size_t i = 1; i < src_list.size(); ++i)
+    {
+        assert(src_list[i]->rows == new_rows);
+        new_cols += src_list[i]->cols;
+    }
+    Resize(new_rows, new_cols);    
+    size_t dst_offset = 0;
     for (size_t row = 0; row < this->rows; ++row)
     {
         for (size_t p = 0; p < src_list.size(); ++p)
         {
-            memcpy(this->data + dst_offset, src_list[p]->data + row * src_cols, sizeof(Dtype) * src_cols);
-            dst_offset += src_cols;
+            size_t col_cnt = src_list[p]->cols;
+            memcpy(this->data + dst_offset, src_list[p]->data + row * col_cnt, sizeof(Dtype) * col_cnt);
+            dst_offset += col_cnt;
         }            
     }
 }
@@ -578,6 +584,20 @@ void DenseMat<CPU, Dtype>::AddSubmat(DenseMat<CPU, Dtype>& src, size_t row_start
 		MKLHelper_Axpby(this->cols, 1.0, src.data + (row_start + row) * src.cols + col_start, beta, this->data + row * this->cols);
 	}
 }
+
+template<typename Dtype>
+void DenseMat<CPU, Dtype>::GetColsFrom(DenseMat<CPU, Dtype>& src, size_t col_start, size_t col_cnt)
+{
+    assert(col_start + col_cnt <= src.cols);    
+    this->Resize(src.rows, col_cnt);
+    
+    size_t offset = col_start;
+    for (size_t i = 0; i < src.rows; ++i)
+    {
+        memcpy(this->data + i * col_cnt, src.data + offset, sizeof(Dtype) * col_cnt);
+        offset += src.cols;
+    }
+} 
 
 template<typename Dtype>
 void DenseMat<CPU, Dtype>::ShuffleCols(DenseMat<CPU, Dtype>& src, const int* perm)

@@ -1,8 +1,8 @@
-#include "entropy_loss_criterion_layer.h"
+#include "max_entropy_criterion_layer.h"
 #include "dense_matrix.h"
 
 template<MatMode mode, typename Dtype>
-EntropyLossCriterionLayer<mode, Dtype>::EntropyLossCriterionLayer(std::string _name, 
+MaxEntropyCriterionLayer<mode, Dtype>::MaxEntropyCriterionLayer(std::string _name, 
                                                                   Dtype _lambda, 
                                                                   PropErr _properr)
 				 : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr)
@@ -12,7 +12,7 @@ EntropyLossCriterionLayer<mode, Dtype>::EntropyLossCriterionLayer(std::string _n
 }
 
 template<MatMode mode, typename Dtype>
-void EntropyLossCriterionLayer<mode, Dtype>::UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase)
+void MaxEntropyCriterionLayer<mode, Dtype>::UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase)
 {
     assert(operands.size() == 1);       
     
@@ -29,7 +29,7 @@ void EntropyLossCriterionLayer<mode, Dtype>::UpdateOutput(std::vector< ILayer<mo
 }
 
 template<MatMode mode, typename Dtype>
-void EntropyLossCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta)
+void MaxEntropyCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta)
 {
     assert(operands.size() == 1 && cur_idx == 0);
     
@@ -47,7 +47,7 @@ void EntropyLossCriterionLayer<mode, Dtype>::BackPropErr(std::vector< ILayer<mod
     prev_grad.Add(this->lambda / grad.rows);                          
 }
 
-template class EntropyLossCriterionLayer<CPU, float>;
-template class EntropyLossCriterionLayer<CPU, double>;
-template class EntropyLossCriterionLayer<GPU, float>;
-template class EntropyLossCriterionLayer<GPU, double>;
+template class MaxEntropyCriterionLayer<CPU, float>;
+template class MaxEntropyCriterionLayer<CPU, double>;
+template class MaxEntropyCriterionLayer<GPU, float>;
+template class MaxEntropyCriterionLayer<GPU, double>;

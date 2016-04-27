@@ -636,6 +636,31 @@ void DenseMat<GPU, Dtype>::ScatterCols(std::vector< DenseMat<GPU, Dtype>* >& dst
 }
 
 template<typename Dtype>
+__global__ void GetColsFromKernel(Dtype* dst, Dtype* src, const int src_cols, const int col_start, const int dst_cols, int numElements)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    
+    if (i < numElements) 
+    {
+        int cur_row = i / dst_cols;        
+        int cur_col = i % dst_cols;
+        dst[i] = src[col_start + cur_row * src_cols + cur_col];            
+    }
+}
+
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::GetColsFrom(DenseMat<GPU, Dtype>& src, size_t col_start, size_t col_cnt)
+{
+    assert(col_start + col_cnt <= src.cols);    
+    this->Resize(src.rows, col_cnt);
+    
+    int thread_num = min(c_uCudaThreadNum, this->count);
+    int blocksPerGrid = (this->count + thread_num - 1) / thread_num;
+    GetColsFromKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[streamid] >>>(this->data, src.data, src.cols, col_start, col_cnt, this->count);
+} 
+
+template<typename Dtype>
 __global__ void ConcatColsKernel(Dtype* dst, Dtype* src, const int src_cols, const int dst_cols, const int num_parts, int numElements)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -660,6 +685,7 @@ void DenseMat<GPU, Dtype>::ConcatCols(DenseMat<GPU, Dtype>& src)
     ConcatColsKernel <<< blocksPerGrid, thread_num, 0, GPUHandle::streams[streamid] >>> (this->data, src.data, src.cols, this->cols, num_parts, this->count); 
 }
 
+
 template<typename Dtype>
 __global__ void ConcatColsKernel(Dtype* dst, Dtype** src_list, const int other_cols, const int this_cols, int numElements)
 {
@@ -676,7 +702,7 @@ __global__ void ConcatColsKernel(Dtype* dst, Dtype** src_list, const int other_c
 }
 
 template<typename Dtype>
-void DenseMat<GPU, Dtype>::ConcatCols(std::vector< DenseMat<GPU, Dtype>* >& src_list)
+void DenseMat<GPU, Dtype>::ConcatCols(std::vector< DenseMat<GPU, Dtype>* > src_list)
 {
     assert(src_list.size() > 0);
     assert(src_list.size() * src_list[0]->cols == this->cols);
