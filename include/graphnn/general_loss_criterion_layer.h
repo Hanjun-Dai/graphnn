@@ -8,7 +8,7 @@ class GeneralLossCriterionLayer : public ICriterionLayer<mode, Dtype>
 {
 public:
 			GeneralLossCriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T)
-                : GeneralLossCriterionLayer<mode, Dtype>(_name, _lambda, _properr)
+                : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr)
             {
                 
             }

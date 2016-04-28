@@ -15,7 +15,7 @@ public:
 
     static std::string str_type()
     {
-        return "ReLU"; 
+        return "Softmax"; 
     }
     
     virtual void Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out) override;
@@ -35,7 +35,7 @@ public:
 
     static std::string str_type()
     {
-        return "ReLU"; 
+        return "Softmax"; 
     }
     
     virtual void Act(DenseMat<GPU, Dtype>& prev_out, DenseMat<GPU, Dtype>& cur_out) override;
