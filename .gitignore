@@ -1,4 +1,5 @@
 build/
+*~
 *.swp
 make_common
 **/mnist/data/
