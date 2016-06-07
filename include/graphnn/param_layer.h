@@ -27,6 +27,7 @@ public:
     
     virtual void UpdateOutput(std::vector< ILayer<mode, Dtype>* >& operands, Phase phase) override
     {
+        assert(operands.size() == params.size());
         auto& cur_output = this->state->DenseDerived();
         for (size_t i = 0; i < operands.size(); ++i)
         {

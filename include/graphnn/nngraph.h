@@ -18,6 +18,14 @@ public:
         hash.clear();
     }
     
+    void Clear()
+    {
+        layer_dict.clear();
+        ordered_layers.clear();
+        name_idx_map.clear();
+        hash.clear();
+    }
+    
     void FeedForward(std::map<std::string, IMatrix<mode, Dtype>* > input, Phase phase);   
        
     std::map<std::string, Dtype> GetLoss();
