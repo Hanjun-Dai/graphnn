@@ -36,7 +36,7 @@ public:
             output->Zeros(input->rows, this->p["weight"]->value.cols);
         }
         
-        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase)
+        virtual void UpdateOutput(IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output, Dtype beta, Phase phase) override
         {
             auto& weight = this->p["weight"]->value;
                             

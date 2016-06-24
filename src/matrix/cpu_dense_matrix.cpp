@@ -653,6 +653,20 @@ void DenseMat<CPU, Dtype>::MulRowVec(DenseMat<CPU, Dtype>& src, DenseMat<CPU, Dt
 }
 
 template<typename Dtype>
+void DenseMat<CPU, Dtype>::MulColVec(DenseMat<CPU, Dtype>& src, DenseMat<CPU, Dtype>& x)
+{
+	Resize(src.rows, src.cols);
+	assert(x.count == this->rows);
+	size_t offset = 0; 
+	for (size_t row_idx = 0; row_idx < this->rows; ++row_idx)
+	{	
+		for (size_t col_idx = 0; col_idx < this->cols; ++col_idx)
+			this->data[offset + col_idx] = src.data[offset + col_idx] * x.data[row_idx];
+		offset += this->cols;
+	}
+}
+
+template<typename Dtype>
 void DenseMat<CPU, Dtype>::MulRowVec(DenseMat<CPU, Dtype>& x)
 {
     this->MulRowVec(*this, x);

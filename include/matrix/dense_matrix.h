@@ -104,6 +104,8 @@ public:
         
 		void MulRowVec(DenseMat<CPU, Dtype>& src, DenseMat<CPU, Dtype>& x, Dtype beta = 0);
         void MulRowVec(DenseMat<CPU, Dtype>& x);
+		void MulColVec(DenseMat<CPU, Dtype>& src, DenseMat<CPU, Dtype>& x);
+
 		void AddSubmat(DenseMat<CPU, Dtype>& src, size_t row_start, size_t col_start, Dtype beta);
 		void SubmatAdd(size_t row_start, size_t col_start, DenseMat<CPU, Dtype>& src, Dtype beta);
 		void SubmatAdd(size_t row_start, size_t col_start, SparseMat<CPU, Dtype>& src, Dtype beta);		
@@ -261,6 +263,7 @@ public:
         void Mean(DenseMat<GPU, Dtype>& src);
 		void MulRowVec(DenseMat<GPU, Dtype>& src, DenseMat<GPU, Dtype>& x, Dtype beta = 0);
 		void MulRowVec(DenseMat<GPU, Dtype>& x);
+		void MulColVec(DenseMat<GPU, Dtype>& src, DenseMat<GPU, Dtype>& x);
 		void GeaM(Dtype alpha, Trans transa, DenseMat<GPU, Dtype>& A, Dtype beta, Trans transb, DenseMat<GPU, Dtype>& B);
 		void Axpy(Dtype alpha, DenseMat<GPU, Dtype>& x);
         void Axpy(Dtype alpha, SparseMat<GPU, Dtype>& x);        

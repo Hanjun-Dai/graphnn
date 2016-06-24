@@ -470,6 +470,12 @@ void DenseMat<GPU, Dtype>::MulRowVec(DenseMat<GPU, Dtype>& src, DenseMat<GPU, Dt
 }
 
 template<typename Dtype>
+void DenseMat<GPU, Dtype>::MulColVec(DenseMat<GPU, Dtype>& src, DenseMat<GPU, Dtype>& x)
+{
+    assert(false);
+}
+
+template<typename Dtype>
 __global__ void MulRowKernel(Dtype *dst, Dtype* factor, int cols, int numElements)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
