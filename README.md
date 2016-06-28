@@ -59,3 +59,13 @@ Tested under Ubuntu 14.04 and Mac OSX 10.10.5
     
     The 5 datasets under the data/ folder are commonly used in graph kernel. 
     
+#### Reference
+
+```bibtex
+@article{dai2016discriminative,
+  title={Discriminative Embeddings of Latent Variable Models for Structured Data},
+  author={Dai, Hanjun and Dai, Bo and Song, Le},
+  journal={arXiv preprint arXiv:1603.05629},
+  year={2016}
+}
+```
