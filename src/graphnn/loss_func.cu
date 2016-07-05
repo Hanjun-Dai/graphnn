@@ -89,5 +89,11 @@ Dtype LossFunc<GPU, Dtype>::GetErrCnt(DenseMat<GPU, Dtype>& pred, SparseMat<GPU,
         return loss; 
 }
 
+template<typename Dtype>
+Dtype LossFunc<GPU, Dtype>::GetAverageRank(DenseMat<GPU, Dtype>& pred, SparseMat<GPU, Dtype>& label)
+{
+        throw std::runtime_error("not implemented");
+}
+
 template class LossFunc<GPU, float>;
 template class LossFunc<GPU, double>;

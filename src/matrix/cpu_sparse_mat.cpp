@@ -48,6 +48,18 @@ void SparseMat<CPU, Dtype>::Resize(size_t newRos, size_t newCols)
 }
 
 template<typename Dtype>
+void SparseMat<CPU, Dtype>::Print2Screen() // debug only
+{
+        std::cerr << "========mat content========" << std::endl;
+        for (size_t i = 0; i < this->rows; ++i)
+        {
+            for (int j = data->ptr[i]; j < data->ptr[i + 1]; ++j)
+                std::cerr << "(" << i << "," << data->col_idx[j] << ") : " << data->val[j] << std::endl;
+        }
+        std::cerr << "========    end    ========" << std::endl;    
+}
+
+template<typename Dtype>
 void SparseMat<CPU, Dtype>::ResizeSp(int newNNZ, int newNPtr)
 {
 		if (newNNZ > data->nzCap || newNPtr > data->ptrCap)

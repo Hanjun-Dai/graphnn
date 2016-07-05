@@ -34,6 +34,8 @@ public:
 			assert(fread(&cols, sizeof(size_t), 1, fid) == 1);
 			assert(fread(&count, sizeof(size_t), 1, fid) == 1);
 		}
+        
+        virtual void Print2Screen() = 0;
 		
 		virtual DenseMat<mode, Dtype>& DenseDerived() 
 		{

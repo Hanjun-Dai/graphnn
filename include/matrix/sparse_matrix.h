@@ -41,6 +41,8 @@ public:
         
 		Dtype Asum();
         
+        virtual void Print2Screen() override;
+        
 		virtual void Serialize(FILE* fid) override;
 		virtual void Deserialize(FILE* fid) override;
 		
@@ -81,7 +83,8 @@ public:
         
         virtual void Serialize(FILE* fid) override;
 		virtual void Deserialize(FILE* fid) override;
-		
+		virtual void Print2Screen() override;
+        
 		void Resize(size_t newRos, size_t newCols);		
 		void ResizeSp(int newNNZ, int newNPtr);
 	

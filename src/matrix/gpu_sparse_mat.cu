@@ -40,6 +40,12 @@ void SparseMat<GPU, Dtype>::Resize(size_t newRos, size_t newCols)
 }
 
 template<typename Dtype>
+void SparseMat<GPU, Dtype>::Print2Screen() // debug only
+{
+        throw "not implemented";
+}
+
+template<typename Dtype>
 void SparseMat<GPU, Dtype>::ResizeSp(int newNNZ, int newNPtr)
 {
 		if (newNNZ > data->nzCap || newNPtr > data->ptrCap)

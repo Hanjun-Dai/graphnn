@@ -142,7 +142,7 @@ public:
 				
 		void SparseMM(SparseMat<CPU, Dtype>& A, DenseMat<CPU, Dtype>& B, Trans transa, Trans transb, Dtype alpha, Dtype beta);
 		
-		void Print2Screen();
+		virtual void Print2Screen() override;
 		
 		Dtype* data;
 		size_t mem_size;
@@ -275,7 +275,7 @@ public:
 		
 		void SparseMM(SparseMat<GPU, Dtype>& A, DenseMat<GPU, Dtype>& B, Trans transa, Trans transb, Dtype alpha, Dtype beta);
 		
-		void Print2Screen();
+		virtual void Print2Screen() override;
         
 		unsigned streamid;
 		Dtype* data;
