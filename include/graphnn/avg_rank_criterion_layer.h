@@ -7,8 +7,8 @@ template<MatMode mode, typename Dtype>
 class AvgRankCriterionLayer : public ICriterionLayer<mode, Dtype>
 {
 public:
-			AvgRankCriterionLayer(std::string _name)
-                : ICriterionLayer<mode, Dtype>(_name, PropErr::N) {}
+			AvgRankCriterionLayer(std::string _name, RankOrder _order)
+                : ICriterionLayer<mode, Dtype>(_name, PropErr::N), order(_order) {}
                         
             static std::string str_type()
             {
@@ -20,13 +20,15 @@ public:
                 auto& pred = operands[0]->state->DenseDerived();
                 auto& labels = operands[1]->state->SparseDerived();
                 
-                this->loss = LossFunc<mode, Dtype>::GetAverageRank(pred, labels);
+                this->loss = LossFunc<mode, Dtype>::GetAverageRank(pred, labels, order);
             }
             
             virtual void BackPropErr(std::vector< ILayer<mode, Dtype>* >& operands, unsigned cur_idx, Dtype beta) override
             {
                 throw std::runtime_error("no grad in this layer");
             }      
+            
+            RankOrder order;            
 };
 
 #endif

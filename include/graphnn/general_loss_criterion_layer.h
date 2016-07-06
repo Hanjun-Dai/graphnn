@@ -7,6 +7,9 @@ template<MatMode mode, typename Dtype>
 class GeneralLossCriterionLayer : public ICriterionLayer<mode, Dtype>
 {
 public:
+            GeneralLossCriterionLayer(std::string _name, PropErr _properr = PropErr::T)
+                : GeneralLossCriterionLayer(_name, 1.0, _properr) {}
+                
 			GeneralLossCriterionLayer(std::string _name, Dtype _lambda, PropErr _properr = PropErr::T)
                 : ICriterionLayer<mode, Dtype>(_name, _lambda, _properr)
             {

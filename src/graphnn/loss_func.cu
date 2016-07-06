@@ -90,7 +90,7 @@ Dtype LossFunc<GPU, Dtype>::GetErrCnt(DenseMat<GPU, Dtype>& pred, SparseMat<GPU,
 }
 
 template<typename Dtype>
-Dtype LossFunc<GPU, Dtype>::GetAverageRank(DenseMat<GPU, Dtype>& pred, SparseMat<GPU, Dtype>& label)
+Dtype LossFunc<GPU, Dtype>::GetAverageRank(DenseMat<GPU, Dtype>& pred, SparseMat<GPU, Dtype>& label, RankOrder order)
 {
         throw std::runtime_error("not implemented");
 }
