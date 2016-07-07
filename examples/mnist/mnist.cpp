@@ -17,7 +17,7 @@
 #include "learner.h"
 
 typedef double Dtype;
-const MatMode mode = GPU;
+const MatMode mode = CPU;
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
 int dev_id;
@@ -132,15 +132,17 @@ void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int 
 int main(const int argc, const char** argv)
 {	
     LoadParams(argc, argv);    
-	GPUHandle::Init(dev_id);
+//	GPUHandle::Init(dev_id);
     
     InitModel();
     
     LoadRaw(f_train_feat, f_train_label, images_train, labels_train);
     LoadRaw(f_test_feat, f_test_label, images_test, labels_test);
     
-    MomentumSGDLearner<mode, Dtype> learner(&model, lr, 0.9, 0);
-            
+    //MomentumSGDLearner<mode, Dtype> learner(&model, lr, 0.9, 0);
+    AdamLearner<mode, Dtype> learner(&model, lr);
+    learner.clipping_enabled = false;
+
     Dtype loss, err_rate;       
     for (int epoch = 0; epoch < 10; ++epoch)
     {
@@ -169,6 +171,6 @@ int main(const int argc, const char** argv)
         }
     }
     
-    GPUHandle::Destroy();
+//    GPUHandle::Destroy();
 	return 0;    
 }
