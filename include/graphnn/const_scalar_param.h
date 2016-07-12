@@ -12,7 +12,7 @@ public:
     
     virtual void InitConst(void* side_info) override {}
        
-    virtual void ResetOutput(const IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output) 
+    virtual void ResetOutput(const IMatrix<mode, Dtype>* input, DenseMat<mode, Dtype>* output) override
     {
         output->Resize(input->rows, input->cols);        
     }             
