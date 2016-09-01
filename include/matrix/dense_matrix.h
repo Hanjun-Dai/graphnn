@@ -99,6 +99,8 @@ public:
 		void AddRowVec(DenseMat<CPU, Dtype>& x, Dtype alpha);		
 		void AddColVec(DenseMat<CPU, Dtype>& x, Dtype alpha);
         void Mean(DenseMat<CPU, Dtype>& src);
+        void RowSum(DenseMat<CPU, Dtype>& src);
+        void ReduceByRow(DenseMat<CPU, Dtype>& src, Dtype scalar);
         
         void GetColsFrom(DenseMat<CPU, Dtype>& src, size_t col_start, size_t col_cnt); 
         
@@ -261,6 +263,9 @@ public:
         void EleWiseMul(DenseMat<GPU, Dtype>& lhs, DenseMat<GPU, Dtype>& rhs);
         void EleWiseMul(SparseMat<GPU, Dtype>& src);
         void Mean(DenseMat<GPU, Dtype>& src);
+        void RowSum(DenseMat<GPU, Dtype>& src);
+        void ReduceByRow(DenseMat<GPU, Dtype>& src, Dtype scalar);
+        
 		void MulRowVec(DenseMat<GPU, Dtype>& src, DenseMat<GPU, Dtype>& x, Dtype beta = 0);
 		void MulRowVec(DenseMat<GPU, Dtype>& x);
 		void MulColVec(DenseMat<GPU, Dtype>& src, DenseMat<GPU, Dtype>& x);

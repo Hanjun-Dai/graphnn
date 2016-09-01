@@ -376,16 +376,29 @@ Dtype DenseMat<CPU, Dtype>::Amax()
 }
 
 template<typename Dtype>
-void DenseMat<CPU, Dtype>::Mean(DenseMat<CPU, Dtype>& src)
+void DenseMat<CPU, Dtype>::ReduceByRow(DenseMat<CPU, Dtype>& src, Dtype scalar)
 {
     Resize(1, src.cols);
     if (bias_mult.count < src.rows)
 		bias_mult.Resize(src.rows);
-	bias_mult.Fill(1.0 / src.rows);
+	bias_mult.Fill(scalar);
     
     MKLHelper_GeMV(CblasRowMajor, CblasTrans, src.rows, src.cols, 1.0, src.data, src.cols, 
                    bias_mult.data, 1, 0.0, this->data, 1);    
 }
+
+template<typename Dtype>
+void DenseMat<CPU, Dtype>::Mean(DenseMat<CPU, Dtype>& src)
+{
+    ReduceByRow(src, 1.0 / src.rows);
+}
+
+template<typename Dtype>
+void DenseMat<CPU, Dtype>::RowSum(DenseMat<CPU, Dtype>& src)
+{
+    ReduceByRow(src, 1.0);
+}
+
 
 template<typename Dtype>
 void DenseMat<CPU, Dtype>::AddRowVec(DenseMat<CPU, Dtype>& x, Dtype alpha)

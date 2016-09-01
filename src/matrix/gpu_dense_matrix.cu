@@ -496,12 +496,12 @@ void DenseMat<GPU, Dtype>::MulRowVec(DenseMat<GPU, Dtype>& x)
 }
 
 template<typename Dtype>
-void DenseMat<GPU, Dtype>::Mean(DenseMat<GPU, Dtype>& src)
+void DenseMat<GPU, Dtype>::ReduceByRow(DenseMat<GPU, Dtype>& src, Dtype scalar)
 {
     Resize(1, src.cols);
     if (bias_mult.count < src.rows)
 		bias_mult.Resize(src.rows);
-	bias_mult.Fill(1.0 / src.rows);
+	bias_mult.Fill(scalar);
     Dtype alpha = 1.0, beta = 0.0;
     cudaStreamSynchronize(GPUHandle::streams[streamid]);
     CudaHelper_GeMV(GPUHandle::cublashandle, GPU_T(Trans::N), 
@@ -509,6 +509,18 @@ void DenseMat<GPU, Dtype>::Mean(DenseMat<GPU, Dtype>& src)
                     &alpha, src.data, src.cols,
                     bias_mult.data, 1, 
                     &beta, this->data, 1); 
+}
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::Mean(DenseMat<GPU, Dtype>& src)
+{
+    ReduceByRow(src, 1.0 / src.rows);
+}
+
+template<typename Dtype>
+void DenseMat<GPU, Dtype>::RowSum(DenseMat<GPU, Dtype>& src)
+{
+    ReduceByRow(src, 1.0);
 }
 
 template<typename Dtype>
