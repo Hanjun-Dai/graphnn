@@ -1,5 +1,6 @@
 #include "relu_layer.h"
 #include "sigmoid_layer.h"
+#include "tanh_layer.h"
 #include "softmax_layer.h"
 #include "mkl_helper.h"
 #include "dense_matrix.h"
@@ -45,6 +46,32 @@ void SigmoidLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CP
 
 template class SigmoidLayer<CPU, float>;
 template class SigmoidLayer<CPU, double>;
+
+// =========================================== tanh layer ================================================
+
+template<typename Dtype>
+void TanhLayer<CPU, Dtype>::Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out)
+{
+    Dtype x, y;
+    for (size_t i = 0; i < cur_out.count; ++i)
+    {
+        x = exp(prev_out.data[i]); 
+        y = exp(-prev_out.data[i]);
+        cur_out.data[i] = (x - y) / (x + y);
+    }
+}
+
+template<typename Dtype>
+void TanhLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
+                            DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad, Dtype beta)
+{
+    dst.Scale(beta);
+    for (size_t i = 0; i < cur_output.count; ++i)
+		dst.data[i] += cur_grad.data[i] * (1 - cur_output.data[i] * cur_output.data[i]);        	
+}
+
+template class TanhLayer<CPU, float>;
+template class TanhLayer<CPU, double>;
 
 // =========================================== softmax layer ================================================
 
