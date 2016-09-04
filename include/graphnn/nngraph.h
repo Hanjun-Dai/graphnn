@@ -13,6 +13,7 @@ public:
     NNGraph()
     {
         layer_dict.clear();
+        static_layer_dict.clear();
         ordered_layers.clear();
         name_idx_map.clear();
         hash.clear();
@@ -21,6 +22,7 @@ public:
     void Clear()
     {
         layer_dict.clear();
+        static_layer_dict.clear();
         ordered_layers.clear();
         name_idx_map.clear();
         hash.clear();
@@ -51,11 +53,30 @@ public:
         }
     }
     
+    inline bool HasLayer(std::string name)
+    {
+        return static_layer_dict.count(name) || layer_dict.count(name);
+    }
+    
+    inline void InsertStaticLayer(ILayer<mode, Dtype>* layer)
+    {
+        assert(static_layer_dict.count(layer->name) == 0);
+        assert(layer_dict.count(layer->name) == 0);
+        static_layer_dict[layer->name] = layer;
+        assert(layer->state);
+        assert(layer->state->count);
+    }
+    
     inline void InsertLayer(ILayer<mode, Dtype>* layer, std::vector< ILayer<mode, Dtype>* > operands)
     {
         assert(layer_dict.count(layer->name) == 0);
         layer_dict[layer->name] = layer;
         name_idx_map[layer->name] = ordered_layers.size();
+        for (auto* op : operands)
+        {
+            if (!HasLayer(op->name))
+                InsertStaticLayer(op);
+        }
         ordered_layers.push_back(std::make_pair(layer->name, operands));        
     }                          
     
@@ -68,7 +89,7 @@ public:
     }
     
     std::map< std::string, unsigned > name_idx_map;
-    std::map< std::string, ILayer<mode, Dtype>* > layer_dict;
+    std::map< std::string, ILayer<mode, Dtype>* > layer_dict, static_layer_dict;
     std::vector< std::pair<std::string, std::vector< ILayer<mode, Dtype>* > > > ordered_layers;
     std::vector< bool > hash;    
 };

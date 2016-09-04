@@ -14,28 +14,34 @@ void NNGraph<mode, Dtype>::FeedForward(std::map<std::string, IMatrix<mode, Dtype
     for (auto it = input.begin(); it != input.end(); ++it)
     {
         layer_dict[it->first]->state = it->second;
+        assert(name_idx_map.count(it->first));
         hash[name_idx_map[it->first]] = true;
     }
     
     // feed-forward
     for (size_t i = 0; i < ordered_layers.size(); ++i)
     {     
+        assert(layer_dict.count(ordered_layers[i].first));
         auto* cur_layer = layer_dict[ordered_layers[i].first];
         auto& operands = ordered_layers[i].second;
+        assert(name_idx_map.count(cur_layer->name));
         if (operands.size() == 0 && ! hash[name_idx_map[cur_layer->name]])
             continue;
         
         bool ready = true;
         for (auto* layer : operands)
         {
+            if (static_layer_dict.count(layer->name))
+                continue;
+            assert(name_idx_map.count(layer->name));
             auto idx = name_idx_map[layer->name];
             ready &= hash[idx];
-        }        
+        }
         hash[name_idx_map[cur_layer->name]] = ready;
         if (ready)            
             cur_layer->UpdateOutput(operands, phase);
         else if (phase != TEST)
-            std::runtime_error("wrong computation flow");         
+            throw std::runtime_error("wrong computation flow");         
     }    
 }
 
@@ -82,6 +88,7 @@ void NNGraph<mode, Dtype>::BackPropagation()
         for (size_t i = 0; i < operands.size(); ++i)
         {            
             auto* prev_layer = operands[i];
+            assert(name_idx_map.count(prev_layer->name));
             auto prev_id = name_idx_map[prev_layer->name];
             if (prev_layer->properr == PropErr::T)
             {
