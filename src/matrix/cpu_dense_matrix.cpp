@@ -627,6 +627,21 @@ void DenseMat<CPU, Dtype>::ShuffleCols(DenseMat<CPU, Dtype>& src, const int* per
 }
 
 template<typename Dtype>
+void DenseMat<CPU, Dtype>::Repmat(DenseMat<CPU, Dtype>& src, size_t times_rows, size_t times_cols)
+{
+	assert(times_cols == 1);
+	assert(times_rows >= 1);
+
+	this->Resize(src.rows * times_rows, src.cols * times_cols);
+	Dtype* cur_pos = this->data;
+	for (size_t i = 0; i < times_rows; ++i)
+	{
+		memcpy(cur_pos, src.data, sizeof(Dtype) * src.count);
+		cur_pos += src.count;
+	}
+}
+
+template<typename Dtype>
 void DenseMat<CPU, Dtype>::ReduceCols(DenseMat<CPU, Dtype>& src)
 {
 	assert(src.cols % this->cols == 0);

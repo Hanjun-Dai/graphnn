@@ -2,6 +2,8 @@
 #define MULTINOMIAL_SAMPLE_LAYER_H
 
 #include "i_act_layer.h"
+#include<random>
+#include<chrono>
 
 template<MatMode mode, typename Dtype>
 class MultinomialSampleLayer;
@@ -17,7 +19,7 @@ class MultinomialSampleLayer<CPU, Dtype> : public IActLayer<CPU, Dtype>
 {
 public:
     
-    MultinomialSampleLayer(std::string _name, SampleType, _st, PropErr _properr = PropErr::T)
+    MultinomialSampleLayer(std::string _name, SampleType _st, PropErr _properr = PropErr::T)
             : IActLayer<CPU, Dtype>(_name, WriteType::OUTPLACE, _properr), st(_st) {}
 
     static std::string str_type()

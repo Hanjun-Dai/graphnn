@@ -120,6 +120,7 @@ public:
 				SubmatAdd(row_start, col_start, src->SparseDerived(), beta);
 			}
 		}
+		void Repmat(DenseMat<CPU, Dtype>& src, size_t times_rows, size_t times_cols);
 		void ScatterCols(std::vector< DenseMat<CPU, Dtype>* >& dst_list);
 		void ConcatCols(DenseMat<CPU, Dtype>& src);
         void ConcatCols(std::vector< DenseMat<CPU, Dtype>* > src_list);
@@ -240,7 +241,7 @@ public:
 		
 		void AddSubmat(DenseMat<GPU, Dtype>& src, size_t row_start, size_t col_start, Dtype beta);
 		void GetColsFrom(DenseMat<GPU, Dtype>& src, size_t col_start, size_t col_cnt); 
-        
+        void Repmat(DenseMat<GPU, Dtype>& src, size_t times_rows, size_t times_cols);
 		void SubmatAdd(size_t row_start, size_t col_start, SparseMat<GPU, Dtype>& src, Dtype beta);
 		void SubmatAdd(size_t row_start, size_t col_start, DenseMat<GPU, Dtype>& src, Dtype beta);
 		void SubmatAdd(size_t row_start, size_t col_start, IMatrix<GPU, Dtype>* src, Dtype beta)

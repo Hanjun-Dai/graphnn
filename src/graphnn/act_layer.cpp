@@ -115,12 +115,40 @@ template class SoftmaxLayer<CPU, double>;
 template<typename Dtype>
 void MultinomialSampleLayer<CPU, Dtype>::Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out)
 {
+    auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+    std::uniform_real_distribution<Dtype> distribution(0, 1);
+
+    cur_out.Zeros(prev_out.rows, prev_out.cols);
+    Dtype* prob = prev_out.data;        
+    for (size_t i = 0; i < prev_out.rows; ++i)
+    {
+        size_t max_id = 0;
+        Dtype cum_sum = 0, threshold = distribution(generator);
+        for (size_t j = 0; j < prev_out.cols; ++j)
+        {
+            if (st == SampleType::MAX && prob[j] > prob[max_id])
+                max_id = j;
+            if (st == SampleType::STOCHASTIC)
+            {
+                cum_sum += prob[j];
+                if (cum_sum >= threshold)
+                {
+                    max_id = j;
+                    break;
+                }
+            }
+        }
+        cur_out.data[cur_out.cols * i + max_id] = 1.0;
+        prob += prev_out.cols;
+    }
 }
 
 template<typename Dtype>
 void MultinomialSampleLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
                                DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad, Dtype beta)
 {
+    dst.Axpby(1.0, cur_grad, beta);
 }
 
 template class MultinomialSampleLayer<CPU, float>;

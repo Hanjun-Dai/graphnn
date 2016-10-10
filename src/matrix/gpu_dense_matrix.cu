@@ -732,6 +732,12 @@ void DenseMat<GPU, Dtype>::ConcatCols(std::vector< DenseMat<GPU, Dtype>* > src_l
 }
 
 template<typename Dtype>
+void DenseMat<GPU, Dtype>::Repmat(DenseMat<GPU, Dtype>& src, size_t times_rows, size_t times_cols)
+{
+    assert(false);
+}
+
+template<typename Dtype>
 __global__ void SparseEleWiseMulKernel(Dtype* dst, int* row_ptr, int* col_idx, Dtype* val, int n_cols, int numElements)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;

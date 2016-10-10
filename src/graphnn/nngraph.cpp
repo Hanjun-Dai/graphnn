@@ -27,7 +27,6 @@ void NNGraph<mode, Dtype>::FeedForward(std::map<std::string, IMatrix<mode, Dtype
         assert(name_idx_map.count(cur_layer->name));
         if (operands.size() == 0 && ! hash[name_idx_map[cur_layer->name]])
             continue;
-        
         bool ready = true;
         for (auto* layer : operands)
         {

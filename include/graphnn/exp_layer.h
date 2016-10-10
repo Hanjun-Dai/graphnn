@@ -8,7 +8,7 @@ class ExpLayer : public IActLayer<mode, Dtype>
 {
 public:
     
-    ExpLayer(std::string _name, WriteType _wt = WriteType::INPLACE, PropErr _properr = PropErr::T)
+    ExpLayer(std::string _name, WriteType _wt = WriteType::OUTPLACE, PropErr _properr = PropErr::T)
             : IActLayer<mode, Dtype>(_name, _wt, _properr) {}
 
     static std::string str_type()
