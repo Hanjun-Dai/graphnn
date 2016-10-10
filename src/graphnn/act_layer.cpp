@@ -2,6 +2,7 @@
 #include "sigmoid_layer.h"
 #include "tanh_layer.h"
 #include "softmax_layer.h"
+#include "multinomial_sample_layer.h"
 #include "mkl_helper.h"
 #include "dense_matrix.h"
 
@@ -108,3 +109,19 @@ void SoftmaxLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CP
 
 template class SoftmaxLayer<CPU, float>;
 template class SoftmaxLayer<CPU, double>;
+
+// =========================================== multinomial_sample layer ================================================
+
+template<typename Dtype>
+void MultinomialSampleLayer<CPU, Dtype>::Act(DenseMat<CPU, Dtype>& prev_out, DenseMat<CPU, Dtype>& cur_out)
+{
+}
+
+template<typename Dtype>
+void MultinomialSampleLayer<CPU, Dtype>::Derivative(DenseMat<CPU, Dtype>& dst, DenseMat<CPU, Dtype>& prev_output, 
+                               DenseMat<CPU, Dtype>& cur_output, DenseMat<CPU, Dtype>& cur_grad, Dtype beta)
+{
+}
+
+template class MultinomialSampleLayer<CPU, float>;
+template class MultinomialSampleLayer<CPU, double>;
