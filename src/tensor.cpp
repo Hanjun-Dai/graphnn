@@ -5,25 +5,14 @@
 namespace gnn
 {
 
-Tensor::Tensor()
+template<Mode mode, MatType matType, DataType dType>
+TensorTemplate<mode, matType, dType>& Tensor::Derived()
 {
-
+	return *(dynamic_cast<TensorTemplate<mode, matType, dType>*>(this));
 }
 
-template<Mode mode, MatType matType, uint rank, DataType dType>
-TensorTemplate<mode, matType, rank, dType> Tensor::Get()
-{
-	TensorTemplate<mode, matType, rank, dType> result(shape, data);
-	return result;
-}
-
-
-Tensor operator+(const Tensor& lhs, const Tensor& rhs)
-{
-	Tensor result;
-	return result;
-}
-
-template TensorTemplate<CPU, DENSE, 1, FLOAT32> Tensor::Get<CPU, DENSE, 1, FLOAT32>(); 
+template TensorTemplate<CPU, DENSE, FLOAT32>& Tensor::Derived<CPU, DENSE, FLOAT32>(); 
+template TensorTemplate<CPU, DENSE, FLOAT64>& Tensor::Derived<CPU, DENSE, FLOAT64>(); 
+template TensorTemplate<CPU, DENSE, INT32>& Tensor::Derived<CPU, DENSE, INT32>(); 
 
 }

@@ -1,40 +1,25 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
+#include "gnn_macros.h"
 #include "t_shape.h"
 #include <memory>
 #include <iostream>
+#include <exception>
+#include <string>
 
 namespace gnn {
 
-typedef unsigned int uint;
-
-enum Mode
-{
-	CPU = 0,
-	GPU = 1
-};
-
-enum MatType
-{
-	DENSE,
-	SPARSE
-};
-
-enum DataType
-{
-	FLOAT32,
-	FLOAT64,
-	INT32
-};
-
 class TData;
 
-template<Mode mode, MatType matType, uint rank, DataType dType>
+template<Mode mode, MatType matType, DataType dType>
 class TensorTemplate;
 
-template<Mode mode, uint rank, DataType dType>
-using DenseTensor = TensorTemplate<mode, DENSE, rank, dType>;
+template<Mode mode, DataType dType>
+using DenseTensor = TensorTemplate<mode, DENSE, dType>;
+
+template<Mode mode, DataType dType>
+using SparseTensor = TensorTemplate<mode, SPARSE, dType>;
 
 /**
  * @brief      Class for tensor.
@@ -43,13 +28,13 @@ class Tensor
 {
 public:
 
-	Tensor();
+	template<Mode mode, MatType matType, DataType dType>
+	TensorTemplate<mode, matType, dType>& Derived();
 
-	virtual void Print() { std::cerr << "base_class" << std::endl; };
+	virtual void Reshape(std::initializer_list<uint> l) NOT_IMPLEMENTED
 
-	template<Mode mode, MatType matType, uint rank, DataType dType>
-	TensorTemplate<mode, matType, rank, dType> Get();
-	
+	virtual void Zeros() NOT_IMPLEMENTED
+
 	/**
 	 * Tensor shape
 	 */
@@ -78,11 +63,9 @@ private:
 
 };
 
-template<Mode mode, MatType matType, uint rank, DataType dType>
+template<Mode mode, MatType matType, DataType dType>
 class TensorTemplate : public Tensor {};
 
-
-Tensor operator+(const Tensor& lhs, const Tensor& rhs);
 
 } // namespace gnn
 #endif

@@ -6,17 +6,16 @@
 namespace gnn
 {
 
-template<uint rank, DataType dType>
-class TensorTemplate<CPU, DENSE, rank, dType> : public Tensor
+template<DataType dType>
+class TensorTemplate<CPU, DENSE, dType> : public Tensor
 {
 public:
 
-	virtual void Print() { std::cerr << "derived class" << std::endl; };
+	TensorTemplate();
 
-	TensorTemplate(TShape _shape, std::shared_ptr< TData > _data)
-	{
+	virtual void Reshape(std::initializer_list<uint> l) override;
 
-	}
+	virtual void Zeros() override;
 };
 
 }

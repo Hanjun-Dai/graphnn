@@ -4,18 +4,14 @@
 
 using namespace gnn;
 
-void Print(Tensor& t)
-{
-	t.Print();
-}
 
 TEST(TensorTest, Compile)
 {
 	int s = rand();
-	Tensor t;
+	Tensor* t = new DenseTensor<CPU, FLOAT32>();
 
-	auto tmp = t.Get<CPU, DENSE, 1, FLOAT32>();
-	Print(t);
-	Print(tmp);
+	auto& tmp = t->Derived<CPU, DENSE, FLOAT32>();
+	tmp.Zeros();
+
 	EXPECT_EQ(1, 1);
 }
