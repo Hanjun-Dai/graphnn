@@ -9,6 +9,8 @@ namespace gnn
 template< Mode mode >
 class MemHolder
 {
+public:
+	
 	template<typename T>
 	static void DelArr(T*& p);
 

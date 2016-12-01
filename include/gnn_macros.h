@@ -22,14 +22,6 @@ enum MatType
 	SPARSE
 };
 
-enum DataType
-{
-	FLOAT32,
-	FLOAT64,
-	INT32
-};
-
-
 }
 
 #endif

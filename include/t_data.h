@@ -5,45 +5,60 @@
 
 namespace gnn{
 
-template<Mode mode, MatType mType, DataType dType>
+template<Mode mode, MatType mType, typename Dtype>
 class TDataTemplate;
 
-template<Mode mode, MatType mType, DataType dType>
+template<Mode mode, MatType mType, typename Dtype>
 class TensorTemplate;
 
-template<Mode mode, DataType dType>
-using DenseData = TDataTemplate<mode, DENSE, dType>;
+template<Mode mode, typename Dtype>
+using DenseData = TDataTemplate<mode, DENSE, Dtype>;
 
-template<Mode mode, DataType dType>
-using SparseData = TDataTemplate<mode, SPARSE, dType>;
+template<Mode mode, typename Dtype>
+using SparseData = TDataTemplate<mode, SPARSE, Dtype>;
 
 class TData
 {
 public: 
-	template<Mode mode, MatType mType, DataType dType>
-	TDataTemplate<mode, mType, dType>& Derived(TensorTemplate<mode, mType, dType>& tensor);
+	template<Mode mode, MatType mType, typename Dtype>
+	TDataTemplate<mode, mType, Dtype>& Derived(TensorTemplate<mode, mType, Dtype>* host)
+	{
+		return *(dynamic_cast<TDataTemplate<mode, mType, Dtype>*>(this));
+	}
 
+	template<Mode mode, MatType mType, typename Dtype>
+	TDataTemplate<mode, mType, Dtype>& Derived(TensorTemplate<mode, mType, Dtype>& host)
+	{
+		return *(dynamic_cast<TDataTemplate<mode, mType, Dtype>*>(this));
+	}
+
+	template<Mode mode, MatType mType, typename Dtype>
+	TDataTemplate<mode, mType, Dtype>& Derived()
+	{
+		return *(dynamic_cast<TDataTemplate<mode, mType, Dtype>*>(this));
+	}
+
+private:
+	virtual void dummy() {};
 };
 
-template<Mode mode, DataType dType>
-class TDataTemplate<mode, DENSE, dType> : public TData
+template<Mode mode, typename Dtype>
+class TDataTemplate<mode, DENSE, Dtype> : public TData
 {
 public:
-	typedef typename std::conditional<dType == FLOAT32, float, typename std::conditional<dType == FLOAT64, double, int>::type >::type D;
 
-	TDataTemplate() : data(nullptr), mem_size(0) {}
+	TDataTemplate() : ptr(nullptr), mem_size(0) {}
 
-	D* data;
+	Dtype* ptr;
 	size_t mem_size;
 };
 
-template<Mode mode, DataType dType>
-class TDataTemplate<mode, SPARSE, dType> : public TData
+template<Mode mode, typename Dtype>
+class TDataTemplate<mode, SPARSE, Dtype> : public TData
 {
 public:
-	typedef typename std::conditional<dType == FLOAT32, float, typename std::conditional<dType == FLOAT64, double, int>::type >::type D;
 
-	D* val;
+	Dtype* val;
 	int* col_idx;
 	int* ptr;
 	

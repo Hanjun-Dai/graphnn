@@ -12,14 +12,14 @@ namespace gnn {
 
 class TData;
 
-template<Mode mode, MatType matType, DataType dType>
+template<Mode mode, MatType matType, typename Dtype>
 class TensorTemplate;
 
-template<Mode mode, DataType dType>
-using DenseTensor = TensorTemplate<mode, DENSE, dType>;
+template<Mode mode, typename Dtype>
+using DenseTensor = TensorTemplate<mode, DENSE, Dtype>;
 
-template<Mode mode, DataType dType>
-using SparseTensor = TensorTemplate<mode, SPARSE, dType>;
+template<Mode mode, typename Dtype>
+using SparseTensor = TensorTemplate<mode, SPARSE, Dtype>;
 
 /**
  * @brief      Class for tensor.
@@ -28,8 +28,8 @@ class Tensor
 {
 public:
 
-	template<Mode mode, MatType matType, DataType dType>
-	TensorTemplate<mode, matType, dType>& Derived();
+	template<Mode mode, MatType matType, typename Dtype>
+	TensorTemplate<mode, matType, Dtype>& Derived();
 
 	virtual void Reshape(std::initializer_list<uint> l) NOT_IMPLEMENTED
 
@@ -55,15 +55,11 @@ public:
 	 * data ptr
 	 */
 	std::shared_ptr< TData > data;
-	/**
-	 * data type
-	 */
-	DataType dType;
 private:
 
 };
 
-template<Mode mode, MatType matType, DataType dType>
+template<Mode mode, MatType matType, typename Dtype>
 class TensorTemplate : public Tensor {};
 
 

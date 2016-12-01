@@ -6,8 +6,8 @@
 namespace gnn
 {
 
-template<DataType dType>
-class TensorTemplate<CPU, DENSE, dType> : public Tensor
+template<typename Dtype>
+class TensorTemplate<CPU, DENSE, Dtype> : public Tensor
 {
 public:
 
