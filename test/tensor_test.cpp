@@ -15,7 +15,7 @@ TEST(TensorTest, ReshapeSize)
 	ASSERT_EQ(2 * 3 * 4, t_data.mem_size);
 }
 
-TEST(TensorTest, Zero)
+TEST(TensorTest, ZeroInt)
 {
 	Tensor* t = new DenseTensor<CPU, int>();
 	t->Reshape({2, 3, 4});
@@ -27,6 +27,15 @@ TEST(TensorTest, Zero)
 		ans += t_data.ptr[i];
 
 	ASSERT_EQ(0, ans);
+}
+
+TEST(TensorTest, AsScalar)
+{
+	Tensor* t = new DenseTensor<CPU, int>();
+	t->Reshape({1, 1, 1});
+	t->Zeros();
+
+	ASSERT_EQ(0, t->AsScalar<int>());
 }
 
 TEST(TensorTest, Compile)

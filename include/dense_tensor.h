@@ -16,6 +16,9 @@ public:
 	virtual void Reshape(std::initializer_list<uint> l) override;
 
 	virtual void Zeros() override;
+
+	virtual int AsInt() override;
+
 };
 
 }

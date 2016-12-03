@@ -35,6 +35,11 @@ public:
 
 	virtual void Zeros() NOT_IMPLEMENTED
 
+	virtual int AsInt() NOT_IMPLEMENTED
+
+	template<typename Dtype>
+	Dtype AsScalar(); 
+
 	/**
 	 * Tensor shape
 	 */

@@ -15,4 +15,10 @@ template TensorTemplate<CPU, DENSE, float>& Tensor::Derived<CPU, DENSE, float>()
 template TensorTemplate<CPU, DENSE, double>& Tensor::Derived<CPU, DENSE, double>(); 
 template TensorTemplate<CPU, DENSE, int>& Tensor::Derived<CPU, DENSE, int>(); 
 
+template<>
+int Tensor::AsScalar()
+{
+	return this->AsInt();
+}
+
 }
