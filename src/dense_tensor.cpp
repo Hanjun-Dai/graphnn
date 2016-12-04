@@ -2,6 +2,7 @@
 #include "t_data.h"
 #include "mem_holder.h"
 #include <cstring>
+#include <cassert>
 
 namespace gnn 
 {
@@ -36,6 +37,14 @@ void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 
 	if (t_data.mem_size)
 	   memset(t_data.ptr, 0, sizeof(Dtype) * t_data.mem_size);
+}
+
+template<typename Dtype>
+int TensorTemplate<CPU, DENSE, Dtype>::AsInt()
+{
+	assert(this->shape.Count() == 1);
+	auto& t_data = this->data->Derived(this);
+	return t_data.ptr[0];	
 }
 
 template class TensorTemplate<CPU, DENSE, float>;
