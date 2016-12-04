@@ -1,7 +1,7 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
-#include "gnn_macros.h"
+#include "util/gnn_macros.h"
 #include "t_shape.h"
 #include <memory>
 #include <iostream>
@@ -31,15 +31,17 @@ public:
 	template<typename mode, typename matType>
 	TensorTemplate<mode, matType>& Derived();
 
-	virtual void Reshape(std::initializer_list<uint>) NOT_IMPLEMENTED
+	virtual void Reshape(std::initializer_list<uint> l) NOT_IMPLEMENTED
 
 	virtual void Zeros() NOT_IMPLEMENTED
 
 	virtual Dtype AsScalar() NOT_IMPLEMENTED
 
-	virtual void SetRandN(Dtype, Dtype) NOT_IMPLEMENTED
+	virtual void SetRandN(Dtype mean, Dtype std) NOT_IMPLEMENTED
 
-	virtual void Fill(Dtype) NOT_IMPLEMENTED
+	virtual void Fill(Dtype scalar) NOT_IMPLEMENTED
+
+	virtual Dtype ASum() NOT_IMPLEMENTED
 
 	/**
 	 * Tensor shape

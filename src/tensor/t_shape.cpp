@@ -1,4 +1,4 @@
-#include "t_shape.h"
+#include "tensor/t_shape.h"
 
 namespace gnn
 {

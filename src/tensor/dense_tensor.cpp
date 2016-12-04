@@ -1,6 +1,8 @@
-#include "dense_tensor.h"
-#include "t_data.h"
-#include "mem_holder.h"
+#include "tensor/dense_tensor.h"
+#include "tensor/t_data.h"
+#include "tensor/unary_functor.h"
+#include "tensor/mkl_helper.h"
+#include "util/mem_holder.h"
 #include <cstring>
 #include <cassert>
 
@@ -50,7 +52,18 @@ void TensorTemplate<CPU, DENSE>::SetRandN(Dtype mean, Dtype std)
 
 void TensorTemplate<CPU, DENSE>::Fill(Dtype scalar)
 {
-	
+	if (scalar == 0)
+		this->Zeros();
+	else {
+		auto& t_data = this->data->Derived(this);
+		UnaryEngine<CPU>::Exec<UnarySet>(t_data.ptr, this->shape.Count(), scalar);
+	}
+}
+
+Dtype TensorTemplate<CPU, DENSE>::ASum()
+{
+	auto& t_data = this->data->Derived(this);
+	return MKL_ASum(this->shape.Count(), t_data.ptr);
 }
 
 template class TensorTemplate<CPU, DENSE>;

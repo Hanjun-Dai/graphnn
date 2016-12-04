@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "dense_tensor.h"
-#include "t_data.h"
+#include "tensor/dense_tensor.h"
+#include "tensor/t_data.h"
 #include <type_traits>
 
 using namespace gnn;
@@ -15,17 +15,13 @@ TEST(TensorTest, ReshapeSize)
 	ASSERT_EQ(2 * 3 * 4, t_data.mem_size);
 }
 
-TEST(TensorTest, ZeroInt)
+TEST(TensorTest, Zero)
 {
 	Tensor* t = new DenseTensor<CPU>();
 	t->Reshape({2, 3, 4});
 	t->Zeros();
 
-	auto& t_data = t->data->Derived<CPU, DENSE>();
-	int ans = 0;
-	for (size_t i = 0; i < t_data.mem_size; ++i)
-		ans += t_data.ptr[i];
-
+	int ans = t->ASum();
 	ASSERT_EQ(0, ans);
 }
 
@@ -36,6 +32,20 @@ TEST(TensorTest, AsScalar)
 	t->Zeros();
 
 	ASSERT_EQ(0, t->AsScalar());
+}
+
+TEST(TensorTest, Fill)
+{
+	Tensor* t = new DenseTensor<CPU>();
+	t->Reshape({2, 3, 4});
+	t->Fill(2.0);
+
+	auto& t_data = t->data->Derived<CPU, DENSE>();
+	Dtype ans = 0;
+	for (size_t i = 0; i < t_data.mem_size; ++i)
+		ans += t_data.ptr[i];
+
+	ASSERT_EQ(48, ans);
 }
 
 TEST(TensorTest, Compile)

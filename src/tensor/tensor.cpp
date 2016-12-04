@@ -1,6 +1,6 @@
-#include "tensor.h"
-#include "t_data.h"
-#include "dense_tensor.h"
+#include "tensor/tensor.h"
+#include "tensor/t_data.h"
+#include "tensor/dense_tensor.h"
 
 namespace gnn
 {

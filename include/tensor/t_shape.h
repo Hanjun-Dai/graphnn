@@ -1,7 +1,7 @@
 #ifndef T_SHAPE_H
 #define T_SHAPE_H
 
-#include "gnn_macros.h"
+#include "util/gnn_macros.h"
 #include <vector>
 
 namespace gnn 

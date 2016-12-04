@@ -22,6 +22,8 @@ public:
 	virtual void SetRandN(Dtype mean, Dtype std) override;
 
 	virtual void Fill(Dtype scalar) override;
+
+	virtual Dtype ASum() override;
 };
 
 }
