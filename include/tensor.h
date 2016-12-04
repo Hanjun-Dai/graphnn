@@ -12,33 +12,34 @@ namespace gnn {
 
 class TData;
 
-template<typename mode, typename matType, typename Dtype>
+template<typename mode, typename matType>
 class TensorTemplate;
 
-template<typename mode, typename Dtype>
-using DenseTensor = TensorTemplate<mode, DENSE, Dtype>;
+template<typename mode>
+using DenseTensor = TensorTemplate<mode, DENSE>;
 
-template<typename mode, typename Dtype>
-using SparseTensor = TensorTemplate<mode, SPARSE, Dtype>;
+template<typename mode>
+using SparseTensor = TensorTemplate<mode, SPARSE>;
 
 /**
- * @brief      Class for tensor.
+ * @brief      Abstract Class for tensor.
  */
 class Tensor
 {
 public:
 // 
-	template<typename mode, typename matType, typename Dtype>
-	TensorTemplate<mode, matType, Dtype>& Derived();
+	template<typename mode, typename matType>
+	TensorTemplate<mode, matType>& Derived();
 
-	virtual void Reshape(std::initializer_list<uint> l) NOT_IMPLEMENTED
+	virtual void Reshape(std::initializer_list<uint>) NOT_IMPLEMENTED
 
 	virtual void Zeros() NOT_IMPLEMENTED
 
-	virtual int AsInt() NOT_IMPLEMENTED
+	virtual Dtype AsScalar() NOT_IMPLEMENTED
 
-	template<typename Dtype>
-	Dtype AsScalar(); 
+	virtual void SetRandN(Dtype, Dtype) NOT_IMPLEMENTED
+
+	virtual void Fill(Dtype) NOT_IMPLEMENTED
 
 	/**
 	 * Tensor shape
@@ -56,7 +57,7 @@ private:
 
 };
 
-template<typename mode, typename matType, typename Dtype>
+template<typename mode, typename matType>
 class TensorTemplate : public Tensor {};
 
 

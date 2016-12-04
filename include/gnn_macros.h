@@ -8,6 +8,7 @@ namespace gnn
 
 #define NOT_IMPLEMENTED { throw std::logic_error(std::string("not implemented virtual func: ") + std::string(__FUNCTION__)); }
 
+typedef float Dtype;
 typedef unsigned int uint;
 
 struct CPU

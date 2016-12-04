@@ -5,20 +5,11 @@
 namespace gnn
 {
 
-template<typename mode, typename matType, typename Dtype>
-TensorTemplate<mode, matType, Dtype>& Tensor::Derived()
+template<typename mode, typename matType>
+TensorTemplate<mode, matType>& Tensor::Derived()
 {
-	return *(dynamic_cast<TensorTemplate<mode, matType, Dtype>*>(this));
+	return *(dynamic_cast<TensorTemplate<mode, matType>*>(this));
 }
 
-template TensorTemplate<CPU, DENSE, float>& Tensor::Derived<CPU, DENSE, float>(); 
-template TensorTemplate<CPU, DENSE, double>& Tensor::Derived<CPU, DENSE, double>(); 
-template TensorTemplate<CPU, DENSE, int>& Tensor::Derived<CPU, DENSE, int>(); 
-
-template<>
-int Tensor::AsScalar()
-{
-	return this->AsInt();
-}
-
+template TensorTemplate<CPU, DENSE>& Tensor::Derived<CPU, DENSE>(); 
 }

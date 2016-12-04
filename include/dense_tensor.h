@@ -6,8 +6,8 @@
 namespace gnn
 {
 
-template<typename Dtype>
-class TensorTemplate<CPU, DENSE, Dtype> : public Tensor
+template<>
+class TensorTemplate<CPU, DENSE> : public Tensor
 {
 public:
 
@@ -17,8 +17,11 @@ public:
 
 	virtual void Zeros() override;
 
-	virtual int AsInt() override;
+	virtual Dtype AsScalar() override;
 
+	virtual void SetRandN(Dtype mean, Dtype std) override;
+
+	virtual void Fill(Dtype scalar) override;
 };
 
 }

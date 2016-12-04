@@ -7,19 +7,17 @@
 namespace gnn 
 {
 
-template<typename Dtype>
-TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate()
+TensorTemplate<CPU, DENSE>::TensorTemplate()
 {
 
 }
 
-template<typename Dtype>
-void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::initializer_list<uint> l)
+void TensorTemplate<CPU, DENSE>::Reshape(std::initializer_list<uint> l)
 {
 	this->shape.Reshape(l);
 
 	if (this->data == nullptr)
-		this->data = std::make_shared< DenseData<CPU, Dtype> >();
+		this->data = std::make_shared< DenseData<CPU> >();
 
 	auto& t_data = this->data->Derived(this);
 	if (this->shape.Count() > t_data.mem_size)
@@ -30,8 +28,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::initializer_list<uint> l)
 	}
 }
 
-template<typename Dtype>
-void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
+void TensorTemplate<CPU, DENSE>::Zeros()
 {
 	auto& t_data = this->data->Derived(this);
 
@@ -39,16 +36,23 @@ void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 	   memset(t_data.ptr, 0, sizeof(Dtype) * t_data.mem_size);
 }
 
-template<typename Dtype>
-int TensorTemplate<CPU, DENSE, Dtype>::AsInt()
+Dtype TensorTemplate<CPU, DENSE>::AsScalar()
 {
 	assert(this->shape.Count() == 1);
 	auto& t_data = this->data->Derived(this);
 	return t_data.ptr[0];	
 }
 
-template class TensorTemplate<CPU, DENSE, float>;
-template class TensorTemplate<CPU, DENSE, double>;
-template class TensorTemplate<CPU, DENSE, int>;
+void TensorTemplate<CPU, DENSE>::SetRandN(Dtype mean, Dtype std)
+{
+
+}
+
+void TensorTemplate<CPU, DENSE>::Fill(Dtype scalar)
+{
+	
+}
+
+template class TensorTemplate<CPU, DENSE>;
 
 }
