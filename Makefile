@@ -50,7 +50,7 @@ $(test_build_root)/%.o: test/%.cpp
 
 $(test_build_root)/test_main: $(test_target) $(gnn_lib)
 	$(dir_guard)
-	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.o, $^) -L$(lib_dir) $(LDFLAGS) -lgnn -lpthread -lgtest -lgtest_main
+	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.o, $^) -L$(lib_dir) -lgnn $(LDFLAGS) -lpthread -lgtest -lgtest_main
 
 clean:
 	rm -rf build
