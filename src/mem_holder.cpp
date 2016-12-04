@@ -1,5 +1,6 @@
 #include "mem_holder.h"
 #include <memory>
+#include <cstdlib>
 
 namespace gnn
 {

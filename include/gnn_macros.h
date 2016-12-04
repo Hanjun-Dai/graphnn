@@ -10,16 +10,20 @@ namespace gnn
 
 typedef unsigned int uint;
 
-enum Mode
+struct CPU
 {
-	CPU = 0,
-	GPU = 1
 };
 
-enum MatType
+struct GPU
 {
-	DENSE,
-	SPARSE
+};
+
+struct DENSE
+{
+};
+
+struct SPARSE
+{
 };
 
 }

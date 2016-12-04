@@ -12,13 +12,13 @@ namespace gnn {
 
 class TData;
 
-template<Mode mode, MatType matType, typename Dtype>
+template<typename mode, typename matType, typename Dtype>
 class TensorTemplate;
 
-template<Mode mode, typename Dtype>
+template<typename mode, typename Dtype>
 using DenseTensor = TensorTemplate<mode, DENSE, Dtype>;
 
-template<Mode mode, typename Dtype>
+template<typename mode, typename Dtype>
 using SparseTensor = TensorTemplate<mode, SPARSE, Dtype>;
 
 /**
@@ -27,8 +27,8 @@ using SparseTensor = TensorTemplate<mode, SPARSE, Dtype>;
 class Tensor
 {
 public:
-
-	template<Mode mode, MatType matType, typename Dtype>
+// 
+	template<typename mode, typename matType, typename Dtype>
 	TensorTemplate<mode, matType, Dtype>& Derived();
 
 	virtual void Reshape(std::initializer_list<uint> l) NOT_IMPLEMENTED
@@ -44,14 +44,6 @@ public:
 	 */
 	uint rank;
 	/**
-	 * cpu or gpu mode
-	 */
-	Mode mode;
-	/**
-	 * sparse or dense
-	 */
-	MatType matType;
-	/**
 	 * data ptr
 	 */
 	std::shared_ptr< TData > data;
@@ -59,7 +51,7 @@ private:
 
 };
 
-template<Mode mode, MatType matType, typename Dtype>
+template<typename mode, typename matType, typename Dtype>
 class TensorTemplate : public Tensor {};
 
 

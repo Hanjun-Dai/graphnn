@@ -31,14 +31,12 @@ TEST(TensorTest, Zero)
 
 TEST(TensorTest, Compile)
 {
-	int s = rand();
 	Tensor* t = new DenseTensor<CPU, float>();
 
 	auto& tmp = t->Derived<CPU, DENSE, float>();
 	tmp.Reshape({2, 2, 4});
 
 	auto& t_data = tmp.data->Derived(&tmp);
-	std::cerr << t_data.mem_size << std::endl;
 	tmp.Zeros();
 
 	EXPECT_EQ(1, 1);

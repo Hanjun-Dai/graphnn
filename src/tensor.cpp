@@ -5,7 +5,7 @@
 namespace gnn
 {
 
-template<Mode mode, MatType matType, typename Dtype>
+template<typename mode, typename matType, typename Dtype>
 TensorTemplate<mode, matType, Dtype>& Tensor::Derived()
 {
 	return *(dynamic_cast<TensorTemplate<mode, matType, Dtype>*>(this));

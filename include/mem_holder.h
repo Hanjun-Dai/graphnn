@@ -6,7 +6,7 @@
 namespace gnn
 {
 
-template< Mode mode >
+template< typename mode >
 class MemHolder
 {
 public:
