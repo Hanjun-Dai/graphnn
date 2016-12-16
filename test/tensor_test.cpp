@@ -7,57 +7,50 @@ using namespace gnn;
 
 TEST(TensorTest, ReshapeSize)
 {
-	Tensor* t = new DenseTensor<CPU>();
+	Tensor* t = new DenseTensor<CPU, float>();
 	t->Reshape({2, 3, 4});
 
-	auto& t_data = t->data->Derived<CPU, DENSE>();
+	auto& mat = t->Derived<CPU, DENSE, float>();
 
-	ASSERT_EQ(2 * 3 * 4, t_data.mem_size);
+	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);
 }
 
 TEST(TensorTest, Zero)
 {
-	Tensor* t = new DenseTensor<CPU>();
+	Tensor* t = new DenseTensor<CPU, float>();
 	t->Reshape({2, 3, 4});
-	t->Zeros();
+	auto& mat = t->Derived<CPU, DENSE, float>();
+	mat.Zeros();
 
-	int ans = t->ASum();
+	int ans = mat.ASum();
 	ASSERT_EQ(0, ans);
 }
 
 TEST(TensorTest, AsScalar)
 {
-	Tensor* t = new DenseTensor<CPU>();
+	Tensor* t = new DenseTensor<CPU, float>();
 	t->Reshape({1, 1, 1});
-	t->Zeros();
+	auto& mat = t->Derived<CPU, DENSE, float>();
+	mat.Zeros();
 
-	ASSERT_EQ(0, t->AsScalar());
+	ASSERT_EQ(0, mat.AsScalar());
 }
 
 TEST(TensorTest, Fill)
 {
-	Tensor* t = new DenseTensor<CPU>();
+	Tensor* t = new DenseTensor<CPU, int>();
 	t->Reshape({2, 3, 4});
-	t->Fill(2.0);
+	auto& mat = t->Derived<CPU, DENSE, int>();
+	mat.Fill(2);
 
-	auto& t_data = t->data->Derived<CPU, DENSE>();
-	Dtype ans = 0;
-	for (size_t i = 0; i < t_data.mem_size; ++i)
-		ans += t_data.ptr[i];
+	float ans = 0;
+	for (size_t i = 0; i < mat.data->mem_size; ++i)
+		ans += mat.data->ptr[i];
 
 	ASSERT_EQ(48, ans);
 }
 
 TEST(TensorTest, Compile)
 {
-	int s = rand();
-	Tensor* t = new DenseTensor<CPU>();
-
-	auto& tmp = t->Derived<CPU, DENSE>();
-	tmp.Reshape({2, 2, 4});
-
-	auto& t_data = tmp.data->Derived(&tmp);
-	tmp.Zeros();
-
 	EXPECT_EQ(1, 1);
 }

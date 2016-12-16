@@ -7,20 +7,14 @@
 namespace gnn
 {
 
-/**
- * @brief      Class for unary set.
- *
- * @tparam     mode  CPU/GPU
- */
-template<typename mode>
+
+template<typename mode, typename Dtype>
 class UnarySet
 {};
 
-/**
- * @brief      Class for unary set, CPU specialization
- */
-template<>
-class UnarySet<CPU>
+
+template<typename Dtype>
+class UnarySet<CPU, Dtype>
 {
 public:
 	/**
@@ -58,14 +52,14 @@ template<>
 class UnaryEngine<CPU>
 {
 public:
-	template<template <typename> class Functor, typename... Args>
+	template<template <typename, typename> class Functor, typename Dtype, typename... Args>
 	static void Exec(Dtype* data, size_t count, Args&&... args)
 	{
-		Functor<CPU> func(std::forward<Args>(args)...);
+		Functor<CPU, Dtype> func(std::forward<Args>(args)...);
 		Exec(data, count, func);
 	}
 
-	template<typename Functor>
+	template<typename Dtype, typename Functor>
 	static void Exec(Dtype* data, size_t count, Functor f)
 	{
 		for (size_t i = 0; i < count; ++i)

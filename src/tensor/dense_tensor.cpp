@@ -9,63 +9,109 @@
 namespace gnn 
 {
 
-TensorTemplate<CPU, DENSE>::TensorTemplate()
+template<typename Dtype>
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate() : data(nullptr)
 {
-
 }
 
-void TensorTemplate<CPU, DENSE>::Reshape(std::initializer_list<uint> l)
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::initializer_list<uint> l)
 {
 	this->shape.Reshape(l);
 
 	if (this->data == nullptr)
-		this->data = std::make_shared< DenseData<CPU> >();
+		this->data = std::make_shared< DenseData<CPU, Dtype> >();
 
-	auto& t_data = this->data->Derived(this);
-	if (this->shape.Count() > t_data.mem_size)
+	if (this->shape.Count() > this->data->mem_size)
 	{
-		t_data.mem_size = this->shape.Count();
-		MemHolder<CPU>::DelArr(t_data.ptr);
-		MemHolder<CPU>::MallocArr(t_data.ptr, sizeof(Dtype) * this->shape.Count());
+		this->data->mem_size = this->shape.Count();
+		MemHolder<CPU>::DelArr(this->data->ptr);
+		MemHolder<CPU>::MallocArr(this->data->ptr, sizeof(Dtype) * this->shape.Count());
 	}
 }
 
-void TensorTemplate<CPU, DENSE>::Zeros()
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 {
-	auto& t_data = this->data->Derived(this);
-
-	if (t_data.mem_size)
-	   memset(t_data.ptr, 0, sizeof(Dtype) * t_data.mem_size);
+	if (this->data->mem_size)
+	   memset(this->data->ptr, 0, sizeof(Dtype) * this->data->mem_size);
 }
 
-Dtype TensorTemplate<CPU, DENSE>::AsScalar()
+template<typename Dtype>
+Dtype TensorTemplate<CPU, DENSE, Dtype>::AsScalar()
 {
 	assert(this->shape.Count() == 1);
-	auto& t_data = this->data->Derived(this);
-	return t_data.ptr[0];	
+	return this->data->ptr[0];	
 }
 
-void TensorTemplate<CPU, DENSE>::SetRandN(Dtype mean, Dtype std)
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::SetRandN(Dtype mean, Dtype std)
 {
 
 }
 
-void TensorTemplate<CPU, DENSE>::Fill(Dtype scalar)
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Fill(Dtype scalar)
 {
 	if (scalar == 0)
 		this->Zeros();
 	else {
-		auto& t_data = this->data->Derived(this);
-		UnaryEngine<CPU>::Exec<UnarySet>(t_data.ptr, this->shape.Count(), scalar);
+		UnaryEngine<CPU>::Exec<UnarySet>(this->data->ptr, this->shape.Count(), scalar);
 	}
 }
 
-Dtype TensorTemplate<CPU, DENSE>::ASum()
+template<typename Dtype>
+Dtype TensorTemplate<CPU, DENSE, Dtype>::ASum()
 {
-	auto& t_data = this->data->Derived(this);
-	return MKL_ASum(this->shape.Count(), t_data.ptr);
+	return MKL_ASum(this->shape.Count(), this->data->ptr);
 }
 
-template class TensorTemplate<CPU, DENSE>;
+template class TensorTemplate<CPU, DENSE, float>;
+template class TensorTemplate<CPU, DENSE, double>;
+
+///================================ int tensor ===================================
+
+TensorTemplate<CPU, DENSE, int>::TensorTemplate() : data(nullptr)
+{
+
+}
+
+void TensorTemplate<CPU, DENSE, int>::Reshape(std::initializer_list<uint> l)
+{
+	this->shape.Reshape(l);
+
+	if (this->data == nullptr)
+		this->data = std::make_shared< DenseData<CPU, int> >();
+
+	if (this->shape.Count() > this->data->mem_size)
+	{
+		this->data->mem_size = this->shape.Count();
+		MemHolder<CPU>::DelArr(this->data->ptr);
+		MemHolder<CPU>::MallocArr(this->data->ptr, sizeof(int) * this->shape.Count());
+	}
+}
+
+void TensorTemplate<CPU, DENSE, int>::Zeros()
+{
+	if (this->data->mem_size)
+	   memset(this->data->ptr, 0, sizeof(int) * this->data->mem_size);
+}
+
+void TensorTemplate<CPU, DENSE, int>::Fill(int scalar)
+{
+	if (scalar == 0)
+		this->Zeros();
+	else {
+		UnaryEngine<CPU>::Exec<UnarySet>(this->data->ptr, this->shape.Count(), scalar);
+	}
+}
+
+int TensorTemplate<CPU, DENSE, int>::AsScalar()
+{
+	assert(this->shape.Count() == 1);
+	return this->data->ptr[0];	
+}
+
+template class TensorTemplate<CPU, DENSE, int>;
 
 }

@@ -5,45 +5,23 @@
 
 namespace gnn{
 
-template<typename mode, typename mType>
+template<typename mode, typename mType, typename Dtype>
 class TDataTemplate;
 
-template<typename mode, typename mType>
-class TensorTemplate;
+template<typename mode, typename Dtype>
+using DenseData = TDataTemplate<mode, DENSE, Dtype>;
 
-template<typename mode>
-using DenseData = TDataTemplate<mode, DENSE>;
-
-template<typename mode>
-using SparseData = TDataTemplate<mode, SPARSE>;
+template<typename mode, typename Dtype>
+using SparseData = TDataTemplate<mode, SPARSE, Dtype>;
 
 class TData
 {
-public: 
-	template<typename mode, typename mType>
-	TDataTemplate<mode, mType>& Derived(TensorTemplate<mode, mType>*)
-	{
-		return *(dynamic_cast<TDataTemplate<mode, mType>*>(this));
-	}
-
-	template<typename mode, typename mType>
-	TDataTemplate<mode, mType>& Derived(TensorTemplate<mode, mType>&)
-	{
-		return *(dynamic_cast<TDataTemplate<mode, mType>*>(this));
-	}
-
-	template<typename mode, typename mType>
-	TDataTemplate<mode, mType>& Derived()
-	{
-		return *(dynamic_cast<TDataTemplate<mode, mType>*>(this));
-	}
-
 private:
 	virtual void dummy() {};
 };
 
-template<typename mode>
-class TDataTemplate<mode, DENSE> : public TData
+template<typename mode, typename Dtype>
+class TDataTemplate<mode, DENSE, Dtype> : public TData
 {
 public:
 
@@ -53,8 +31,8 @@ public:
 	size_t mem_size;
 };
 
-template<typename mode>
-class TDataTemplate<mode, SPARSE> : public TData
+template<typename mode, typename Dtype>
+class TDataTemplate<mode, SPARSE, Dtype> : public TData
 {
 public:
 
