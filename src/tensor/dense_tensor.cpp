@@ -31,6 +31,18 @@ void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::initializer_list<uint> l)
 }
 
 template<typename Dtype>
+MatType TensorTemplate<CPU, DENSE, Dtype>::GetMatType()
+{
+	return MatType::dense;
+}
+
+template<typename Dtype>
+MatMode TensorTemplate<CPU, DENSE, Dtype>::GetMatMode()
+{
+	return MatMode::cpu;
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 {
 	if (this->data->mem_size)
@@ -89,6 +101,16 @@ void TensorTemplate<CPU, DENSE, int>::Reshape(std::initializer_list<uint> l)
 		MemHolder<CPU>::DelArr(this->data->ptr);
 		MemHolder<CPU>::MallocArr(this->data->ptr, sizeof(int) * this->shape.Count());
 	}
+}
+
+MatType TensorTemplate<CPU, DENSE, int>::GetMatType()
+{
+	return MatType::dense;
+}
+
+MatMode TensorTemplate<CPU, DENSE, int>::GetMatMode()
+{
+	return MatMode::cpu;
 }
 
 void TensorTemplate<CPU, DENSE, int>::Zeros()

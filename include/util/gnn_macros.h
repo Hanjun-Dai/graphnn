@@ -10,20 +10,36 @@ namespace gnn
 
 typedef unsigned int uint;
 
+enum class MatType
+{
+	dense,
+	sparse
+};
+
+enum MatMode
+{
+	cpu = 0,
+	gpu = 1
+};
+
 struct CPU
 {
+	static const MatMode mode = MatMode::cpu;
 };
 
 struct GPU
 {
+	static const MatMode mode = MatMode::gpu;
 };
 
 struct DENSE
 {
+	static const MatType type = MatType::dense;
 };
 
 struct SPARSE
 {
+	static const MatType type = MatType::sparse;
 };
 
 }

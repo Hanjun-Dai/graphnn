@@ -30,6 +30,10 @@ public:
 
 	virtual void Reshape(std::initializer_list<uint> l) NOT_IMPLEMENTED
 
+	virtual MatType GetMatType() = 0;
+
+	virtual MatMode GetMatMode() = 0;
+
 	/**
 	 * Tensor shape
 	 */

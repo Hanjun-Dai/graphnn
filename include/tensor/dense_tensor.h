@@ -16,6 +16,8 @@ public:
 	TensorTemplate();
 
 	virtual void Reshape(std::initializer_list<uint> l) override;
+	virtual MatType GetMatType() override;
+	virtual MatMode GetMatMode() override;
 
 	virtual void Zeros(); 
 
@@ -38,7 +40,8 @@ public:
 	TensorTemplate();
 
 	virtual void Reshape(std::initializer_list<uint> l) override;
-
+	virtual MatType GetMatType() override;
+	virtual MatMode GetMatMode() override;
 	virtual void Zeros(); 
 
 	virtual int AsScalar(); 
