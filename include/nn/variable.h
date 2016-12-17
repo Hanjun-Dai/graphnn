@@ -9,12 +9,15 @@
 namespace gnn
 {
 
+class FactorGraph;
+
 class Variable
 {
 public:
 	Variable(std::string _name);
 
 	std::string name;
+	FactorGraph* g;
 };
 
 class ConstVar : public Variable

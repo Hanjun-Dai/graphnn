@@ -16,7 +16,7 @@ enum class MatType
 	sparse
 };
 
-enum MatMode
+enum class MatMode
 {
 	cpu = 0,
 	gpu = 1
