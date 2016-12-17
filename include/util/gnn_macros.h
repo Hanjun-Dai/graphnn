@@ -16,6 +16,12 @@ enum class MatType
 	sparse
 };
 
+enum class PropErr
+{
+	N = 0,
+	T = 1	
+};
+
 enum class MatMode
 {
 	cpu = 0,
