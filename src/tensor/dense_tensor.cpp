@@ -22,12 +22,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::initializer_list<uint> l)
 	if (this->data == nullptr)
 		this->data = std::make_shared< DenseData<CPU, Dtype> >();
 
-	if (this->shape.Count() > this->data->mem_size)
-	{
-		this->data->mem_size = this->shape.Count();
-		MemHolder<CPU>::DelArr(this->data->ptr);
-		MemHolder<CPU>::MallocArr(this->data->ptr, sizeof(Dtype) * this->shape.Count());
-	}
+	this->data->Resize(this->shape.Count());
 }
 
 template<typename Dtype>

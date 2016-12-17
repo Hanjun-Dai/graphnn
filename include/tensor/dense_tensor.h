@@ -7,7 +7,6 @@
 namespace gnn
 {
 
-
 template<typename Dtype>
 class TensorTemplate<CPU, DENSE, Dtype> : public Tensor
 {
@@ -49,6 +48,34 @@ public:
 	virtual void Fill(int scalar);
 
 	std::shared_ptr< DenseData<CPU, int> > data;
+};
+
+template<typename Dtype>
+class TensorTemplate<GPU, DENSE, Dtype> : public Tensor
+{
+public:
+
+	TensorTemplate();
+
+	virtual void Reshape(std::initializer_list<uint> l) override;
+	virtual MatType GetMatType() override;
+	virtual MatMode GetMatMode() override;
+
+	std::shared_ptr< DenseData<GPU, Dtype> > data;
+};
+
+template<>
+class TensorTemplate<GPU, DENSE, int> : public Tensor
+{
+public:
+
+	TensorTemplate();
+
+	virtual void Reshape(std::initializer_list<uint> l) override;
+	virtual MatType GetMatType() override;
+	virtual MatMode GetMatMode() override;
+	
+	std::shared_ptr< DenseData<GPU, int> > data;
 };
 
 }

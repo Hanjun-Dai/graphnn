@@ -14,10 +14,10 @@ template<typename mode, typename matType, typename Dtype>
 class TensorTemplate;
 
 template<typename mode, typename Dtype>
-using DenseTensor = TensorTemplate<mode, DENSE, Dtype>;
+using DTensor = TensorTemplate<mode, DENSE, Dtype>;
 
 template<typename mode, typename Dtype>
-using SparseTensor = TensorTemplate<mode, SPARSE, Dtype>;
+using SpTensor = TensorTemplate<mode, SPARSE, Dtype>;
 
 /**
  * @brief      Abstract Class for tensor.

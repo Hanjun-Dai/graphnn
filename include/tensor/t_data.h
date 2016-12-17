@@ -21,11 +21,29 @@ private:
 };
 
 template<typename mode, typename Dtype>
-class TDataTemplate<mode, DENSE, Dtype> : public TData
+class TDataTemplate<mode, DENSE, Dtype> : public TData {};
+
+
+
+template<typename Dtype>
+class TDataTemplate<CPU, DENSE, Dtype> : public TData
 {
 public:
 
-	TDataTemplate() : ptr(nullptr), mem_size(0) {}
+	TDataTemplate();
+	void Resize(size_t new_size);
+
+	Dtype* ptr;
+	size_t mem_size;
+};
+
+template<typename Dtype>
+class TDataTemplate<GPU, DENSE, Dtype> : public TData
+{
+public:
+
+	TDataTemplate();
+	void Resize(size_t new_size);
 
 	Dtype* ptr;
 	size_t mem_size;

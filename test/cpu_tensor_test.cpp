@@ -7,7 +7,7 @@ using namespace gnn;
 
 TEST(TensorTest, ReshapeSize)
 {
-	Tensor* t = new DenseTensor<CPU, float>();
+	Tensor* t = new DTensor<CPU, float>();
 	t->Reshape({2, 3, 4});
 
 	auto& mat = t->Derived<CPU, DENSE, float>();
@@ -17,7 +17,7 @@ TEST(TensorTest, ReshapeSize)
 
 TEST(TensorTest, Zero)
 {
-	Tensor* t = new DenseTensor<CPU, float>();
+	Tensor* t = new DTensor<CPU, float>();
 	t->Reshape({2, 3, 4});
 	auto& mat = t->Derived<CPU, DENSE, float>();
 	mat.Zeros();
@@ -28,7 +28,7 @@ TEST(TensorTest, Zero)
 
 TEST(TensorTest, AsScalar)
 {
-	Tensor* t = new DenseTensor<CPU, float>();
+	Tensor* t = new DTensor<CPU, float>();
 	t->Reshape({1, 1, 1});
 	auto& mat = t->Derived<CPU, DENSE, float>();
 	mat.Zeros();
@@ -38,7 +38,7 @@ TEST(TensorTest, AsScalar)
 
 TEST(TensorTest, Fill)
 {
-	Tensor* t = new DenseTensor<CPU, int>();
+	Tensor* t = new DTensor<CPU, int>();
 	t->Reshape({2, 3, 4});
 	auto& mat = t->Derived<CPU, DENSE, int>();
 	mat.Fill(2);
