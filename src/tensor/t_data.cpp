@@ -6,7 +6,7 @@ namespace gnn
 
 template<typename Dtype>
 TDataTemplate<CPU, DENSE, Dtype>::TDataTemplate()
-		: ptr(nullptr), mem_size(0)
+		: TData(), ptr(nullptr), mem_size(0)
 {
 
 }
@@ -25,5 +25,18 @@ void TDataTemplate<CPU, DENSE, Dtype>::Resize(size_t new_size)
 template class TDataTemplate<CPU, DENSE, float>;
 template class TDataTemplate<CPU, DENSE, double>;
 template class TDataTemplate<CPU, DENSE, int>;
+
+template<typename mode, typename Dtype>
+TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate()
+		: TData()
+{
+	nnz = len_ptr = nzCap = ptrCap = 0;
+	val = nullptr;
+	col_idx = ptr = nullptr;
+}
+
+template class TDataTemplate<CPU, SPARSE, float>;
+template class TDataTemplate<CPU, SPARSE, double>;
+template class TDataTemplate<CPU, SPARSE, int>;
 
 }

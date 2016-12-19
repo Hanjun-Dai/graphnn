@@ -38,6 +38,17 @@ MatMode TensorTemplate<CPU, DENSE, Dtype>::GetMatMode()
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<CPU, Dtype>& src)
+{
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<GPU, Dtype>& src)
+{
+}
+
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 {
 	if (this->data->mem_size)

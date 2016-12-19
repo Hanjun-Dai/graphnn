@@ -3,38 +3,40 @@
 namespace gnn
 {
 
-Variable::Variable(std::string _name) : name(_name)
-{
-
-}
-
-ConstVar::ConstVar(std::string _name) : Variable(_name)
-{
-	
-}
-
-DiffVar::DiffVar(std::string _name) : Variable(_name)
+Variable::Variable(std::string _name) : name(_name), g(nullptr)
 {
 
 }
 
 template<typename mode, typename Dtype>
-DTensorVar<mode, Dtype>::DTensorVar(std::string _name) : DiffVar(_name)
+DTensorVar<mode, Dtype>::DTensorVar(std::string _name) : TensorVar<mode, Dtype>(_name)
 {
 
 }
 
 template<typename mode, typename Dtype>
 DTensorVar<mode, Dtype>::DTensorVar(std::string _name, std::initializer_list<uint> l)
-				 : DiffVar(_name)
+				 : TensorVar<mode, Dtype>(_name)
 {
 	value.Reshape(l);
 }
 
 template<typename mode, typename Dtype>
-SpTensorVar<mode, Dtype>::SpTensorVar(std::string _name) : ConstVar(_name)
+Dtype DTensorVar<mode, Dtype>::AsScalar()
+{
+	return value.AsScalar();
+}
+
+template<typename mode, typename Dtype>
+SpTensorVar<mode, Dtype>::SpTensorVar(std::string _name) : TensorVar<mode, Dtype>(_name)
 {
 
+}
+
+template<typename mode, typename Dtype>
+Dtype SpTensorVar<mode, Dtype>::AsScalar()
+{
+	return 0;
 }
 
 template class DTensorVar<CPU, float>;

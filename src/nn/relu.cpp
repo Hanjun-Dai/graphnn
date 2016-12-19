@@ -9,5 +9,7 @@ ReLU<mode, Dtype>::ReLU(std::string _name, PropErr _properr) : Factor(_name, _pr
 
 }
 
+template class ReLU<CPU, float>;
+template class ReLU<CPU, double>;
 
 }

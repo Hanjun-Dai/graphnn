@@ -1,5 +1,5 @@
-#ifndef MATMUL_H
-#define MATMUL_H
+#ifndef TYPE_CAST_H
+#define TYPE_CAST_H
 
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
@@ -10,12 +10,12 @@ namespace gnn
 {
 
 template<typename mode, typename Dtype>
-class MatMul : public Factor
+class TypeCast : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "MatMul";
+		return "Cast";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;
@@ -26,10 +26,11 @@ public:
 		return std::make_shared< DTensorVar<mode, Dtype> >(out_name);
 	}
 
-	MatMul(std::string _name, PropErr _properr = PropErr::T);
+	TypeCast(std::string _name, PropErr _properr = PropErr::T);
 
 };
 
 }
+
 
 #endif

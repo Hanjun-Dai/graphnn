@@ -18,15 +18,18 @@ public:
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
 
-	virtual void Zeros(); 
+	void CopyFrom(DTensor<CPU, Dtype>& src);		
+	void CopyFrom(DTensor<GPU, Dtype>& src);
 
-	virtual Dtype AsScalar(); 
+	void Zeros(); 
 
-	virtual void SetRandN(Dtype mean, Dtype std);
+	Dtype AsScalar(); 
 
-	virtual void Fill(Dtype scalar);
+	void SetRandN(Dtype mean, Dtype std);
 
-	virtual Dtype ASum();
+	void Fill(Dtype scalar);
+
+	Dtype ASum();
 
 	std::shared_ptr< DenseData<CPU, Dtype> > data;
 };

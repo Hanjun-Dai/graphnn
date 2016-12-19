@@ -1,5 +1,5 @@
-#ifndef MATMUL_H
-#define MATMUL_H
+#ifndef IS_EQUAL_H
+#define IS_EQUAL_H
 
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
@@ -10,12 +10,12 @@ namespace gnn
 {
 
 template<typename mode, typename Dtype>
-class MatMul : public Factor
+class IsEqual : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "MatMul";
+		return "IsEqual";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;
@@ -26,10 +26,11 @@ public:
 		return std::make_shared< DTensorVar<mode, Dtype> >(out_name);
 	}
 
-	MatMul(std::string _name, PropErr _properr = PropErr::T);
+	IsEqual(std::string _name);
 
 };
 
 }
+
 
 #endif

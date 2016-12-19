@@ -20,33 +20,32 @@ public:
 	FactorGraph* g;
 };
 
-class ConstVar : public Variable
+template<typename mode, typename Dtype>
+class TensorVar : public Variable
 {
 public:
-	ConstVar(std::string _name);
-};
-
-class DiffVar : public Variable
-{
-public:
-	DiffVar(std::string _name);
+	TensorVar(std::string _name) : Variable(_name) {}
+	virtual Dtype AsScalar() = 0;
 };
 
 template<typename mode, typename Dtype>
-class DTensorVar : public DiffVar
+class DTensorVar : public TensorVar<mode, Dtype>
 {
 public: 
 	DTensorVar(std::string _name);
 	DTensorVar(std::string _name, std::initializer_list<uint> l);
 
+	virtual Dtype AsScalar() override;
 	DTensor< mode, Dtype > value, grad;
 };
 
 template<typename mode, typename Dtype>
-class SpTensorVar : public ConstVar
+class SpTensorVar : public TensorVar<mode, Dtype>
 {
 public:
 	SpTensorVar(std::string _name);
+
+	virtual Dtype AsScalar() override;
 };
 
 }

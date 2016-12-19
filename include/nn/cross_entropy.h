@@ -1,21 +1,23 @@
-#ifndef MATMUL_H
-#define MATMUL_H
+#ifndef CROSS_ENTROPY_H
+#define CROSS_ENTROPY_H
 
 #include "util/gnn_macros.h"
+#include "fmt/printf.h"
 #include "nn/factor.h"
 #include "nn/variable.h"
-#include "fmt/printf.h"
+
+#include <memory>
 
 namespace gnn
 {
 
 template<typename mode, typename Dtype>
-class MatMul : public Factor
+class CrossEntropy : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "MatMul";
+		return "CrossEntropy";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;
@@ -26,8 +28,9 @@ public:
 		return std::make_shared< DTensorVar<mode, Dtype> >(out_name);
 	}
 
-	MatMul(std::string _name, PropErr _properr = PropErr::T);
+	CrossEntropy(std::string _name, bool _need_softmax, PropErr _properr = PropErr::T);
 
+	bool need_softmax;
 };
 
 }

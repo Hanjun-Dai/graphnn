@@ -4,12 +4,21 @@
 #include <cmath>
 #include "mnist_helper.h"
 #include "nn/param_set.h"
+#include "tensor/sparse_tensor.h"
+#include "nn/expr_sugar.h"
 #include "nn/factor_graph.h"
 #include "nn/matmul.h"
+#include "nn/relu.h"
+#include "nn/cross_entropy.h"
+#include "nn/arg_max.h"
+#include "nn/type_cast.h"
+#include "nn/reduce_mean.h"
+#include "nn/is_equal.h"
 
 using namespace gnn;
 
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
+unsigned batch_size = 100;
 int dev_id;
 std::vector< Dtype* > images_train, images_test;
 std::vector< int > labels_train, labels_test;
@@ -32,25 +41,64 @@ void LoadParams(const int argc, const char** argv)
 	}
 }
 
-ParamSet pset;
+ParamSet<mode, Dtype> pset;
 FactorGraph g;
-void BuildGraph()
+
+std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVar<mode, Dtype> > > BuildGraph()
 {
-	auto w1 = add_diff<DTensorVar<mode, Dtype> >(pset, "w1", {784u, 1024u});	
-	auto w2 = add_diff<DTensorVar<mode, Dtype> >(pset, "w2", {1024u, 1024u});
-	auto wo = add_diff<DTensorVar<mode, Dtype> >(pset, "wo", {1024u, 10u});
+	auto w1 = add_diff<DTensorVar>(pset, "w1", {784u, 1024u});	
+	auto w2 = add_diff<DTensorVar>(pset, "w2", {1024u, 1024u});
+	auto wo = add_diff<DTensorVar>(pset, "wo", {1024u, 10u});
 	w1->value.SetRandN(0, 0.01);
 	w2->value.SetRandN(0, 0.01);
 	wo->value.SetRandN(0, 0.01);
 
 	auto x = add_var< DTensorVar<mode, Dtype> >(g, "x");
-	/*auto h1 =  add_factor< MatMul >(g, {x});
-	h1 = add_factor<ReLU>(g, {h1});
+	auto y = add_var< SpTensorVar<mode, Dtype> >(g, "y");
+	auto h1 =  af< MatMul >({x, w1});
+	
+	h1 = af< ReLU >({h1});
+	auto h2 = af< MatMul >({h1, w2});	
+	h2 = af< ReLU >({h2});
+	auto output = af< MatMul >({h2, wo});
 
-	auto h2 = add_factor<MatMul>(g, {h1});
-	h2 = add_factor<ReLU>(g, {h2});
- 
-	auto output = add_factor<MatMul>()*/
+	auto ce = af< CrossEntropy >({output, y}, true);
+	auto loss = af< ReduceMean >({ce});
+
+	auto pred = af< ArgMax >({output});
+	auto label = af< ArgMax >({y});
+	auto cmp = af< IsEqual<mode, Dtype> >({pred, label});
+
+	auto acc = af< ReduceMean >({cmp});
+
+	return {loss, acc};	
+}
+
+DTensor<CPU, Dtype> x_cpu;
+SpTensor<CPU, Dtype> y_cpu;
+DTensor<mode, Dtype> input;
+SpTensor<mode, Dtype> label;
+
+void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int >& labels)
+{
+    unsigned cur_bsize = batch_size;
+    if (idx_st + batch_size > images.size())
+        cur_bsize = images.size() - idx_st;
+    x_cpu.Reshape({cur_bsize, 784});
+    y_cpu.Reshape({cur_bsize, 10});
+    y_cpu.ResizeSp(cur_bsize, cur_bsize + 1); 
+
+    for (unsigned i = 0; i < cur_bsize; ++i)
+    {
+        memcpy(x_cpu.data->ptr + i * 784, images[i + idx_st], sizeof(Dtype) * 784); 
+        y_cpu.data->ptr[i] = i;
+        y_cpu.data->val[i] = 1.0;
+        y_cpu.data->col_idx[i] = labels[i + idx_st];  
+    }
+    y_cpu.data->ptr[cur_bsize] = cur_bsize;
+
+    input.CopyFrom(x_cpu);
+    label.CopyFrom(y_cpu);
 }
 
 int main(const int argc, const char** argv)
@@ -60,5 +108,33 @@ int main(const int argc, const char** argv)
     LoadRaw(f_test_feat, f_test_label, images_test, labels_test);
     std::cerr << images_train.size() << " images for training" << std::endl;
     std::cerr << images_test.size() << " images for test" << std::endl;
+
+    auto targets = BuildGraph();
+    auto var_loss = targets.first;
+    auto var_acc = targets.second;
+
+	Dtype loss, err_rate;  
+	for (int epoch = 0; epoch < 10; ++epoch)
+    {
+        std::cerr << "testing" << std::endl;
+        loss = err_rate = 0;
+        for (unsigned i = 0; i < labels_test.size(); i += batch_size)
+        {
+                LoadBatch(i, images_test, labels_test);
+                g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}});
+                loss += var_loss->AsScalar();
+                err_rate += 1.0 - var_acc->AsScalar();
+        }
+        loss /= labels_test.size();
+        err_rate /= labels_test.size();
+        std::cerr << fmt::sprintf("test loss: %.4f\t error rate: %.4f", loss, err_rate) << std::endl;
+        
+        for (unsigned i = 0; i < labels_train.size(); i += batch_size)
+        {
+                LoadBatch(i, images_train, labels_train);
+                g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}});
+                g.BackPropagate({var_loss});
+        }
+    }
 	return 0;
 }

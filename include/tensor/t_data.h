@@ -24,7 +24,6 @@ template<typename mode, typename Dtype>
 class TDataTemplate<mode, DENSE, Dtype> : public TData {};
 
 
-
 template<typename Dtype>
 class TDataTemplate<CPU, DENSE, Dtype> : public TData
 {
@@ -53,13 +52,16 @@ template<typename mode, typename Dtype>
 class TDataTemplate<mode, SPARSE, Dtype> : public TData
 {
 public:
-
+	TDataTemplate();
+	
 	Dtype* val;
 	int* col_idx;
 	int* ptr;
 	
 	int nnz;
 	int len_ptr;
+	int nzCap;
+	int ptrCap;	
 };
 
 }

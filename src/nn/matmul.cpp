@@ -10,5 +10,7 @@ MatMul<mode, Dtype>::MatMul(std::string _name, PropErr _properr)
 
 }
 
+template class MatMul<CPU, float>;
+template class MatMul<CPU, double>;
 
 }
