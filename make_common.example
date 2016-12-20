@@ -7,7 +7,7 @@ FIND := gfind
 CXX := g++
 NVCC := $(CUDA_HOME)/bin/nvcc
 CXXFLAGS += -Wall -O2 -std=c++11
-LDFLAGS += -lm -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand -lcusparse -lmkl_rt -lcppformat -lwht
+LDFLAGS += -lm -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand -lcusparse -lmkl_rt -lfmt -lwht
 CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
 		-gencode arch=compute_20,code=sm_21 \
 		-gencode arch=compute_30,code=sm_30 \
