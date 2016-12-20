@@ -8,12 +8,21 @@
 namespace gnn
 {
 
-
+/**
+ * @brief      Functor to set an element
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double/int }
+ */
 template<typename mode, typename Dtype>
 class UnarySet
 {};
 
-
+/**
+ * @brief      CPU specialization of UnarySet
+ *
+ * @tparam     Dtype  { float/double/int }
+ */
 template<typename Dtype>
 class UnarySet<CPU, Dtype>
 {
@@ -37,9 +46,20 @@ private:
 	Dtype scalar;
 };
 
+/**
+ * @brief      Functor to set an element from normal distribution
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double }
+ */
 template<typename mode, typename Dtype>
 class UnaryRandNorm {};
 
+/**
+ * @brief      CPU specialization of UnaryRandNorm
+ *
+ * @tparam     Dtype  { float/double }
+ */
 template<typename Dtype>
 class UnaryRandNorm<CPU, Dtype>
 {
@@ -80,6 +100,17 @@ template<>
 class UnaryEngine<CPU>
 {
 public:
+	/**
+	 * @brief      Execute the unary operation
+	 *
+	 * @param      data       The data pointer
+	 * @param[in]  count      # elements to operate
+	 * @param[in]  <unnamed>  { other parameter required by specific functor }
+	 *
+	 * @tparam     Functor    { Functor class type }
+	 * @tparam     Dtype      { float/double/int }
+	 * @tparam     Args       { extra arguements required by specific functor }
+	 */
 	template<template <typename, typename> class Functor, typename Dtype, typename... Args>
 	static void Exec(Dtype* data, size_t count, Args&&... args)
 	{
@@ -87,6 +118,16 @@ public:
 		Exec(data, count, func);
 	}
 
+	/**
+	 * @brief      Execute the unary operation
+	 *
+	 * @param      data     The data pointer 
+	 * @param[in]  count    # elements to operate
+	 * @param[in]  f        { the functor object }
+	 *
+	 * @tparam     Dtype    { float/double/int }
+	 * @tparam     Functor  { The functor class }
+	 */
 	template<typename Dtype, typename Functor>
 	static void Exec(Dtype* data, size_t count, Functor f)
 	{

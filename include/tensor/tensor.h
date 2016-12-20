@@ -40,17 +40,57 @@ using SpTensor = TensorTemplate<mode, SPARSE, Dtype>;
 class Tensor
 {
 public:
+	/**
+	 * @brief      get derived subclass from the pointer to this abstract class
+	 *
+	 * @tparam     mode     { CPU/GPU }
+	 * @tparam     matType  { DENSE/SPARSE }
+	 * @tparam     Dtype    { float/double/int }
+	 *
+	 * @return     the derived subclass
+	 */
 	template<typename mode, typename matType, typename Dtype>
 	TensorTemplate<mode, matType, Dtype>& Derived();
 
+	/**
+	 * @brief      vector = rank 1, matrix = rank 2, etc
+	 *
+	 * @return     the rank
+	 */
 	uint rank();
+	/**
+	 * @brief      # rows; only valid when rank <= 2
+	 *
+	 * @return     # rows;
+	 */
 	size_t rows();
+
+	/**
+	 * @brief      # cols; only valid when rank <= 2
+	 *
+	 * @return     # cols
+	 */
 	size_t cols();
 
+	/**
+	 * @brief      reshape the tensor
+	 *
+	 * @param[in]  l     a list specifying the new shape
+	 */
 	virtual void Reshape(std::vector<size_t> l) NOT_IMPLEMENTED
 
+	/**
+	 * @brief      Gets the matrix type.
+	 *
+	 * @return     DENSE/SPARSE enum
+	 */
 	virtual MatType GetMatType() = 0;
 
+	/**
+	 * @brief      Gets the matrix mode.
+	 *
+	 * @return     CPU/GPU enum
+	 */
 	virtual MatMode GetMatMode() = 0;
 
 	/**
@@ -61,6 +101,13 @@ private:
 
 };
 
+/**
+ * @brief      the implementation of abstract tensor
+ *
+ * @tparam     mode     { CPU/GPU }	
+ * @tparam     matType  { DENSE/SPARSE }
+ * @tparam     Dtype    { float/double/int }
+ */
 template<typename mode, typename matType, typename Dtype>
 class TensorTemplate : public Tensor {};
 

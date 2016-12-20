@@ -14,13 +14,42 @@ class TShape
 {
 public:
 	TShape();
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  l     the list specifying the shape. For example, {3, 4} creates a 
+	 * 					matrix with 3 rows and 4 cols.
+	 */
 	TShape(std::vector<size_t> l);
 
+	/**
+	 * @brief      reshape this shape representation
+	 *
+	 * @param[in]  l     a list specifying the new shape
+	 */
 	void Reshape(std::vector<size_t> l);
+
+	/**
+	 * @brief      count # elements starting from dim dimension
+	 *
+	 * @param[in]  dim   The dim to start (default is 0)
+	 *
+	 * @return     \prod_{i=dim}^{rank - 1} dims[i]
+	 */
 	size_t Count(uint dim = 0);
 
+	/**
+	 * @brief      get the size of a certain dimension
+	 *
+	 * @param[in]  dim   The dim
+	 *
+	 * @return     the size of {dim} dimension
+	 */
 	size_t operator[](uint dim);
 
+	/**
+	 * stores the size per each dimension
+	 */
 	std::vector<size_t> dims;
 };
 

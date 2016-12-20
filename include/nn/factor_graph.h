@@ -15,6 +15,9 @@ namespace gnn
 
 class Variable;
 
+/**
+ * @brief      the computation graph; responsible for representing the factor graph, as well as the execution
+ */
 class FactorGraph
 {
 public:	
@@ -22,10 +25,29 @@ public:
 	typedef std::vector<std::shared_ptr<Variable> > VarList;
 	typedef std::vector<std::shared_ptr<Factor> > FactorList;
 
+	/**
+	 * @brief      constructor
+	 */
 	FactorGraph();	
 
+	/**
+	 * @brief      Adds a variable to this computation graph
+	 *
+	 * @param[in]  var        The variable to be add
+	 * @param[in]  need_feed  Whether this is an actual variable or an placeholder variable
+	 */
 	void AddVar(VarPtr var, bool need_feed = true);
 
+	/**
+	 * @brief      Adds a factor (operator) to the graph
+	 *
+	 * @param[in]  factor      The factor
+	 * @param[in]  vars_in     The variables (inputs) to the factor
+	 * @param[in]  var_out     The variable (output) produced by the factor
+	 *
+	 * @tparam     FactorPtr   { the factor class type }
+	 * @tparam     VarPtrList  { for the variable class }
+	 */
 	template<typename FactorPtr, typename VarPtrList>
 	void AddFactor(FactorPtr factor, VarPtrList vars_in, VarPtr var_out)
 	{
@@ -57,33 +79,123 @@ public:
 		factor_list.push_back(factor);
 	}
 
+	/**
+	 * @brief      feed forward function
+	 *
+	 * @param[in]  targets    The targets which the user wants to fetch
+	 * @param[in]  feed_dict  The feed dictionary; used to set the placeholders
+	 * @param[in]  n_thread   # threads used in this function
+	 *
+	 * @return     { The targets required by user}
+	 */
 	VarList FeedForward(std::initializer_list< VarPtr > targets, 
 						std::map<std::string, void*> feed_dict,
 						uint n_thread = 1);
 
+	/**
+	 * @brief      back propagation funciton; used to calculate the gradient with respect to each variable
+	 *
+	 * @param[in]  targets   The top variables that contributes to the objective 
+	 * 						(typically only loss should be provided here)
+	 * @param[in]  n_thread  # threads used in this function
+	 */
 	void BackPropagate(std::initializer_list< VarPtr > targets, uint n_thread = 1);
 
-	void SequentialForward(std::initializer_list< VarPtr > targets, 
-							std::map<std::string, void*> feed_dict);
-	void DependencyParse(std::initializer_list< VarPtr > targets);
+	/**
+	 * @brief      Variable index in this graph
+	 *
+	 * @param[in]  var   The shared_ptr to variable
+	 *
+	 * @return     { the integer index }
+	 */
 	size_t VarIdx(VarPtr var);
+
+	/**
+	 * @brief      Variable index in this graph
+	 *
+	 * @param[in]  var_name  The variable name
+	 *
+	 * @return     { the integer index }
+	 */
 	size_t VarIdx(std::string var_name);
+
+	/**
+	 * @brief      Factor index in this graph
+	 *
+	 * @param[in]  fac   The shared_ptr to factor
+	 *
+	 * @return     { the integer index }
+	 */
 	size_t FacIdx(std::shared_ptr<Factor> fac);	
-
-	std::map<std::string, std::pair< VarList, VarList > > factorEdges;
-	std::map<std::string, std::pair< FactorList, FactorList > > varEdges;
-
-	std::map<std::string, VarPtr> ready_dict;
+	
+	/**
+	 * the map: string name -> (variable index, variable ptr)
+	 */
 	std::map<std::string, std::pair< size_t, VarPtr> > var_dict;
+
+	/**
+	 * the map: string name -> (factor index, factor ptr)
+	 */
 	std::map<std::string, std::pair< size_t, std::shared_ptr<Factor> > > factor_dict;
 
+	/**
+	 * variable list; used for integer indexing
+	 */
 	std::vector< VarPtr > var_list;
-	std::vector< std::shared_ptr< Factor > > factor_list;
 
+	/**
+	 * factor list; used for integer indexing
+	 */
+	std::vector< std::shared_ptr< Factor > > factor_list;	
+	/**
+	 * the in/out edges of a factor: factor_name -> (in variables, out variables)
+	 */
+	std::map<std::string, std::pair< VarList, VarList > > factorEdges;
+	/**
+	 * the in/out edges of an variable: variable_name -> (factor(s) produce this var, factors use this var)
+	 */
+	std::map<std::string, std::pair< FactorList, FactorList > > varEdges;
+	
+protected:
+	/**
+	 * @brief      The single threaded feed forward function
+	 *
+	 * @param[in]  targets    The targets which the user wants to fetch
+	 * @param[in]  feed_dict  The feed dictionary; used to set the placeholders
+	 */
+	void SequentialForward(std::initializer_list< VarPtr > targets, 
+							std::map<std::string, void*> feed_dict);
+
+	/**
+	 * @brief      Parse the dependency to see which variables are required
+	 *
+	 * @param[in]  targets  The targets which the user wants to fetch
+	 */
+	void DependencyParse(std::initializer_list< VarPtr > targets);
+
+	/**
+	 * whether the variable (indexed by name) is ready
+	 */
+	std::map<std::string, VarPtr> ready_dict;
+
+	/**
+	 * whether the variable (indexed by integer) is ready
+	 */
 	std::vector<bool> isReady;
+
+	/**
+	 * whether the variable (indexed by integer) is required by user
+	 */
 	std::vector<bool> isRequired;
+
+	/**
+	 * num of pending variables each factor have; when it is zero, this factor can be executed
+	 */
 	std::vector<size_t> n_pending;
 
+	/**
+	 * queue data structure used for topo_sort/BFS
+	 */
 	std::queue<std::string> q;
 };
 

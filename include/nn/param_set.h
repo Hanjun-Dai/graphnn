@@ -8,14 +8,28 @@
 namespace gnn
 {
 
+/**
+ * @brief      the set of learnable params
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double }
+ */
 template<typename mode, typename Dtype>
 class ParamSet
 {
 public:
 	ParamSet();
 
+	/**
+	 * @brief      Adds a parameter.
+	 *
+	 * @param[in]  param  The parameter shared pointer
+	 */
 	void AddParam(std::shared_ptr< DTensorVar<mode, Dtype> > param);
 
+	/**
+	 * the dictionary: param name -> param shared pointer
+	 */
 	std::map<std::string, std::shared_ptr< DTensorVar<mode, Dtype> > > params;
 };
 

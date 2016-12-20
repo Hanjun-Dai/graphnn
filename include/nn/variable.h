@@ -12,16 +12,47 @@ namespace gnn
 
 class FactorGraph;
 
+/**
+ * @brief      the abstract class of variable; Variables are the objects which hold
+ * 				the inputs to the operators, as well as the outputs from operators
+ */
 class Variable
 {
 public:
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _name  The variable string name
+	 */
 	Variable(std::string _name);
+
+	/**
+	 * @brief      use reference to set the variable; by doing so, we can avoid extra 
+	 * 				copy work
+	 *
+	 * @param      p     a pointer which can be used to hold any object; however, a static_cast
+	 * 					is required when use this
+	 */
 	virtual void SetRef(void* p) NOT_IMPLEMENTED
 
+	/**
+	 * @brief      Get the basic element type (float/double/int) of this variable
+	 *             
+	 * @return     The enum ele type.
+	 */
 	virtual EleType GetEleType() = 0;
+
+	/**
+	 * the variable's string name
+	 */
 	std::string name;
+
+	/**
+	 * the computation graph the variable currently in
+	 */
 	FactorGraph* g;
 };
+
 
 template<typename mode, typename matType, typename Dtype>
 class TensorVarTemplate;
@@ -32,10 +63,23 @@ using DTensorVar = TensorVarTemplate<mode, DENSE, Dtype>;
 template<typename mode, typename Dtype>
 using SpTensorVar = TensorVarTemplate<mode, SPARSE, Dtype>;
 
+/**
+ * @brief      Class for tensor variable, which is the most common variable in this package
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double/int }
+ */
 template<typename mode, typename Dtype>
 class TensorVar : public Variable
 {
 public:
+	/**
+	 * @brief      Get the specific derived tensor variable type (DENSE/SPARSE)
+	 *
+	 * @tparam     matType  whether the derived tensor is DENSE/SPARSE
+	 *
+	 * @return     the derived subclass
+	 */
 	template<typename matType>
 	TensorVarTemplate<mode, matType, Dtype>& Derived()
 	{
@@ -49,42 +93,119 @@ public:
 		return Dtype2Enum<Dtype>();
 	}
 
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _name  The name
+	 */
 	TensorVar(std::string _name) : Variable(_name) {}
+
+	/**
+	 * @brief      convert the tensor variable to a scalar; assert that the tensor is trivial here
+	 *
+	 * @return     the only element in this tensor
+	 */
 	virtual Dtype AsScalar() = 0;
+
+	/**
+	 * @brief      Gets the matrix type (DENSE/SPARSE)
+	 *             
+	 * @return     The matrix enum type
+	 */
 	virtual MatType GetMatType() = 0;
 };
 
+/**
+ * @brief      implementation of TensorVar;
+ *
+ * @tparam     mode     { CPU/GPU }
+ * @tparam     matType  { DENSE/SPARSE }
+ * @tparam     Dtype    { float/double/int }
+ */
 template<typename mode, typename matType, typename Dtype>
 class TensorVarTemplate : TensorVar<mode, Dtype> {};
 
+/**
+ * @brief      DENSE tensor specialization of TensorVar
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double/int }
+ */
 template<typename mode, typename Dtype>
 class TensorVarTemplate<mode, DENSE, Dtype> : public TensorVar<mode, Dtype>
 {
 public: 
 	TensorVarTemplate(std::string _name);
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _name  The name
+	 * @param[in]  l      the tensor shape
+	 */
 	TensorVarTemplate(std::string _name, std::vector<size_t> l);
 
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _name  The name
+	 * @param[in]  l      the tensor shape specified by int list
+	 */
 	TensorVarTemplate(std::string _name, std::vector<int> l)
 		: TensorVarTemplate(_name, std::vector<size_t>(l.begin(), l.end())) {}
 
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _name  The name
+	 * @param[in]  l      the tensor shape specified by unsigned int list
+	 */
 	TensorVarTemplate(std::string _name, std::vector<uint> l)
 		: TensorVarTemplate(_name, std::vector<size_t>(l.begin(), l.end())) {}
 
+	/**
+	 * @brief      Sets the reference.
+	 *
+	 * @param      p    Here we assume p is a raw pointer to DTensor<mode, Dtype>
+	 */
 	virtual void SetRef(void* p) override;
+
 	virtual Dtype AsScalar() override;
 	virtual MatType GetMatType() override;
-	DTensor< mode, Dtype > value, grad;
+
+	/**
+	 * the actual value of this variable
+	 */
+	DTensor< mode, Dtype > value;
+	/**
+	 * stores the gradient with respect to this variable
+	 */
+	DTensor< mode, Dtype> grad;
 };
 
+/**
+ * @brief      SPARSE tensor specialization of TensorVar
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double/int }
+ */
 template<typename mode, typename Dtype>
 class TensorVarTemplate<mode, SPARSE, Dtype> : public TensorVar<mode, Dtype>
 {
 public:
 	TensorVarTemplate(std::string _name);
+	/**
+	 * @brief      Sets the reference.
+	 *
+	 * @param      p     Here we assume p is a raw pointer to SpTensor<mode, Dtype>
+	 */
 	virtual void SetRef(void* p) override;
+
 	virtual Dtype AsScalar() override;
 	virtual MatType GetMatType() override;
 
+	/**
+	 * the actual value of this variable
+	 */
 	SpTensor<mode, Dtype> value;
 };
 

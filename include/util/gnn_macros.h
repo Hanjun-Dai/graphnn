@@ -120,21 +120,33 @@ inline EleType Dtype2Enum<double>() { return EleType::FLOAT64; }
 template<>
 inline EleType Dtype2Enum<int>() { return EleType::INT32; }
 
+/**
+ * @brief      CPU token; used for template parsing
+ */
 struct CPU
 {
   static const MatMode mode = MatMode::cpu;
 };
 
+/**
+ * @brief      GPU token; used for template parsing
+ */
 struct GPU
 {
 	static const MatMode mode = MatMode::gpu;
 };
 
+/**
+ * @brief      DENSE tensor token; used for template parsing
+ */
 struct DENSE
 {
 	static const MatType type = MatType::dense;
 };
 
+/**
+ * @brief      SPARSE tensor token; used for template parsing
+ */
 struct SPARSE
 {
 	static const MatType type = MatType::sparse;

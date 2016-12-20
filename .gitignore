@@ -1,5 +1,6 @@
 build/
 .vscode/
+html/
 *~
 *.swp
 make_common
