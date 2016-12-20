@@ -3,6 +3,7 @@
 
 #include "util/gnn_macros.h"
 #include <utility>
+#include <random>
 
 namespace gnn
 {
@@ -34,6 +35,33 @@ private:
 	 * scalar to be set
 	 */
 	Dtype scalar;
+};
+
+template<typename mode, typename Dtype>
+class UnaryRandNorm {};
+
+template<typename Dtype>
+class UnaryRandNorm<CPU, Dtype>
+{
+public:
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _mean  The mean
+	 * @param[in]  _std   The standard deviation
+	 */
+	UnaryRandNorm(Dtype _mean, Dtype _std);
+
+	/**
+	 * set set to be a sample from gaussian distribution
+	 */
+	void operator()(Dtype& dst);
+
+private:
+	std::default_random_engine* generator;
+	std::normal_distribution<Dtype>* distribution;
+	Dtype mean;
+	Dtype std;
 };
 
 /**

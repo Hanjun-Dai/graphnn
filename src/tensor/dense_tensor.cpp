@@ -15,7 +15,7 @@ TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate() : data(nullptr)
 }
 
 template<typename Dtype>
-void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::initializer_list<uint> l)
+void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::vector<size_t> l)
 {
 	this->shape.Reshape(l);
 
@@ -40,6 +40,8 @@ MatMode TensorTemplate<CPU, DENSE, Dtype>::GetMatMode()
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<CPU, Dtype>& src)
 {
+	Reshape(src.shape.dims);
+	memcpy(data->ptr, src.data->ptr, sizeof(Dtype) * shape.Count());
 }
 
 template<typename Dtype>
@@ -47,6 +49,12 @@ void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<GPU, Dtype>& src)
 {
 }
 
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::ShallowCopy(DTensor<CPU, Dtype>& src)
+{
+	this->shape = src.shape;
+	this->data = src.data;
+}
 
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
@@ -65,7 +73,7 @@ Dtype TensorTemplate<CPU, DENSE, Dtype>::AsScalar()
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::SetRandN(Dtype mean, Dtype std)
 {
-
+	UnaryEngine<CPU>::Exec<UnaryRandNorm>(this->data->ptr, this->shape.Count(), mean, std);
 }
 
 template<typename Dtype>
@@ -84,6 +92,86 @@ Dtype TensorTemplate<CPU, DENSE, Dtype>::ASum()
 	return MKL_ASum(this->shape.Count(), this->data->ptr);
 }
 
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::ArgMax(DTensor<CPU, int>& dst, uint axis)
+{
+	ASSERT(axis == 0, "not supported for axis > 0 in CPU DENSE Tensor");
+	dst.Reshape({this->shape[0]});
+
+	Dtype* ptr = data->ptr;
+	for (size_t i = 0; i < this->shape[0]; ++i)
+	{
+		dst.data->ptr[i] = 0;
+		Dtype cur_max = *ptr;
+		for (size_t j = 1; j < this->shape.Count(1); ++j)
+			if (ptr[j] > cur_max)
+			{
+				cur_max = ptr[j];
+				dst.data->ptr[i] = j;
+			}
+		ptr += this->shape.Count(1);
+	}
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::MM(DTensor<CPU, Dtype>& a, DTensor<CPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
+{
+	ASSERT(a.rank() == 2 && b.rank() == 2, "only support mat x mat now");
+	size_t m, n, k;
+	GetDims(a.rows(), a.cols(), transA, b.rows(), b.cols(), transB, m, n, k);
+	
+	Reshape({m, n});
+	MKL_GeMM(CblasRowMajor, CPU_T(transB), CPU_T(transB), 
+			m, n, k, alpha, 
+			a.data->ptr, a.cols(), 
+			b.data->ptr, b.cols(), 
+			beta, data->ptr, this->cols());
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::MM(SpTensor<CPU, Dtype>& a, DTensor<CPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
+{
+
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Softmax()
+{
+	ASSERT(this->rank() == 2, "Softmax is assumed to exec on matrix");
+    Dtype sum, max_v;
+	size_t i, j;
+	Dtype* data_ptr;
+    for (i = 0, data_ptr = this->data->ptr; i < this->rows(); ++i, data_ptr += this->cols())
+    {
+        max_v = data_ptr[0];
+        for (j = 1; j < this->cols(); ++j)
+            if (data_ptr[j] > max_v)
+                max_v = data_ptr[j];
+        for (j = 0; j < this->cols(); ++j)    
+            data_ptr[j] -= max_v;
+    }
+    
+    MKL_Exp(this->shape.Count(), this->data->ptr, this->data->ptr);
+    for (i = 0, data_ptr = this->data->ptr; i < this->rows(); ++i, data_ptr += this->cols())
+    {
+        sum = MKL_ASum(this->cols(), data_ptr);
+        for (j = 0; j < this->cols(); ++j)
+            data_ptr[j] /= sum;
+    }
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Mean(DTensor<CPU, Dtype>& a, int axis)
+{
+	ASSERT(axis == -1, "currently only support global mean");
+	Reshape({1});
+
+	Dtype s = 0;
+	for (size_t i = 0; i < a.shape.Count(); ++i)
+		s += a.data->ptr[i];
+	data->ptr[0] = s / a.shape.Count();
+}
+
 template class TensorTemplate<CPU, DENSE, float>;
 template class TensorTemplate<CPU, DENSE, double>;
 
@@ -94,7 +182,7 @@ TensorTemplate<CPU, DENSE, int>::TensorTemplate() : data(nullptr)
 
 }
 
-void TensorTemplate<CPU, DENSE, int>::Reshape(std::initializer_list<uint> l)
+void TensorTemplate<CPU, DENSE, int>::Reshape(std::vector<size_t> l)
 {
 	this->shape.Reshape(l);
 
@@ -117,6 +205,12 @@ MatType TensorTemplate<CPU, DENSE, int>::GetMatType()
 MatMode TensorTemplate<CPU, DENSE, int>::GetMatMode()
 {
 	return MatMode::cpu;
+}
+
+void TensorTemplate<CPU, DENSE, int>::ShallowCopy(DTensor<CPU, int>& src)
+{
+	this->shape = src.shape;
+	this->data = src.data;
 }
 
 void TensorTemplate<CPU, DENSE, int>::Zeros()

@@ -28,7 +28,12 @@ public:
 		return std::make_shared< DTensorVar<mode, Dtype> >(out_name);
 	}
 
-	ReduceMean(std::string _name, PropErr _properr = PropErr::T);
+	ReduceMean(std::string _name, int _axis = -1, bool _keep_dim = false, PropErr _properr = PropErr::T);
+	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
+						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+
+	int axis;
+	bool keep_dim;
 };
 
 }

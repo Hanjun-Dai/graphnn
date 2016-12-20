@@ -2,6 +2,7 @@
 #define EXPR_SUGAR_H
 
 #include "nn/factor_graph.h"
+#include "nn/type_cast.h"
 
 namespace gnn
 {

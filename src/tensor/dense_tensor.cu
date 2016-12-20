@@ -11,7 +11,7 @@ TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate() : data(nullptr)
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, DENSE, Dtype>::Reshape(std::initializer_list<uint> l)
+void TensorTemplate<GPU, DENSE, Dtype>::Reshape(std::vector<size_t> l)
 {
 	this->shape.Reshape(l);
 
@@ -43,7 +43,7 @@ TensorTemplate<GPU, DENSE, int>::TensorTemplate() : data(nullptr)
 
 }
 
-void TensorTemplate<GPU, DENSE, int>::Reshape(std::initializer_list<uint> l)
+void TensorTemplate<GPU, DENSE, int>::Reshape(std::vector<size_t> l)
 {
 	this->shape.Reshape(l);
 

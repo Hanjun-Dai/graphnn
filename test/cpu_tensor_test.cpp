@@ -5,6 +5,8 @@
 
 using namespace gnn;
 
+#define sqr(x) ((x) * (x))
+
 TEST(TensorTest, ReshapeSize)
 {
 	Tensor* t = new DTensor<CPU, float>();
@@ -13,6 +15,29 @@ TEST(TensorTest, ReshapeSize)
 	auto& mat = t->Derived<CPU, DENSE, float>();
 
 	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);
+}
+
+TEST(TensorTest, RandNorm)
+{
+	Tensor* t = new DTensor<CPU, double>();
+	t->Reshape({100, 500, 100});	
+	auto& mat = t->Derived<CPU, DENSE, double>();
+
+	mat.SetRandN(5.0, 0.1);
+
+	double s = 0.0;
+	for (size_t i = 0; i < mat.data->mem_size; ++i)
+		s += mat.data->ptr[i];
+	s /= mat.shape.Count();
+	double err = fabs(s - 5.0);
+	EXPECT_LE(err, 1e-4);
+
+	double ss = 0.0;
+	for (size_t i = 0; i < mat.data->mem_size; ++i)
+		ss += sqr(mat.data->ptr[i] - s);
+	ss = sqrt(ss / mat.shape.Count());
+	err = fabs(ss - 0.1);
+	EXPECT_LE(err, 1e-4);
 }
 
 TEST(TensorTest, Zero)

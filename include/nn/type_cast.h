@@ -27,6 +27,8 @@ public:
 	}
 
 	TypeCast(std::string _name, PropErr _properr = PropErr::T);
+	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
+						 std::vector< std::shared_ptr<Variable> >& outputs) override;
 
 };
 

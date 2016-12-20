@@ -11,6 +11,12 @@
 namespace gnn
 {
 
+template<typename Dtype>
+void CalcCrossEntropy(DTensor<CPU, Dtype>& prob, SpTensor<CPU, Dtype>& label, DTensor<CPU, Dtype>& out);
+
+template<typename Dtype>
+void CalcCrossEntropy(DTensor<GPU, Dtype>& prob, SpTensor<GPU, Dtype>& label, DTensor<CPU, Dtype>& out);
+
 template<typename mode, typename Dtype>
 class CrossEntropy : public Factor
 {
@@ -29,8 +35,11 @@ public:
 	}
 
 	CrossEntropy(std::string _name, bool _need_softmax, PropErr _properr = PropErr::T);
+	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
+						 std::vector< std::shared_ptr<Variable> >& outputs) override;
 
 	bool need_softmax;
+	DTensor<mode, Dtype> probs;
 };
 
 }

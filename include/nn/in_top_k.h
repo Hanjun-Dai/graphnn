@@ -1,23 +1,27 @@
-#ifndef ARG_MAX_H
-#define ARG_MAX_H
+#ifndef IN_TOP_H_H
+#define IN_TOP_H_H
 
 #include "util/gnn_macros.h"
-#include "fmt/printf.h"
 #include "nn/factor.h"
 #include "nn/variable.h"
-
-#include <memory>
+#include "fmt/printf.h"
 
 namespace gnn
 {
 
+template<typename Dtype>
+void IsInTopK(DTensor<CPU, Dtype>& pred, DTensor<CPU, int>& label, DTensor<CPU, int>& out, int k);
+
+template<typename Dtype>
+void IsInTopK(DTensor<GPU, Dtype>& pred, DTensor<GPU, int>& label, DTensor<CPU, int>& out, int k);
+
 template<typename mode, typename Dtype>
-class ArgMax : public Factor
+class InTopK : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "ArgMax";
+		return "InTopK";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, int> >;
@@ -28,15 +32,14 @@ public:
 		return std::make_shared< DTensorVar<mode, int> >(out_name);
 	}
 
-	ArgMax(std::string _name, uint _axis = 0);
+	InTopK(std::string _name, int _topK = 1);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 std::vector< std::shared_ptr<Variable> >& outputs) override;
 
-	uint axis;
+	int topK;
 };
 
 }
-
 
 #endif

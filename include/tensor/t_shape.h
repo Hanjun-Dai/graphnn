@@ -14,12 +14,14 @@ class TShape
 {
 public:
 	TShape();
-	TShape(std::initializer_list<uint> l);
+	TShape(std::vector<size_t> l);
 
-	void Reshape(std::initializer_list<uint> l);
-	size_t Count();
-	
-	std::vector<uint> dims;
+	void Reshape(std::vector<size_t> l);
+	size_t Count(uint dim = 0);
+
+	size_t operator[](uint dim);
+
+	std::vector<size_t> dims;
 };
 
 }

@@ -14,12 +14,22 @@ public:
 
 	TensorTemplate();
 
-	virtual void Reshape(std::initializer_list<uint> l) override;
+	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
 
 	void CopyFrom(DTensor<CPU, Dtype>& src);		
 	void CopyFrom(DTensor<GPU, Dtype>& src);
+
+	template<typename otherType> 
+	void CopyFrom(DTensor<CPU, otherType>& src)
+	{
+		Reshape(src.shape.dims);
+		for (size_t i = 0; i < src.shape.Count(); ++i)
+			data->ptr[i] = src.data->ptr[i];
+	}
+
+	void ShallowCopy(DTensor<CPU, Dtype>& src);
 
 	void Zeros(); 
 
@@ -31,6 +41,15 @@ public:
 
 	Dtype ASum();
 
+	void ArgMax(DTensor<CPU, int>& dst, uint axis = 0);
+
+	void MM(DTensor<CPU, Dtype>& a, DTensor<CPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta);
+	void MM(SpTensor<CPU, Dtype>& a, DTensor<CPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta);
+
+	void Softmax();
+	
+	void Mean(DTensor<CPU, Dtype>& a, int axis = -1);
+
 	std::shared_ptr< DenseData<CPU, Dtype> > data;
 };
 
@@ -41,14 +60,17 @@ public:
 
 	TensorTemplate();
 
-	virtual void Reshape(std::initializer_list<uint> l) override;
+	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
-	virtual void Zeros(); 
 
-	virtual int AsScalar(); 
+	void ShallowCopy(DTensor<CPU, int>& src);
 
-	virtual void Fill(int scalar);
+	void Zeros(); 
+
+	int AsScalar(); 
+
+	void Fill(int scalar);
 
 	std::shared_ptr< DenseData<CPU, int> > data;
 };
@@ -60,7 +82,7 @@ public:
 
 	TensorTemplate();
 
-	virtual void Reshape(std::initializer_list<uint> l) override;
+	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
 
@@ -74,7 +96,7 @@ public:
 
 	TensorTemplate();
 
-	virtual void Reshape(std::initializer_list<uint> l) override;
+	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
 	

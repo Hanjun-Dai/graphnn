@@ -32,7 +32,19 @@ TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate()
 {
 	nnz = len_ptr = nzCap = ptrCap = 0;
 	val = nullptr;
-	col_idx = ptr = nullptr;
+	col_idx = row_ptr = nullptr;
+}
+
+template<typename mode, typename Dtype>
+TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate(int newNzCap, int newPtrCap)
+		: TData()
+{
+	nnz = len_ptr = 0;
+	nzCap = newNzCap; 
+	ptrCap = newPtrCap;
+	MemHolder<mode>::MallocArr(val, sizeof(Dtype) * nzCap);
+	MemHolder<mode>::MallocArr(col_idx, sizeof(int) * nzCap);
+	MemHolder<mode>::MallocArr(row_ptr, sizeof(int) * ptrCap);
 }
 
 template class TDataTemplate<CPU, SPARSE, float>;

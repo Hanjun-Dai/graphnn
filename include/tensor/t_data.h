@@ -53,10 +53,11 @@ class TDataTemplate<mode, SPARSE, Dtype> : public TData
 {
 public:
 	TDataTemplate();
-	
+	TDataTemplate(int newNzCap, int newPtrCap); 
+
 	Dtype* val;
 	int* col_idx;
-	int* ptr;
+	int* row_ptr;
 	
 	int nnz;
 	int len_ptr;

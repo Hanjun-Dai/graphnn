@@ -26,8 +26,13 @@ public:
 		return std::make_shared< DTensorVar<mode, Dtype> >(out_name);
 	}
 
-	MatMul(std::string _name, PropErr _properr = PropErr::T);
+	MatMul(std::string _name, Trans _transA = Trans::N, 
+			Trans _transB = Trans::N, PropErr _properr = PropErr::T);
+	
+	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
+						 std::vector< std::shared_ptr<Variable> >& outputs) override;
 
+	Trans transA, transB;
 };
 
 }
