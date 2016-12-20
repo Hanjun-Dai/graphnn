@@ -3,7 +3,7 @@
 
 #include "i_layer.h"
 #include "i_param.h"
-#include "cppformat/format.h"
+#include "fmt/printf.h"
 #include <vector>
 
 template<MatMode mode, typename Dtype>
