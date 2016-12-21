@@ -23,7 +23,6 @@ void MatMul<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& oper
 	ASSERT(rhs->GetMatType() == MatType::dense, "only support [sparse/dense] x [dense]");
 
 	auto* lhs = dynamic_cast< TensorVar<mode, Dtype>* >(operands[0].get());
-
 	MAT_TYPE_SWITCH(lhs->GetMatType(), matType, {
 		auto& left_mat = lhs->template Derived<matType>().value;
 		auto& right_mat = rhs->template Derived<DENSE>().value;

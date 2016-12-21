@@ -81,6 +81,14 @@ public:
 	void SetRandN(Dtype mean, Dtype std);
 
 	/**
+	 * @brief      Sets this tensor from random uniform
+	 *
+	 * @param[in]  lb    The lower bound
+	 * @param[in]  ub    The upper bound
+	 */
+	void SetRandU(Dtype lb, Dtype ub);
+	
+	/**
 	 * @brief      fill this tensor with same scalar
 	 *
 	 * @param[in]  scalar  The scalar to be set

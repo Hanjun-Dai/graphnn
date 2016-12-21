@@ -95,7 +95,7 @@ public:
 	 *
 	 * @return     { The targets required by user}
 	 */
-	VarList FeedForward(std::initializer_list< VarPtr > targets, 
+	VarList FeedForward(std::vector< VarPtr > targets, 
 						std::map<std::string, void*> feed_dict,
 						uint n_thread = 1);
 
@@ -106,7 +106,7 @@ public:
 	 * 						(typically only loss should be provided here)
 	 * @param[in]  n_thread  # threads used in this function
 	 */
-	void BackPropagate(std::initializer_list< VarPtr > targets, uint n_thread = 1);
+	void BackPropagate(std::vector< VarPtr > targets, uint n_thread = 1);
 
 	/**
 	 * @brief      Variable index in this graph
@@ -177,7 +177,7 @@ protected:
 	 * @param[in]  targets    The targets which the user wants to fetch
 	 * @param[in]  feed_dict  The feed dictionary; used to set the placeholders
 	 */
-	void SequentialForward(std::initializer_list< VarPtr > targets, 
+	void SequentialForward(std::vector< VarPtr > targets, 
 							std::map<std::string, void*> feed_dict);
 
 	/**
@@ -185,14 +185,14 @@ protected:
 	 *
 	 * @param[in]  targets  The targets which contributes directly to the objective
 	 */
-	void SequentialBackward(std::initializer_list< VarPtr > targets);
+	void SequentialBackward(std::vector< VarPtr > targets);
 	
 	/**
 	 * @brief      Parse the dependency to see which variables are required
 	 *
 	 * @param[in]  targets  The targets which the user wants to fetch
 	 */
-	void DependencyParse(std::initializer_list< VarPtr > targets);
+	void DependencyParse(std::vector< VarPtr > targets);
 
 	/**
 	 * whether the variable (indexed by name) is ready

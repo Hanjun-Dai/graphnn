@@ -37,4 +37,26 @@ void UnaryRandNorm<CPU, Dtype>::operator()(Dtype& dst)
 template class UnaryRandNorm<CPU, float>;
 template class UnaryRandNorm<CPU, double>;
 
+
+template<typename Dtype>
+UnaryRandUniform<CPU, Dtype>::UnaryRandUniform(Dtype _lb, Dtype _ub) : lb(_lb), ub(_ub) 
+{
+	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+	generator = new std::default_random_engine(seed);
+
+	distribution = new std::uniform_real_distribution<Dtype>(lb, ub);
+}
+
+template<typename Dtype>
+void UnaryRandUniform<CPU, Dtype>::operator()(Dtype& dst)
+{
+	auto& dist = *distribution;
+	auto& engine = *generator;
+	dst = dist(engine);
+}
+
+template class UnaryRandUniform<CPU, float>;
+template class UnaryRandUniform<CPU, double>;
+
+
 }

@@ -78,8 +78,9 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
     // c++ doesn't have heterogeneous initializer list, make_pair is required
     // return an int tensor (vector)
     auto cmp = af< InTopK<mode, Dtype> >(g, std::make_pair(output, label));
+    auto real_cmp = af< TypeCast<mode, Dtype> >(g, {cmp});
 
-	auto acc = af< ReduceMean >(g, { af< TypeCast<mode, Dtype> >(g, {cmp}) });
+	auto acc = af< ReduceMean >(g, { real_cmp });
 
 	return {loss, acc};	
 }

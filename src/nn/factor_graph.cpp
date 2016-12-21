@@ -38,7 +38,7 @@ size_t FactorGraph::FacIdx(std::shared_ptr<Factor> fac)
 	return factor_dict[fac->name].first;
 }
 
-void FactorGraph::DependencyParse(std::initializer_list<FactorGraph::VarPtr> targets)
+void FactorGraph::DependencyParse(std::vector<FactorGraph::VarPtr> targets)
 {
 	isRequired.resize(var_dict.size());
 	for (size_t i = 0; i < isRequired.size(); ++i)
@@ -71,7 +71,7 @@ void FactorGraph::DependencyParse(std::initializer_list<FactorGraph::VarPtr> tar
 	}
 }
 
-void FactorGraph::SequentialForward(std::initializer_list< FactorGraph::VarPtr > targets, 
+void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets, 
 									std::map<std::string, void*> feed_dict)
 {
 	n_pending.resize(factor_list.size());
@@ -136,7 +136,7 @@ void FactorGraph::SequentialForward(std::initializer_list< FactorGraph::VarPtr >
 	}
 }
 
-FactorGraph::VarList FactorGraph::FeedForward(std::initializer_list<FactorGraph::VarPtr> targets, 
+FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> targets, 
 											std::map<std::string, void*> feed_dict,
 											uint n_thread)
 {	
@@ -172,7 +172,7 @@ FactorGraph::VarList FactorGraph::FeedForward(std::initializer_list<FactorGraph:
 	return result;
 }
 
-void FactorGraph::SequentialBackward(std::initializer_list< FactorGraph::VarPtr > targets)
+void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 {
 	for (size_t i = 0; i < factor_list.size(); ++i)
 	{		
@@ -199,7 +199,7 @@ void FactorGraph::SequentialBackward(std::initializer_list< FactorGraph::VarPtr 
 
 	while (!q.empty())
 	{
-		auto& cur_name = q.front();
+		auto& cur_name = q.front();		
 		q.pop();
 
 		auto& factor = factor_dict[cur_name].second;
@@ -220,7 +220,9 @@ void FactorGraph::SequentialBackward(std::initializer_list< FactorGraph::VarPtr 
 		}
 		
 		if (necessary)
+		{
 			factor->Backward(operands, info_const_list, outputs);
+		}
 
 		for (auto p : operands)
 		{
@@ -236,7 +238,7 @@ void FactorGraph::SequentialBackward(std::initializer_list< FactorGraph::VarPtr 
 
 }
 
-void FactorGraph::BackPropagate(std::initializer_list< FactorGraph::VarPtr > targets, 
+void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets, 
 								uint n_thread)
 {
 	ASSERT(isReady.size() == var_dict.size() && n_pending.size() == factor_list.size() && isReady.size() == isRequired.size(), 

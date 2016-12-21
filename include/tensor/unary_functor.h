@@ -85,6 +85,44 @@ private:
 };
 
 /**
+ * @brief      Functor to set an element from uniform distribution
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryRandUniform {};
+
+/**
+ * @brief      CPU specialization of UnaryRandUniform
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnaryRandUniform<CPU, Dtype>
+{
+public:
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _mean  The lower bound
+	 * @param[in]  _std   The upper bound
+	 */
+	UnaryRandUniform(Dtype _mean, Dtype _std);
+
+	/**
+	 * set set to be a sample from uniform distribution
+	 */
+	void operator()(Dtype& dst);
+
+private:
+	std::default_random_engine* generator;
+	std::uniform_real_distribution<Dtype>* distribution;
+	Dtype lb;
+	Dtype ub;
+};
+
+/**
  * @brief      Class for unary engine.
  *
  * @tparam     mode  CPU/GPU

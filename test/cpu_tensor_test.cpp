@@ -57,6 +57,22 @@ TEST(TensorTest, BroadcastMulRow)
 			ASSERT_EQ(x.data->ptr[i * x.cols() + j], (i + 1) * (j + 1));
 }
 
+TEST(TensorTest, RandUniform)
+{
+	Tensor* t = new DTensor<CPU, double>();
+	t->Reshape({100, 100, 100});	
+	auto& mat = t->Derived<CPU, DENSE, double>();
+
+	mat.SetRandU(-1.0, 3.0);
+
+	double s = 0.0;
+	for (size_t i = 0; i < mat.data->mem_size; ++i)
+		s += mat.data->ptr[i];
+	s /= mat.shape.Count();
+	double err = fabs(s - 1.0);
+	EXPECT_LE(err, 1e-3);
+}
+
 TEST(TensorTest, RandNorm)
 {
 	Tensor* t = new DTensor<CPU, double>();

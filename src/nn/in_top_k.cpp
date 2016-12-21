@@ -1,6 +1,3 @@
-#ifndef IN_TOP_K_H
-#define IN_TOP_K_H
-
 #include "nn/in_top_k.h"
 
 namespace gnn
@@ -51,5 +48,3 @@ template class InTopK<CPU, float>;
 template class InTopK<CPU, double>;
 
 }
-
-#endif

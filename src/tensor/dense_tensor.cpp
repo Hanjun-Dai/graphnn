@@ -90,6 +90,12 @@ void TensorTemplate<CPU, DENSE, Dtype>::SetRandN(Dtype mean, Dtype std)
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::SetRandU(Dtype lb, Dtype ub)
+{
+	UnaryEngine<CPU>::Exec<UnaryRandUniform>(this->data->ptr, this->shape.Count(), lb, ub);
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Fill(Dtype scalar)
 {
 	if (scalar == 0)
@@ -145,7 +151,15 @@ void TensorTemplate<CPU, DENSE, Dtype>::MM(DTensor<CPU, Dtype>& a, DTensor<CPU, 
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::MM(SpTensor<CPU, Dtype>& a, DTensor<CPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
 {
+	assert(transB == Trans::N);
+	size_t m, n, k;
+	GetDims(a.rows(), a.cols(), transA, b.rows(), b.cols(), transB, m, n, k);
 
+	Reshape({m, n});
+	MKL_CSRMM(CPU_CharT(transA), a.rows(), this->cols(), a.cols(), alpha,
+				(char*)"GLNC", a.data->val, a.data->col_idx, a.data->row_ptr, a.data->row_ptr + 1,
+				b.data->ptr, b.cols(), 
+				beta, data->ptr, this->cols());
 }
 
 template<typename Dtype>
