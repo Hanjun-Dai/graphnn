@@ -48,10 +48,29 @@ public:
 	size_t operator[](uint dim);
 
 	/**
+	 * @brief      coordicate to 1d index
+	 *
+	 * @param[in]  l     coordinates
+	 *
+	 * @return     scalar index
+	 */
+	size_t Coor2Idx(const std::vector<size_t>& l);
+
+	/**
 	 * stores the size per each dimension
 	 */
 	std::vector<size_t> dims;
 };
+
+inline bool operator==(const TShape& lhs, const TShape& rhs)
+{
+	if (lhs.dims.size() != rhs.dims.size())
+		return false;
+	for (size_t i = 0; i < lhs.dims.size(); ++i)
+		if (lhs.dims[i] != rhs.dims[i])
+			return false;
+	return true;
+}
 
 }
 

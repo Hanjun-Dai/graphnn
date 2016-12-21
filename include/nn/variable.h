@@ -13,6 +13,23 @@ namespace gnn
 class FactorGraph;
 
 /**
+ * @brief      interface for differentiable variables
+ */
+class IDifferentiable
+{
+public:
+	/**
+	 * @brief      clear gradient
+	 */
+	virtual void ZeroGrad() = 0;
+
+	/**
+	 * @brief      set the gradient to be ones; used on the top variable
+	 */
+	virtual void OnesGrad() = 0;
+};
+
+/**
  * @brief      the abstract class of variable; Variables are the objects which hold
  * 				the inputs to the operators, as well as the outputs from operators
  */
@@ -43,14 +60,16 @@ public:
 	virtual EleType GetEleType() = 0;
 
 	/**
+	 * @brief      whether this is a constant variable
+	 *
+	 * @return     True if constant, False otherwise.
+	 */
+	virtual bool IsConst(); 
+
+	/**
 	 * the variable's string name
 	 */
 	std::string name;
-
-	/**
-	 * the computation graph the variable currently in
-	 */
-	FactorGraph* g;
 };
 
 
@@ -132,17 +151,25 @@ class TensorVarTemplate : TensorVar<mode, Dtype> {};
  * @tparam     Dtype  { float/double/int }
  */
 template<typename mode, typename Dtype>
-class TensorVarTemplate<mode, DENSE, Dtype> : public TensorVar<mode, Dtype>
+class TensorVarTemplate<mode, DENSE, Dtype> : public TensorVar<mode, Dtype>, public IDifferentiable
 {
 public: 
-	TensorVarTemplate(std::string _name);
 	/**
 	 * @brief      constructor
 	 *
-	 * @param[in]  _name  The name
-	 * @param[in]  l      the tensor shape
+	 * @param[in]  _name     The name
+	 * @param[in]  _isConst  Indicates if constant
 	 */
-	TensorVarTemplate(std::string _name, std::vector<size_t> l);
+	TensorVarTemplate(std::string _name, bool _isConst = false);
+
+	/**
+	 * @brief      constructor
+	 *
+	 * @param[in]  _name     The name
+	 * @param[in]  l         the tensor shape specified by the size_t list
+	 * @param[in]  _isConst  Indicates if constant
+	 */
+	TensorVarTemplate(std::string _name, std::vector<size_t> l, bool _isConst = false);
 
 	/**
 	 * @brief      constructor
@@ -169,9 +196,16 @@ public:
 	 */
 	virtual void SetRef(void* p) override;
 
+	virtual bool IsConst() override;
 	virtual Dtype AsScalar() override;
 	virtual MatType GetMatType() override;
 
+	/**
+	 * @brief     init the gradient to be zero
+	 */
+	virtual void ZeroGrad() override;
+
+	virtual void OnesGrad() override;
 	/**
 	 * the actual value of this variable
 	 */
@@ -180,6 +214,10 @@ public:
 	 * stores the gradient with respect to this variable
 	 */
 	DTensor< mode, Dtype> grad;
+	/**
+	 * whether this is a constant tensor
+	 */
+	bool isConst;
 };
 
 /**
@@ -199,7 +237,7 @@ public:
 	 * @param      p     Here we assume p is a raw pointer to SpTensor<mode, Dtype>
 	 */
 	virtual void SetRef(void* p) override;
-
+	virtual bool IsConst() override;
 	virtual Dtype AsScalar() override;
 	virtual MatType GetMatType() override;
 

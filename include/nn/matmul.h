@@ -49,7 +49,9 @@ public:
 			Trans _transB = Trans::N, PropErr _properr = PropErr::T);
 	
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+						std::vector< std::shared_ptr<Variable> >& outputs) override;
+	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+						std::vector< std::shared_ptr<Variable> >& outputs) override;
 
 	/**
 	 * whether to transpose operand A

@@ -17,6 +17,46 @@ TEST(TensorTest, ReshapeSize)
 	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);
 }
 
+TEST(TensorTest, BroadcastMulCol)
+{
+	DTensor<CPU, float> x, y;
+	x.Reshape({5, 3}); 
+	y.Reshape({5, 1});
+	x.Fill(1.0);
+	for (int i = 0; i < 5; ++i)
+	{
+		x.data->ptr[i * 3 + 1] = 2.0;
+		x.data->ptr[i * 3 + 2] = 3.0;
+	}
+	for (int i = 0; i < 5; ++i)
+		y.data->ptr[i] = i + 1;
+
+	x.ElewiseMul(y);
+	for (int i = 0; i < (int)x.rows(); ++i)
+		for (int j = 0; j < (int)x.cols(); ++j)
+			ASSERT_EQ(x.data->ptr[i * x.cols() + j], (i + 1) * (j + 1));
+}
+
+TEST(TensorTest, BroadcastMulRow)
+{
+	DTensor<CPU, float> x, y;
+	x.Reshape({3, 5}); 
+	y.Reshape({1, 5});
+	x.Fill(1.0);
+	for (int i = 0; i < 5; ++i)
+	{
+		x.data->ptr[5 + i] = 2.0;
+		x.data->ptr[10 + i] = 3.0;
+	}
+
+	for (int i = 0; i < 5; ++i)
+		y.data->ptr[i] = i + 1;
+	x.ElewiseMul(y);
+	for (int i = 0; i < (int)x.rows(); ++i)
+		for (int j = 0; j < (int)x.cols(); ++j)
+			ASSERT_EQ(x.data->ptr[i * x.cols() + j], (i + 1) * (j + 1));
+}
+
 TEST(TensorTest, RandNorm)
 {
 	Tensor* t = new DTensor<CPU, double>();

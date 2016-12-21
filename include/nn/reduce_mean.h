@@ -48,8 +48,12 @@ public:
 	 * @param[in]  _properr   whether propaget error
 	 */
 	ReduceMean(std::string _name, int _axis = -1, bool _keep_dim = false, PropErr _properr = PropErr::T);
+
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+	
+	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+						  std::vector< std::shared_ptr<Variable> >& outputs) override;
 
 	/**
 	 * the axis to be reduce

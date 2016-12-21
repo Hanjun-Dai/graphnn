@@ -1,4 +1,5 @@
 #include "tensor/dense_tensor.h"
+#include "tensor/sparse_tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/unary_functor.h"
 #include "tensor/mkl_helper.h"
@@ -170,6 +171,112 @@ void TensorTemplate<CPU, DENSE, Dtype>::Mean(DTensor<CPU, Dtype>& a, int axis)
 	for (size_t i = 0; i < a.shape.Count(); ++i)
 		s += a.data->ptr[i];
 	data->ptr[0] = s / a.shape.Count();
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Add(Dtype scalar)
+{
+	for (size_t i = 0; i < shape.Count(); ++i)
+		data->ptr[i] += scalar;
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, DTensor<CPU, Dtype>& x)
+{
+	ASSERT(this->shape == x.shape, "shape doesn't match in Axpy");
+	MKL_Axpy(shape.Count(), a, x.data->ptr, data->ptr);
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, SpTensor<CPU, Dtype>& x)
+{
+	ASSERT(this->shape == x.shape, "shape doesn't match in Axpy");
+	for (size_t i = 0; i < x.rows(); ++i)
+	{
+		for (int k = x.data->row_ptr[i]; k < x.data->row_ptr[i + 1]; ++k)
+			data->ptr[x.cols() * i + x.data->col_idx[k]] += a * x.data->val[k];
+	}
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(SpTensor<CPU, Dtype>& src)
+{
+	ASSERT(this->shape == src.shape, "shape doesn't match in ElewiseMul");
+    
+    int st, ed;
+    Dtype* pointer = this->data->ptr;
+    for (size_t i = 0; i < this->rows(); ++i)
+    {
+        st = src.data->row_ptr[i];
+        ed = src.data->row_ptr[i + 1]; 
+        
+        for (size_t j = 0; j < this->cols(); ++j)
+        {
+            if (st == ed || j != src.data->col_idx[st])
+                pointer[j] = 0;
+            else {
+                pointer[j] *= src.data->val[st];
+                st++;
+            }
+        }
+        pointer += this->cols();
+    }
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(DTensor<CPU, Dtype>& src)
+{
+	if (this->shape == src.shape)
+	{
+		MKL_Mul(this->shape.Count(), src.data->ptr, this->data->ptr, this->data->ptr);
+	} else { // require broad casting
+		ASSERT(this->rank() == src.rank(), "broadcasting only support same rank tensors; please do reshape manually");
+		for (size_t i = 0; i < this->rank(); ++i)
+			if (shape.dims[i] != src.shape.dims[i])
+				ASSERT(src.shape.dims[i] == 1, "shape mismatch, broadcasting failed");
+		
+		int r = rank();
+		size_t src_idx;
+		std::vector<size_t> cur_pos(r), src_pos(r);
+		for (auto& c : cur_pos)
+			c = 0;
+
+		for (size_t i = 0; i < shape.Count(); ++i)
+		{
+			for (int i = 0; i < r; ++i)
+				src_pos[i] = cur_pos[i] >= src.shape.dims[i] ? 0 : cur_pos[i];
+			src_idx = src.shape.Coor2Idx(src_pos);
+			data->ptr[i] *= src.data->ptr[src_idx];
+			cur_pos[r - 1] += 1;
+			for (int i = r - 1; i > 0; --i)
+				if (cur_pos[i] >= shape.dims[i])
+				{
+					cur_pos[i] -= shape.dims[i];
+					cur_pos[i - 1]++;
+				}
+		}
+	}
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Scale(Dtype scalar)
+{
+	if (scalar == 0)
+	{
+		memset(data->ptr, 0, sizeof(Dtype) * this->shape.Count());
+		return;
+	}	
+	if (scalar != 1)
+	{
+		for (int i = 0; i < this->shape.Count(); ++i)
+			data->ptr[i] *= scalar;
+	}
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Inv()
+{
+	MKL_Inv(this->shape.Count(), data->ptr, data->ptr);
 }
 
 template class TensorTemplate<CPU, DENSE, float>;

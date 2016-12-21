@@ -60,24 +60,24 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
 
 	auto x = add_var< DTensorVar<mode, Dtype> >(g, "x");
 	auto y = add_var< SpTensorVar<mode, Dtype> >(g, "y");
-	auto h1 = af< MatMul >({x, w1});
+	auto h1 = af< MatMul >(g, {x, w1});
 
-	h1 = af< ReLU >({h1});
-	auto h2 = af< MatMul >({h1, w2});	
-	h2 = af< ReLU >({h2});
-	auto output = af< MatMul >({h2, wo});
+	h1 = af< ReLU >(g, {h1});
+	auto h2 = af< MatMul >(g, {h1, w2});	
+	h2 = af< ReLU >(g, {h2});
+	auto output = af< MatMul >(g, {h2, wo});
 
-	auto ce = af< CrossEntropy >({output, y}, true);
-	auto loss = af< ReduceMean >({ce});
+	auto ce = af< CrossEntropy >(g, {output, y}, true);
+	auto loss = af< ReduceMean >(g, {ce});
 
-    auto label = af< ArgMax >({y});    
+    auto label = af< ArgMax >(g, {y});    
 
     // output (Dtype) and label (int) has different types
     // c++ doesn't have heterogeneous initializer list, make_pair is required
     // return an int tensor (vector)
-    auto cmp = af< InTopK<mode, Dtype> >(std::make_pair(output, label));
+    auto cmp = af< InTopK<mode, Dtype> >(g, std::make_pair(output, label));
 
-	auto acc = af< ReduceMean >({ af< TypeCast<mode, Dtype> >({cmp}) });
+	auto acc = af< ReduceMean >(g, { af< TypeCast<mode, Dtype> >(g, {cmp}) });
 
 	return {loss, acc};	
 }
@@ -135,14 +135,15 @@ int main(const int argc, const char** argv)
         loss /= labels_test.size();
         err_rate /= labels_test.size();
         std::cerr << fmt::sprintf("test loss: %.4f\t error rate: %.4f", loss, err_rate) << std::endl;
-        break;
 
         for (unsigned i = 0; i < labels_train.size(); i += batch_size)
         {
                 LoadBatch(i, images_train, labels_train);
                 g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}});
                 g.BackPropagate({var_loss});
+                break;
         }
+        break;
     }
 	return 0;
 }

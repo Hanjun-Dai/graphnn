@@ -37,4 +37,16 @@ size_t TShape::operator[](uint dim)
 	return this->dims[dim];
 }
 
+size_t TShape::Coor2Idx(const std::vector<size_t>& l)
+{
+	ASSERT(l.size() == dims.size(), "rank mismatch");
+	size_t ans = 0;
+	for (size_t i = 0; i < l.size(); ++i)
+	{
+		ASSERT(l[i] < dims[i], "coordinate out of range");
+		ans = ans * dims[i] + l[i];
+	}
+	return ans;
+}
+
 }

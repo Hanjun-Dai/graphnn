@@ -138,6 +138,59 @@ public:
 	void Mean(DTensor<CPU, Dtype>& a, int axis = -1);
 
 	/**
+	 * @brief      Add a scalar to each element
+	 *
+	 * @param[in]  scalar  The scalar to be added
+	 */
+	void Add(Dtype scalar);
+
+	/**
+	 * @brief      the same axpy defined in blas: y = a * x + y
+	 *
+	 * @param[in]  a     scalar a
+	 * @param      x     dense tensor x
+	 */
+	void Axpy(Dtype a, DTensor<CPU, Dtype>& x);
+
+	/**
+	 * @brief      the same axpy defined in blas: y = a * x + y; but here
+	 * 				x is a sparse tensor
+	 *
+	 * @param[in]  a     scalar a
+	 * @param      x     sparse tensor x
+	 */
+	void Axpy(Dtype a, SpTensor<CPU, Dtype>& x);
+
+	/**
+	 * @brief      element-wise multiplication between dense and sparse tensor
+	 * 				the same shape of two tensors is required.
+	 *
+	 * @param      src   The sparse tensor
+	 */
+	void ElewiseMul(SpTensor<CPU, Dtype>& src);
+
+	/**
+	 * @brief      element-wise multiplication between two dense tensors; broadcasting
+	 * 				is enabled, but we assume the result tensor keeps the shape of this
+	 * 				current tensor (caller).
+	 *
+	 * @param      src   The other dense tensor
+	 */
+	void ElewiseMul(DTensor<CPU, Dtype>& src);
+
+	/**
+	 * @brief      multipy the tensor with a scalar
+	 *
+	 * @param[in]  scalar  The scalar to be multiplied
+	 */
+	void Scale(Dtype scalar);
+
+	/**
+	 * @brief      set each element x to be 1/x
+	 */
+	void Inv();
+	
+	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */
 	std::shared_ptr< DenseData<CPU, Dtype> > data;

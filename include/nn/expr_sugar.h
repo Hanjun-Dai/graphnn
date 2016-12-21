@@ -8,45 +8,45 @@ namespace gnn
 {
 
 template<template <typename, typename> class FacType, typename... Args>
-typename FacType<CPU, float>::OutType af(std::vector< std::shared_ptr< TensorVar<CPU, float> > > op, 
+typename FacType<CPU, float>::OutType af(FactorGraph& g, std::vector< std::shared_ptr< TensorVar<CPU, float> > > op, 
 										Args&&... args)
 {
-	return af< FacType<CPU, float> >(*(op[0]->g), op, std::forward<Args>(args)...);
+	return af< FacType<CPU, float> >(g, op, std::forward<Args>(args)...);
 }
 
 template<template <typename, typename> class FacType, typename... Args>
-typename FacType<CPU, double>::OutType af(std::vector< std::shared_ptr< TensorVar<CPU, double> > > op, 
+typename FacType<CPU, double>::OutType af(FactorGraph& g, std::vector< std::shared_ptr< TensorVar<CPU, double> > > op, 
 										Args&&... args)
 {
-	return af< FacType<CPU, double> >(*(op[0]->g), op, std::forward<Args>(args)...);
+	return af< FacType<CPU, double> >(g, op, std::forward<Args>(args)...);
 }
 
 template<template <typename, typename> class FacType, typename... Args>
-typename FacType<CPU, int>::OutType af(std::vector< std::shared_ptr< TensorVar<CPU, int> > > op, 
+typename FacType<CPU, int>::OutType af(FactorGraph& g, std::vector< std::shared_ptr< TensorVar<CPU, int> > > op, 
 										Args&&... args)
 {
-	return af< FacType<CPU, int> >(*(op[0]->g), op, std::forward<Args>(args)...);
+	return af< FacType<CPU, int> >(g, op, std::forward<Args>(args)...);
 }
 
 template<template <typename, typename> class FacType, typename... Args>
-typename FacType<GPU, float>::OutType af(std::vector< std::shared_ptr< TensorVar<GPU, float> > > op, 
+typename FacType<GPU, float>::OutType af(FactorGraph& g, std::vector< std::shared_ptr< TensorVar<GPU, float> > > op, 
 										Args&&... args)
 {
-	return af< FacType<GPU, float> >(*(op[0]->g), op, std::forward<Args>(args)...);
+	return af< FacType<GPU, float> >(g, op, std::forward<Args>(args)...);
 }
 
 template<template <typename, typename> class FacType, typename... Args>
-typename FacType<GPU, double>::OutType af(std::vector< std::shared_ptr< TensorVar<GPU, double> > > op, 
+typename FacType<GPU, double>::OutType af(FactorGraph& g, std::vector< std::shared_ptr< TensorVar<GPU, double> > > op, 
 										Args&&... args)
 {
-	return af< FacType<GPU, double> >(*(op[0]->g), op, std::forward<Args>(args)...);
+	return af< FacType<GPU, double> >(g, op, std::forward<Args>(args)...);
 }
 
 template<template <typename, typename> class FacType, typename... Args>
-typename FacType<GPU, int>::OutType af(std::vector< std::shared_ptr< TensorVar<GPU, int> > > op, 
+typename FacType<GPU, int>::OutType af(FactorGraph& g, std::vector< std::shared_ptr< TensorVar<GPU, int> > > op, 
 										Args&&... args)
 {
-	return af< FacType<GPU, int> >(*(op[0]->g), op, std::forward<Args>(args)...);
+	return af< FacType<GPU, int> >(g, op, std::forward<Args>(args)...);
 }
 
 }

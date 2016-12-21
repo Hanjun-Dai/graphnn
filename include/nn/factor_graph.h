@@ -167,6 +167,13 @@ protected:
 							std::map<std::string, void*> feed_dict);
 
 	/**
+	 * @brief      The single threaded backward function
+	 *
+	 * @param[in]  targets  The targets which contributes directly to the objective
+	 */
+	void SequentialBackward(std::initializer_list< VarPtr > targets);
+	
+	/**
 	 * @brief      Parse the dependency to see which variables are required
 	 *
 	 * @param[in]  targets  The targets which the user wants to fetch
@@ -220,26 +227,23 @@ typename FacType::OutType af(FactorGraph& g, std::vector< VarPtr > operands,
 }
 
 template<typename FacType, typename VarPtr, typename... Args>
-typename FacType::OutType af(std::initializer_list< VarPtr > op, Args&&... args)
+typename FacType::OutType af(FactorGraph& g, std::initializer_list< VarPtr > op, Args&&... args)
 {
 	std::vector< VarPtr > op_list;
 	for (auto p : op)
 		op_list.push_back(p);
-	auto first_op = *(op.begin());
-	auto* g = first_op->g;
 
-	return af<FacType>(*g, op_list, std::forward<Args>(args)...);
+	return af<FacType>(g, op_list, std::forward<Args>(args)...);
 }
 
 template<typename FacType, typename VarPtr1, typename VarPtr2, typename... Args>
-typename FacType::OutType af(std::pair<VarPtr1, VarPtr2> op, Args&&... args)
+typename FacType::OutType af(FactorGraph& g, std::pair<VarPtr1, VarPtr2> op, Args&&... args)
 {
 	std::vector< std::shared_ptr<Variable> > op_list(2);
 	op_list[0] = op.first;
 	op_list[1] = op.second;
 
-	auto* g = op.first->g;
-	return af<FacType>(*g, op_list, std::forward<Args>(args)...);
+	return af<FacType>(g, op_list, std::forward<Args>(args)...);
 }
 
 }
