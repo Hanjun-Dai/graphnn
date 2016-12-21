@@ -116,13 +116,14 @@ void TensorTemplate<CPU, DENSE, Dtype>::ArgMax(DTensor<CPU, int>& dst, uint axis
 	{
 		dst.data->ptr[i] = 0;
 		Dtype cur_max = *ptr;
-		for (size_t j = 1; j < this->shape.Count(1); ++j)
+		auto cnt = this->shape.Count(1);
+		for (size_t j = 1; j < cnt; ++j)
 			if (ptr[j] > cur_max)
 			{
 				cur_max = ptr[j];
 				dst.data->ptr[i] = j;
 			}
-		ptr += this->shape.Count(1);
+		ptr += cnt;
 	}
 }
 
@@ -180,15 +181,17 @@ void TensorTemplate<CPU, DENSE, Dtype>::Mean(DTensor<CPU, Dtype>& a, int axis)
 	Reshape({1});
 
 	Dtype s = 0;
-	for (size_t i = 0; i < a.shape.Count(); ++i)
+	auto cnt = a.shape.Count();
+	for (size_t i = 0; i < cnt; ++i)
 		s += a.data->ptr[i];
-	data->ptr[0] = s / a.shape.Count();
+	data->ptr[0] = s / cnt;
 }
 
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Add(Dtype scalar)
 {
-	for (size_t i = 0; i < shape.Count(); ++i)
+	auto cnt = shape.Count();
+	for (size_t i = 0; i < cnt; ++i)
 		data->ptr[i] += scalar;
 }
 
@@ -259,8 +262,8 @@ void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(DTensor<CPU, Dtype>& src)
 		std::vector<size_t> cur_pos(r), src_pos(r);
 		for (auto& c : cur_pos)
 			c = 0;
-
-		for (size_t i = 0; i < shape.Count(); ++i)
+		auto ele_cnt = shape.Count();
+		for (size_t i = 0; i < ele_cnt; ++i)
 		{
 			for (int i = 0; i < r; ++i)
 				src_pos[i] = cur_pos[i] >= src.shape.dims[i] ? 0 : cur_pos[i];
@@ -287,7 +290,8 @@ void TensorTemplate<CPU, DENSE, Dtype>::Scale(Dtype scalar)
 	}	
 	if (scalar != 1)
 	{
-		for (size_t i = 0; i < this->shape.Count(); ++i)
+		auto cnt = shape.Count();
+		for (size_t i = 0; i < cnt; ++i)
 			data->ptr[i] *= scalar;
 	}
 }

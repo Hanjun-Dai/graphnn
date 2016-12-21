@@ -23,6 +23,17 @@ public:
 };
 
 template<typename mode, typename Dtype>
+class MomentumSGDOptimizer: public IOptimizer<mode, Dtype>
+{
+public:
+	MomentumSGDOptimizer(ParamSet<mode, Dtype>* m, Dtype _init_lr, Dtype _momentum = 0.9, Dtype _l2_penalty = 0);
+
+	virtual void Update() override;
+	Dtype momentum;
+	std::map<std::string, std::shared_ptr< DTensor<mode, Dtype> > > acc_grad_dict;
+};
+
+template<typename mode, typename Dtype>
 class AdamOptimizer : public IOptimizer<mode, Dtype>
 {
 public:

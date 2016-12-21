@@ -5,31 +5,35 @@
 namespace gnn
 {
 
-TShape::TShape() : dims()
+TShape::TShape() : dims(), cnt()
 {
 
 }
 
-TShape::TShape(std::vector<size_t> l) : dims(l)
+TShape::TShape(std::vector<size_t> l)
 {
-
+	Reshape(l);
 }
 
 void TShape::Reshape(std::vector<size_t> l)
 {
 	this->dims = l;
+	cnt.resize(l.size());
+	cnt[cnt.size() - 1] = this->dims[cnt.size() - 1];
+	for (int i = (int)cnt.size() - 2; i >= 0; --i)
+		cnt[i] = cnt[i + 1] * this->dims[i];
 }
 
-size_t TShape::Count(uint dim)
-{
-	if (dim == 0 && this->dims.size() == 0)
-		return 0;
-	ASSERT(dim < this->dims.size(), fmt::sprintf("dim %d is out of range", dim));
-	size_t result = 1;
-	for (size_t i = dim; i < this->dims.size(); ++i)
-		result *= (size_t)this->dims[i];
-	return result;
-}
+// size_t TShape::Count(uint dim)
+// {
+// 	if (dim == 0 && this->dims.size() == 0)
+// 		return 0;
+// 	ASSERT(dim < this->dims.size(), fmt::sprintf("dim %d is out of range", dim));
+// 	size_t result = 1;
+// 	for (size_t i = dim; i < this->dims.size(); ++i)
+// 		result *= (size_t)this->dims[i];
+// 	return result;
+// }
 
 size_t TShape::operator[](uint dim)
 {

@@ -7,7 +7,8 @@ template<typename Dtype>
 void ReLUAct(DTensor<CPU, Dtype>& in, DTensor<CPU, Dtype>& out)
 {
 	out.CopyFrom(in);
-	for (size_t i = 0; i < out.shape.Count(); ++i)
+	auto cnt = out.shape.Count();
+	for (size_t i = 0; i < cnt; ++i)
 		if (out.data->ptr[i] < 0)
 			out.data->ptr[i] = 0;
 }
@@ -15,7 +16,8 @@ void ReLUAct(DTensor<CPU, Dtype>& in, DTensor<CPU, Dtype>& out)
 template<typename Dtype>
 void ReLUDeriv(DTensor<CPU, Dtype>& dst, DTensor<CPU, Dtype>& cur_out, DTensor<CPU, Dtype>& cur_grad)
 {
-	for (size_t i = 0; i < dst.shape.Count(); ++i)
+	auto cnt = dst.shape.Count();
+	for (size_t i = 0; i < cnt; ++i)
 		if (cur_out.data->ptr[i] > 0.0)
 			dst.data->ptr[i] += cur_grad.data->ptr[i];
 }

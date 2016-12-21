@@ -64,9 +64,9 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
 	auto y = add_const< SpTensorVar<mode, Dtype> >(g, "y", true);
 	auto h1 = af< MatMul >(g, {x, w1});
 
-	//h1 = af< ReLU >(g, {h1});
+	h1 = af< ReLU >(g, {h1});
 	auto h2 = af< MatMul >(g, {h1, w2});	
-	//h2 = af< ReLU >(g, {h2});
+	h2 = af< ReLU >(g, {h2});
 	auto output = af< MatMul >(g, {h2, wo});
 
 	auto ce = af< CrossEntropy >(g, {output, y}, true);
@@ -109,7 +109,6 @@ void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int 
     input.CopyFrom(x_cpu);
     label.CopyFrom(y_cpu);
 }
-
 int main(const int argc, const char** argv)
 {
 	LoadParams(argc, argv); 
@@ -122,6 +121,7 @@ int main(const int argc, const char** argv)
     auto var_loss = targets.first;
     auto var_acc = targets.second;
 
+    //MomentumSGDOptimizer<mode, Dtype> optmz(&pset, lr, 0.9, 0);
     AdamOptimizer<mode, Dtype> optmz(&pset, lr);
     optmz.clipping_enabled = false;
 
@@ -140,7 +140,6 @@ int main(const int argc, const char** argv)
         loss /= labels_test.size();
         err_rate /= labels_test.size();
         std::cerr << fmt::sprintf("test loss: %.4f\t error rate: %.4f", loss, err_rate) << std::endl;
-
 
         double t_ff = 0.0, t_bp = 0.0, t_up = 0.0;
         for (unsigned i = 0; i < labels_train.size(); i += batch_size)
@@ -164,7 +163,7 @@ int main(const int argc, const char** argv)
                 totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count();
                 t_up += totalTime;
         }
-        std::cerr << t_ff / 1000 << " " << t_bp / 1000 << " " << t_up / 1000 << std::endl;
+        std::cerr << t_ff / 1000 << " " << t_bp / 1000  << " " << t_up / 1000 << std::endl;
     }
 	return 0;
 }

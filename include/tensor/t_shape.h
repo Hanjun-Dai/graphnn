@@ -36,8 +36,13 @@ public:
 	 *
 	 * @return     \prod_{i=dim}^{rank - 1} dims[i]
 	 */
-	size_t Count(uint dim = 0);
-
+	inline size_t Count(uint dim = 0)
+	{
+		if (dim == 0 && this->dims.size() == 0)
+			return 0;
+		ASSERT(dim < this->dims.size(), "dim is out of range");
+		return cnt[dim];
+	}
 	/**
 	 * @brief      get the size of a certain dimension
 	 *
@@ -60,6 +65,8 @@ public:
 	 * stores the size per each dimension
 	 */
 	std::vector<size_t> dims;
+
+	std::vector<size_t> cnt;
 };
 
 inline bool operator==(const TShape& lhs, const TShape& rhs)

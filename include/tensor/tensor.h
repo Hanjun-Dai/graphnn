@@ -57,20 +57,35 @@ public:
 	 *
 	 * @return     the rank
 	 */
-	uint rank();
+	inline uint rank()
+	{
+		return this->shape.dims.size();
+	}
 	/**
 	 * @brief      # rows; only valid when rank <= 2
 	 *
 	 * @return     # rows;
 	 */
-	size_t rows();
+	inline size_t rows()
+	{
+		ASSERT(rank() <= 2, "rows is not well defined for rank > 2");
+		return this->shape[0];
+	}
 
 	/**
 	 * @brief      # cols; only valid when rank <= 2
 	 *
 	 * @return     # cols
 	 */
-	size_t cols();
+	inline size_t cols()
+	{
+		// assume column vector
+		if (rank() == 1)
+			return 1;
+		if (rank() == 2)
+			return this->shape[1];
+		ASSERT(false, "cols is not well defined for rank > 2");
+	}
 
 	/**
 	 * @brief      reshape the tensor
