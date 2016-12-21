@@ -42,10 +42,14 @@ void ReduceMean<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& 
 
 template<typename mode, typename Dtype>
 void ReduceMean<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+									std::vector< bool >& isConst, 
 						 			std::vector< std::shared_ptr<Variable> >& outputs)
 {
 	ASSERT(operands.size() == 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
+	if (isConst[0])
+		return;
+	
 	ASSERT(axis == -1 && keep_dim == false, "currently only support axis=-1 and keep_dim=false in " << StrType());
 
 	auto& output = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;

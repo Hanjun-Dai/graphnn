@@ -45,11 +45,14 @@ void CrossEntropy<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >
 
 template<typename mode, typename Dtype>
 void CrossEntropy<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+										std::vector< bool >& isConst, 
 						 				std::vector< std::shared_ptr<Variable> >& outputs)
 {
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType());
-
+	if (isConst[0])
+		return;
+	
 	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
 	auto& grad_lhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
 	auto& label = dynamic_cast<SpTensorVar<mode, Dtype>*>(operands[1].get())->value;

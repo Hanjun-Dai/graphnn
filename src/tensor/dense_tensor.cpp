@@ -16,6 +16,18 @@ TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate() : data(nullptr)
 }
 
 template<typename Dtype>
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l)
+{
+	Reshape(l);
+}
+
+template<typename Dtype>
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(TShape s)
+{
+	Reshape(s.dims);
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Reshape(std::vector<size_t> l)
 {
 	this->shape.Reshape(l);
@@ -122,7 +134,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::MM(DTensor<CPU, Dtype>& a, DTensor<CPU, 
 	GetDims(a.rows(), a.cols(), transA, b.rows(), b.cols(), transB, m, n, k);
 	
 	Reshape({m, n});
-	MKL_GeMM(CblasRowMajor, CPU_T(transB), CPU_T(transB), 
+	MKL_GeMM(CblasRowMajor, CPU_T(transA), CPU_T(transB), 
 			m, n, k, alpha, 
 			a.data->ptr, a.cols(), 
 			b.data->ptr, b.cols(), 
@@ -199,6 +211,13 @@ void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, SpTensor<CPU, Dtype>& x)
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Axpby(Dtype a, DTensor<CPU, Dtype>& x, Dtype b)
+{
+	ASSERT(this->shape == x.shape, "shape doesn't match in Axpby");
+	MKL_Axpby(this->shape.Count(), a, x.data->ptr, b, data->ptr);
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(SpTensor<CPU, Dtype>& src)
 {
 	ASSERT(this->shape == src.shape, "shape doesn't match in ElewiseMul");
@@ -210,7 +229,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(SpTensor<CPU, Dtype>& src)
         st = src.data->row_ptr[i];
         ed = src.data->row_ptr[i + 1]; 
         
-        for (size_t j = 0; j < this->cols(); ++j)
+        for (int j = 0; j < (int)this->cols(); ++j)
         {
             if (st == ed || j != src.data->col_idx[st])
                 pointer[j] = 0;
@@ -268,7 +287,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::Scale(Dtype scalar)
 	}	
 	if (scalar != 1)
 	{
-		for (int i = 0; i < this->shape.Count(); ++i)
+		for (size_t i = 0; i < this->shape.Count(); ++i)
 			data->ptr[i] *= scalar;
 	}
 }
@@ -277,6 +296,24 @@ template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Inv()
 {
 	MKL_Inv(this->shape.Count(), data->ptr, data->ptr);
+}
+
+template<typename Dtype>
+Dtype TensorTemplate<CPU, DENSE, Dtype>::Norm2()
+{
+	return MKL_Norm2(this->shape.Count(), data->ptr); 
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Square()
+{
+	MKL_Square(this->shape.Count(), data->ptr, data->ptr);
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Sqrt()
+{
+	MKL_Sqrt(this->shape.Count(), data->ptr, data->ptr);
 }
 
 template class TensorTemplate<CPU, DENSE, float>;

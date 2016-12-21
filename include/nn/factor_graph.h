@@ -31,12 +31,19 @@ public:
 	FactorGraph();	
 
 	/**
-	 * @brief      Adds a variable to this computation graph
+	 * @brief      Adds a constant variable to this computation graph
 	 *
-	 * @param[in]  var        The variable to be add
-	 * @param[in]  need_feed  Whether this is an actual variable or an placeholder variable
+	 * @param[in]  var            The variable
+	 * @param[in]  isPlaceholder  Indicates if placeholder
 	 */
-	void AddVar(VarPtr var, bool need_feed = true);
+	void AddConst(VarPtr var, bool isPlaceholder);
+
+	/**
+	 * @brief      Add a parameter to the computation graph
+	 *
+	 * @param[in]  var   The parameter variable
+	 */
+	void AddParam(VarPtr var);
 
 	/**
 	 * @brief      Adds a factor (operator) to the graph
@@ -158,6 +165,13 @@ public:
 	
 protected:
 	/**
+	 * @brief      Adds an intermediate variable to this computation graph
+	 *
+	 * @param[in]  var        The variable to be add
+	 */
+	void AddVar(VarPtr var);
+
+	/**
 	 * @brief      The single threaded feed forward function
 	 *
 	 * @param[in]  targets    The targets which the user wants to fetch
@@ -191,6 +205,11 @@ protected:
 	std::vector<bool> isReady;
 
 	/**
+	 * whether the variable is constant
+	 */
+	std::vector<bool> isConst;
+
+	/**
 	 * whether the variable (indexed by integer) is required by user
 	 */
 	std::vector<bool> isRequired;
@@ -204,26 +223,26 @@ protected:
 	 * queue data structure used for topo_sort/BFS
 	 */
 	std::queue<std::string> q;
+
+	template<typename FacType, typename VarPtr, typename... Args>
+	friend typename FacType::OutType af(FactorGraph& g, std::vector< VarPtr > operands, 
+										Args&&... args)
+	{
+		auto fname = fmt::sprintf("%s_%d", FacType::StrType(), g.factorEdges.size());
+		auto f = std::make_shared<FacType>(fname, std::forward<Args>(args)...);
+		auto out_vars = f->CreateOutVar();
+		g.AddVar(out_vars);
+		g.AddFactor(f, operands, out_vars);
+		return out_vars;
+	}
 };
 
 template<typename VarType, typename... Args>
-std::shared_ptr<VarType> add_var(FactorGraph& g, std::string var_name, Args&&... args)
+std::shared_ptr<VarType> add_const(FactorGraph& g, std::string var_name, bool isPlaceholder, Args&&... args)
 {
 	auto v = std::make_shared<VarType>(var_name, std::forward<Args>(args)...);
-	g.AddVar(v);
+	g.AddConst(v, isPlaceholder);
 	return v;
-}
-
-template<typename FacType, typename VarPtr, typename... Args>
-typename FacType::OutType af(FactorGraph& g, std::vector< VarPtr > operands, 
-									Args&&... args)
-{
-	auto fname = fmt::sprintf("%s_%d", FacType::StrType(), g.factorEdges.size());
-	auto f = std::make_shared<FacType>(fname, std::forward<Args>(args)...);
-	auto out_vars = f->CreateOutVar();
-	g.AddVar(out_vars);
-	g.AddFactor(f, operands, out_vars);
-	return out_vars;
 }
 
 template<typename FacType, typename VarPtr, typename... Args>

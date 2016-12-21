@@ -38,6 +38,7 @@ public:
 	 * @param      outputs   The output variables produced by this operator
 	 */
 	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+						  std::vector< bool >& isConst, 
 						  std::vector< std::shared_ptr<Variable> >& outputs) NOT_IMPLEMENTED
 
 	/**

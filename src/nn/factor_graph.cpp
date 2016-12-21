@@ -11,6 +11,7 @@ FactorGraph::FactorGraph()
 
 	isReady.clear();
 	isRequired.clear();
+	isConst.clear();
 
 	factorEdges.clear();
 	varEdges.clear();
@@ -194,30 +195,32 @@ void FactorGraph::SequentialBackward(std::initializer_list< FactorGraph::VarPtr 
 				q.push(f->name);
 		}
 	}
+	std::vector<bool> info_const_list;
+
 	while (!q.empty())
 	{
 		auto& cur_name = q.front();
-		std::cerr << cur_name << std::endl;
 		q.pop();
 
 		auto& factor = factor_dict[cur_name].second;
 		auto& operands = factorEdges[cur_name].first;
 		auto& outputs = factorEdges[cur_name].second;
 
-		bool necessary = factor->properr == PropErr::T;
+		bool necessary = factor->properr == PropErr::T;		
 		if (necessary)
 		{
+			info_const_list.resize(operands.size());
 			bool ok = false;
-			for (auto p : operands)
-				if (!p->IsConst())
-				{
-					ok = true; break;
-				}
+			for (size_t i = 0; i < operands.size(); ++i)
+			{
+				info_const_list[i] = isConst[VarIdx(operands[i])];
+				ok |= !info_const_list[i];
+			}
 			necessary = ok;
 		}
 		
 		if (necessary)
-			factor->Backward(operands, outputs);
+			factor->Backward(operands, info_const_list, outputs);
 
 		for (auto p : operands)
 		{
@@ -239,7 +242,7 @@ void FactorGraph::BackPropagate(std::initializer_list< FactorGraph::VarPtr > tar
 	ASSERT(isReady.size() == var_dict.size() && n_pending.size() == factor_list.size() && isReady.size() == isRequired.size(), 
 		"unexpected change of computation graph in backward stage");
 	for (size_t i = 0; i < var_list.size(); ++i)
-		if (!var_list[i]->IsConst())
+		if (!isConst[i])
 		{
 			auto* diff_var = dynamic_cast<IDifferentiable*>(var_list[i].get());
 			diff_var->ZeroGrad();
@@ -248,7 +251,7 @@ void FactorGraph::BackPropagate(std::initializer_list< FactorGraph::VarPtr > tar
 	for (auto p : targets)
 	{
 		ASSERT(varEdges[p->name].second.size() == 0, "only allow backprop from top variables");
-		ASSERT(!p->IsConst(), "cannot calc grad for const variable");
+		ASSERT(!isConst[VarIdx(p)], "cannot calc grad for const variable");
 		auto* diff_var = dynamic_cast<IDifferentiable*>(p.get());
 		diff_var->OnesGrad();
 	}
@@ -260,16 +263,28 @@ void FactorGraph::BackPropagate(std::initializer_list< FactorGraph::VarPtr > tar
 	}
 }
 
-void FactorGraph::AddVar(VarPtr var, bool need_feed)
+void FactorGraph::AddVar(VarPtr var)
 {
 	ASSERT(var_dict.count(var->name) == 0 && varEdges.count(var->name) == 0, 
 			fmt::sprintf("variable %s is already inserted", var->name.c_str()));
 	varEdges[var->name] = std::pair<FactorList, FactorList>();
 	var_dict[var->name] = std::make_pair(var_list.size(), var);
 	var_list.push_back(var);
+	isConst.push_back(false);
+}
 
-	if (!need_feed)
+void FactorGraph::AddConst(VarPtr var, bool isPlaceholder)
+{
+	AddVar(var);
+	isConst[VarIdx(var)] = true;
+	if (!isPlaceholder)
 		ready_dict[var->name] = var;
+}
+
+void FactorGraph::AddParam(VarPtr var)
+{
+	AddVar(var);
+	ready_dict[var->name] = var;
 }
 
 }

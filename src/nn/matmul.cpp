@@ -34,6 +34,7 @@ void MatMul<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& oper
 
 template<typename mode, typename Dtype>
 void MatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+									std::vector< bool >& isConst, 
 						 			std::vector< std::shared_ptr<Variable> >& outputs)
 {
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
@@ -42,19 +43,37 @@ void MatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
 
 	auto* rhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[1].get());
+	auto& right_grad = rhs->grad;
 
 	auto* lhs = dynamic_cast< TensorVar<mode, Dtype>* >(operands[0].get());
 
-	MAT_TYPE_SWITCH(lhs->GetMatType(), matType, {
-		auto& left_mat = lhs->template Derived<matType>().value;
-		auto& right_grad = rhs->grad;
-
-		if (transB == Trans::N)
-			right_grad.MM(left_mat, grad_out, transA == Trans::N ? Trans::T : Trans::N, Trans::N, 1.0, 1.0);
-		else
+	if (!isConst[1])
+	{
+		if (transB == Trans::T)
+		{
+			ASSERT(lhs->GetMatType() == MatType::dense, "unsupported backprop in matmul");
+			auto& left_mat = lhs->template Derived<DENSE>().value;
 			right_grad.MM(grad_out, left_mat, Trans::T, transA, 1.0, 1.0);
-	});
+		} else {
+			MAT_TYPE_SWITCH(lhs->GetMatType(), matType, {
+				auto& left_mat = lhs->template Derived<matType>().value;
+			
+				right_grad.MM(left_mat, grad_out, transA == Trans::N ? Trans::T : Trans::N, Trans::N, 1.0, 1.0);			
+			});
+		}
+	}
 
+	if (!isConst[0])
+	{
+		ASSERT(lhs->GetMatType() == MatType::dense, "differentiable lhs can't be sparse");
+		auto& left_grad = lhs->template Derived<DENSE>().grad;
+		auto& right_mat = rhs->value;
+		
+		if (transA == Trans::N)
+			left_grad.MM(grad_out, right_mat, Trans::N, transB == Trans::N ? Trans::T : Trans::N, 1.0, 1.0);
+		else
+			left_grad.MM(right_mat, grad_out, transB, Trans::T, 1.0, 1.0);
+	}
 }
 
 template class MatMul<CPU, float>;

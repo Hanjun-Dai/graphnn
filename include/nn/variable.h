@@ -60,13 +60,6 @@ public:
 	virtual EleType GetEleType() = 0;
 
 	/**
-	 * @brief      whether this is a constant variable
-	 *
-	 * @return     True if constant, False otherwise.
-	 */
-	virtual bool IsConst(); 
-
-	/**
 	 * the variable's string name
 	 */
 	std::string name;
@@ -158,18 +151,16 @@ public:
 	 * @brief      constructor
 	 *
 	 * @param[in]  _name     The name
-	 * @param[in]  _isConst  Indicates if constant
 	 */
-	TensorVarTemplate(std::string _name, bool _isConst = false);
+	TensorVarTemplate(std::string _name);
 
 	/**
 	 * @brief      constructor
 	 *
 	 * @param[in]  _name     The name
 	 * @param[in]  l         the tensor shape specified by the size_t list
-	 * @param[in]  _isConst  Indicates if constant
 	 */
-	TensorVarTemplate(std::string _name, std::vector<size_t> l, bool _isConst = false);
+	TensorVarTemplate(std::string _name, std::vector<size_t> l);
 
 	/**
 	 * @brief      constructor
@@ -196,7 +187,6 @@ public:
 	 */
 	virtual void SetRef(void* p) override;
 
-	virtual bool IsConst() override;
 	virtual Dtype AsScalar() override;
 	virtual MatType GetMatType() override;
 
@@ -214,10 +204,6 @@ public:
 	 * stores the gradient with respect to this variable
 	 */
 	DTensor< mode, Dtype> grad;
-	/**
-	 * whether this is a constant tensor
-	 */
-	bool isConst;
 };
 
 /**
@@ -237,7 +223,6 @@ public:
 	 * @param      p     Here we assume p is a raw pointer to SpTensor<mode, Dtype>
 	 */
 	virtual void SetRef(void* p) override;
-	virtual bool IsConst() override;
 	virtual Dtype AsScalar() override;
 	virtual MatType GetMatType() override;
 

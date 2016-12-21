@@ -18,7 +18,9 @@ class TensorTemplate<CPU, DENSE, Dtype> : public Tensor
 public:
 
 	TensorTemplate();
-
+	TensorTemplate(std::vector<size_t> l);
+	TensorTemplate(TShape s);
+	
 	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
@@ -162,6 +164,15 @@ public:
 	void Axpy(Dtype a, SpTensor<CPU, Dtype>& x);
 
 	/**
+	 * @brief      the same axpby defined in blas: y = a * x + b * y
+	 *
+	 * @param[in]  a     scalar a
+	 * @param      x     dense tensor x
+	 * @param[in]  b     scalar b
+	 */
+	void Axpby(Dtype a, DTensor<CPU, Dtype>& x, Dtype b);
+
+	/**
 	 * @brief      element-wise multiplication between dense and sparse tensor
 	 * 				the same shape of two tensors is required.
 	 *
@@ -189,7 +200,23 @@ public:
 	 * @brief      set each element x to be 1/x
 	 */
 	void Inv();
+
+	/**
+	 * @brief      get l2-norm of tensor
+	 *
+	 * @return     norm2 scalar
+	 */
+	Dtype Norm2();
 	
+	/**
+	 * @brief      set each element x to be x^2
+	 */
+	void Square();
+	/**
+	 * @brief      set each element x to be x^0.5
+	 */
+	void Sqrt();
+
 	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */

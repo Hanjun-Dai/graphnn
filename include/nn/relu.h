@@ -15,6 +15,12 @@ void ReLUAct(DTensor<CPU, Dtype>& in, DTensor<CPU, Dtype>& out);
 template<typename Dtype>
 void ReLUAct(DTensor<GPU, Dtype>& in, DTensor<GPU, Dtype>& out);
 
+template<typename Dtype>
+void ReLUDeriv(DTensor<CPU, Dtype>& dst, DTensor<CPU, Dtype>& cur_output, DTensor<CPU, Dtype>& cur_grad);
+
+template<typename Dtype>
+void ReLUDeriv(DTensor<GPU, Dtype>& dst, DTensor<GPU, Dtype>& cur_output, DTensor<GPU, Dtype>& cur_grad);
+
 /**
  * @brief      the rectifer linear unit operator
  *
@@ -50,10 +56,13 @@ public:
 	 * @param[in]  _properr  whether propagate error
 	 */
 	ReLU(std::string _name, PropErr _properr = PropErr::T);
-	
+
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 std::vector< std::shared_ptr<Variable> >& outputs) override;
-	
+
+	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+						  std::vector< bool >& isConst, 
+						  std::vector< std::shared_ptr<Variable> >& outputs) override;	
 };
 
 }

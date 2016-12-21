@@ -9,6 +9,7 @@
 #include "nn/factor_graph.h"
 #include "nn/matmul.h"
 #include "nn/relu.h"
+#include "nn/optimizer.h"
 #include "nn/cross_entropy.h"
 #include "nn/arg_max.h"
 #include "nn/type_cast.h"
@@ -20,6 +21,7 @@ using namespace gnn;
 
 const char* f_train_feat, *f_train_label, *f_test_feat, *f_test_label;
 unsigned batch_size = 100;
+Dtype lr = 0.001;
 int dev_id;
 std::vector< Dtype* > images_train, images_test;
 std::vector< int > labels_train, labels_test;
@@ -54,12 +56,12 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
 	w2->value.SetRandN(0, 0.01);
 	wo->value.SetRandN(0, 0.01);
 
-    g.AddVar(w1, false);
-    g.AddVar(w2, false);
-    g.AddVar(wo, false);
+    g.AddParam(w1);
+    g.AddParam(w2);
+    g.AddParam(wo);
 
-	auto x = add_var< DTensorVar<mode, Dtype> >(g, "x");
-	auto y = add_var< SpTensorVar<mode, Dtype> >(g, "y");
+	auto x = add_const< DTensorVar<mode, Dtype> >(g, "x", true);
+	auto y = add_const< SpTensorVar<mode, Dtype> >(g, "y", true);
 	auto h1 = af< MatMul >(g, {x, w1});
 
 	h1 = af< ReLU >(g, {h1});
@@ -120,6 +122,9 @@ int main(const int argc, const char** argv)
     auto var_loss = targets.first;
     auto var_acc = targets.second;
 
+    AdamOptimizer<mode, Dtype> optmz(&pset, lr);
+    optmz.clipping_enabled = false;
+
 	Dtype loss, err_rate;  
 	for (int epoch = 0; epoch < 10; ++epoch)
     {
@@ -141,9 +146,8 @@ int main(const int argc, const char** argv)
                 LoadBatch(i, images_train, labels_train);
                 g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}});
                 g.BackPropagate({var_loss});
-                break;
+                optmz.Update();
         }
-        break;
     }
 	return 0;
 }

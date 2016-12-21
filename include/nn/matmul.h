@@ -51,6 +51,7 @@ public:
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						std::vector< std::shared_ptr<Variable> >& outputs) override;
 	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+						std::vector< bool >& isConst, 
 						std::vector< std::shared_ptr<Variable> >& outputs) override;
 
 	/**
