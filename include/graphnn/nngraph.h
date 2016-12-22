@@ -3,7 +3,7 @@
 
 #include "i_layer.h"
 #include "i_param.h"
-#include "fmt/printf.h"
+#include "fmt/format.h"
 #include <vector>
 
 template<MatMode mode, typename Dtype>
@@ -98,7 +98,7 @@ template<template <MatMode, typename> class LayerType, MatMode mode, typename Dt
 inline ILayer<mode, Dtype>* cl(NNGraph<mode, Dtype>& gnn,
                                std::vector< ILayer<mode, Dtype>* > operands, Args&&... args)
 {
-        return cl<LayerType>(fmt::sprintf("%s-layer-%d", LayerType<mode, Dtype>::str_type(), gnn.layer_dict.size()),
+        return cl<LayerType>(fmt::format("{0}-layer-{1}", LayerType<mode, Dtype>::str_type(), gnn.layer_dict.size()),
                              gnn, 
                              operands, 
                              std::forward<Args>(args)...);
@@ -121,7 +121,7 @@ inline ILayer<mode, Dtype>* cl(NNGraph<mode, Dtype>& gnn,
                                std::vector< IParam<mode, Dtype>* > params, 
                                Args&&... args)
 {        
-        return cl<LayerType>(fmt::sprintf("%s-layer-%d", LayerType<mode, Dtype>::str_type(), gnn.layer_dict.size()),
+        return cl<LayerType>(fmt::format("{0}-layer-{1}", LayerType<mode, Dtype>::str_type(), gnn.layer_dict.size()),
                              gnn, 
                              operands, 
                              params,                               
