@@ -1,4 +1,5 @@
 #include "nn/variable.h"
+#include "util/graph_struct.h"
 
 namespace gnn
 {
@@ -6,6 +7,23 @@ namespace gnn
 Variable::Variable(std::string _name) : name(_name)
 {
 
+}
+
+//================ graph variable =====================
+
+GraphVar::GraphVar(std::string _name) : Variable(_name), graph(nullptr)
+{
+
+}
+
+EleType GraphVar::GetEleType()
+{
+	return EleType::UNKNOWN;
+}
+
+void GraphVar::SetRef(void* p)
+{
+	graph = static_cast< GraphStruct* >(p);
 }
 
 template<typename mode, typename Dtype>

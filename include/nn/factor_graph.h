@@ -231,10 +231,9 @@ protected:
 		auto fname = fmt::sprintf("%s_%d", FacType::StrType(), g.factorEdges.size());
 		auto f = std::make_shared<FacType>(fname, std::forward<Args>(args)...);
 		auto out_vars = f->CreateOutVar();
-		if (f->properr == PropErr::T)
-			g.AddVar(out_vars);
-		else
-			g.AddConst(out_vars, false);
+		g.AddVar(out_vars);
+		if (f->properr == PropErr::N)
+			g.isConst[g.VarIdx(out_vars)] = true;
 		g.AddFactor(f, operands, out_vars);
 		return out_vars;
 	}

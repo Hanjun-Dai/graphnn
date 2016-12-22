@@ -21,7 +21,7 @@ class TypeCast : public Factor
 public:
 	static std::string StrType()
 	{
-		return "Cast";
+		return "TypeCast";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;

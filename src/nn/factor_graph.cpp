@@ -94,6 +94,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 				auto& n_rest = n_pending[FacIdx(f)];
 				if (--n_rest == 0)
 				{
+					//std::cerr << "factor " << f->name << std::endl;
 					q.push(f->name);
 				}
 			}
@@ -101,7 +102,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 
 	while (!q.empty())
 	{
-		auto& cur_name = q.front();
+		auto& cur_name = q.front();		
 		q.pop();
 
 		auto& factor = factor_dict[cur_name].second;

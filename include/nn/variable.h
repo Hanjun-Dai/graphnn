@@ -65,19 +65,18 @@ public:
 	std::string name;
 };
 
+class GraphStruct;
+
 class GraphVar : public Variable
 {
 public:
 	GraphVar(std::string _name);
 
-	virtual EleType GetEleType() override
-	{
-		return EleType::UNKNOWN;
-	}
+	virtual EleType GetEleType();
 
+	virtual void SetRef(void* p) override;	
 	GraphStruct* graph;
 };
-
 
 template<typename mode, typename matType, typename Dtype>
 class TensorVarTemplate;
