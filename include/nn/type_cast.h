@@ -4,7 +4,7 @@
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
 #include "nn/variable.h"
-#include "fmt/printf.h"
+#include "fmt/format.h"
 
 namespace gnn
 {

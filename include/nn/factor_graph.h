@@ -4,7 +4,7 @@
 #include "util/gnn_macros.h"
 #include "nn/variable.h"
 #include "nn/factor.h"
-#include "fmt/printf.h"
+#include "fmt/format.h"
 #include <initializer_list>
 #include <string>
 #include <map>
@@ -231,7 +231,10 @@ protected:
 		auto fname = fmt::sprintf("%s_%d", FacType::StrType(), g.factorEdges.size());
 		auto f = std::make_shared<FacType>(fname, std::forward<Args>(args)...);
 		auto out_vars = f->CreateOutVar();
-		g.AddVar(out_vars);
+		if (f->properr == PropErr::T)
+			g.AddVar(out_vars);
+		else
+			g.AddConst(out_vars, false);
 		g.AddFactor(f, operands, out_vars);
 		return out_vars;
 	}

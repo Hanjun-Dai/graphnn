@@ -1,6 +1,6 @@
 #include <iostream>
 #include "tensor/t_shape.h"
-#include "fmt/printf.h"
+#include "fmt/format.h"
 
 namespace gnn
 {

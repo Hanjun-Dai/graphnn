@@ -105,7 +105,8 @@ enum class EleType
 {
   FLOAT32 = 0, 
   FLOAT64 = 1,
-  INT32 = 2
+  INT32 = 2,
+  UNKNOWN = 3,
 };
 
 template<typename Dtype>

@@ -15,7 +15,6 @@
 #include "nn/type_cast.h"
 #include "nn/reduce_mean.h"
 #include "nn/in_top_k.h"
-#include <chrono>
 
 using namespace gnn;
 
@@ -142,29 +141,15 @@ int main(const int argc, const char** argv)
         err_rate /= labels_test.size();
         std::cerr << fmt::sprintf("test loss: %.4f\t error rate: %.4f", loss, err_rate) << std::endl;
 
-        double t_ff = 0.0, t_bp = 0.0, t_up = 0.0;
         for (unsigned i = 0; i < labels_train.size(); i += batch_size)
         {
                 LoadBatch(i, images_train, labels_train);
-                auto t_start = std::chrono::high_resolution_clock::now();
                 g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}});
-                auto t_end = std::chrono::high_resolution_clock::now();
-                auto totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count();
-                t_ff += totalTime;
-                t_start = t_end;
 
                 g.BackPropagate({var_loss});
-                t_end = std::chrono::high_resolution_clock::now();
-                totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count();
-                t_bp += totalTime;
-                t_start = t_end;
 
                 optmz.Update();
-                t_end = std::chrono::high_resolution_clock::now();
-                totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(t_end-t_start).count();
-                t_up += totalTime;
         }
-        std::cerr << t_ff / 1000 << " " << t_bp / 1000  << " " << t_up / 1000 << std::endl;
     }
 	return 0;
 }

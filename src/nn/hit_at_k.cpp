@@ -9,7 +9,7 @@ void HitsTopK(DTensor<CPU, Dtype>& pred, SpTensor<CPU, Dtype>& label, DTensor<CP
 {
 	ASSERT(pred.rank() == 2, "predicted prob(or logits) should be a matrix");
 	ASSERT(pred.rows() == label.rows(), "# instances doesn't match");
-	if (k > pred.cols())
+	if (k > (int)pred.cols())
 		k = pred.cols();
 
 	out.Reshape({pred.rows(), 1});
