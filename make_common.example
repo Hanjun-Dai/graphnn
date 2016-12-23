@@ -6,6 +6,7 @@ MKL_ROOT := /opt/intel/mkl
 FIND := gfind
 CXX := g++
 NVCC := $(CUDA_HOME)/bin/nvcc
+NVCCFLAGS += --default-stream per-thread
 CXXFLAGS += -Wall -O2 -std=c++11
 LDFLAGS += -lm -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand -lcusparse -lmkl_rt -lcppformat -lwht
 CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
