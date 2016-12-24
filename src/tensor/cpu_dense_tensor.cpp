@@ -1,4 +1,5 @@
-#include "tensor/dense_tensor.h"
+#include "tensor/cpu_dense_tensor.h"
+#include "tensor/gpu_dense_tensor.h"
 #include "tensor/sparse_tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/unary_functor.h"
@@ -11,18 +12,18 @@ namespace gnn
 {
 
 template<typename Dtype>
-TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate() : data(nullptr)
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate() : Tensor(), data(nullptr)
 {
 }
 
 template<typename Dtype>
-TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l)
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l) : Tensor()
 {
 	Reshape(l);
 }
 
 template<typename Dtype>
-TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(TShape s)
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(TShape s) : Tensor()
 {
 	Reshape(s.dims);
 }
@@ -60,6 +61,9 @@ void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<CPU, Dtype>& src)
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<GPU, Dtype>& src)
 {
+	Reshape(src.shape.dims);
+	cudaMemcpy(data->ptr, src.data->ptr, sizeof(Dtype) * this->shape.Count(), cudaMemcpyDeviceToHost);
+	cudaStreamSynchronize(0);
 }
 
 template<typename Dtype>
@@ -79,7 +83,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 template<typename Dtype>
 Dtype TensorTemplate<CPU, DENSE, Dtype>::AsScalar()
 {
-	assert(this->shape.Count() == 1);
+	ASSERT(this->shape.Count() == 1, "can only convert trivial tensor to scalar");
 	return this->data->ptr[0];	
 }
 

@@ -19,6 +19,7 @@ void TDataTemplate<GPU, DENSE, Dtype>::Resize(size_t new_size)
 		this->mem_size = new_size;
 		MemHolder<GPU>::DelArr(this->ptr);
 		MemHolder<GPU>::MallocArr(this->ptr, sizeof(Dtype) * new_size);
+		cudaMemset(this->ptr, 0, sizeof(Dtype) * this->mem_size);
 	}
 }
 

@@ -3,18 +3,8 @@
 #include <algorithm>
 #include <cmath>
 #include "mnist_helper.h"
-#include "nn/param_set.h"
-#include "tensor/sparse_tensor.h"
-#include "nn/expr_sugar.h"
-#include "nn/factor_graph.h"
-#include "nn/matmul.h"
-#include "nn/relu.h"
-#include "nn/optimizer.h"
-#include "nn/cross_entropy.h"
-#include "nn/arg_max.h"
-#include "nn/type_cast.h"
-#include "nn/reduce_mean.h"
-#include "nn/in_top_k.h"
+#include "tensor/tensor_all.h"
+#include "nn/nn_all.h"
 
 using namespace gnn;
 

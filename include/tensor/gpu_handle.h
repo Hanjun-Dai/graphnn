@@ -15,20 +15,26 @@
 #define NUM_RND_THREADS_PER_BLOCK           128
 #define NUM_RND_STREAMS                     (NUM_RND_BLOCKS * NUM_RND_THREADS_PER_BLOCK)
 
+#define WITH_GPUCTX(ctx, ...) \
+	auto ctx = GpuHandle::AquireCtx(); \
+	{__VA_ARGS__} \
+	GpuHandle::ReleaseCtx(ctx); \
+
 struct GpuContext
 {
 	int id;
-	cublasHandle_t cublashandle;
-	cusparseHandle_t cusparsehandle;
+	cublasHandle_t cublasHandle;
+	cusparseHandle_t cusparseHandle;
 	GpuContext(int _id, cublasHandle_t _cublas, cusparseHandle_t _cusparse)
-		: id(_id), cublashandle(_cublas), cusparsehandle(_cusparse) {}
+		: id(_id), cublasHandle(_cublas), cusparseHandle(_cusparse) {}
 };
 
 struct GpuHandle
 {
 	static curandGenerator_t curandgenerator;
 	static unsigned int streamcnt;
-	
+	static cudaStream_t cudaRandStream;
+
 	static void Init(int dev_id, unsigned int _streamcnt = 1U);
 	static void Destroy();
 	
@@ -36,7 +42,8 @@ struct GpuHandle
 	static void ReleaseCtx(const GpuContext& ctx);
 
 	static curandState_t* devRandStates;
-
+	static std::mutex rand_lock;
+	
 private:
 	static cublasHandle_t* cublashandles;
 	static cusparseHandle_t* cusparsehandles;	

@@ -1,13 +1,12 @@
 #include "gtest/gtest.h"
-#include "tensor/dense_tensor.h"
-#include "tensor/t_data.h"
+#include "tensor/tensor_all.h"
 #include <type_traits>
 
 using namespace gnn;
 
 #define sqr(x) ((x) * (x))
 
-TEST(TensorTest, ReshapeSize)
+TEST(CPUTensorTest, ReshapeSize)
 {
 	Tensor* t = new DTensor<CPU, float>();
 	t->Reshape({2, 3, 4});
@@ -17,7 +16,7 @@ TEST(TensorTest, ReshapeSize)
 	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);
 }
 
-TEST(TensorTest, BroadcastMulCol)
+TEST(CPUTensorTest, BroadcastMulCol)
 {
 	DTensor<CPU, float> x, y;
 	x.Reshape({5, 3}); 
@@ -37,7 +36,7 @@ TEST(TensorTest, BroadcastMulCol)
 			ASSERT_EQ(x.data->ptr[i * x.cols() + j], (i + 1) * (j + 1));
 }
 
-TEST(TensorTest, BroadcastMulRow)
+TEST(CPUTensorTest, BroadcastMulRow)
 {
 	DTensor<CPU, float> x, y;
 	x.Reshape({3, 5}); 
@@ -57,7 +56,7 @@ TEST(TensorTest, BroadcastMulRow)
 			ASSERT_EQ(x.data->ptr[i * x.cols() + j], (i + 1) * (j + 1));
 }
 
-TEST(TensorTest, RandUniform)
+TEST(CPUTensorTest, RandUniform)
 {
 	Tensor* t = new DTensor<CPU, double>();
 	t->Reshape({100, 100, 100});	
@@ -73,7 +72,7 @@ TEST(TensorTest, RandUniform)
 	EXPECT_LE(err, 1e-3);
 }
 
-TEST(TensorTest, RandNorm)
+TEST(CPUTensorTest, RandNorm)
 {
 	Tensor* t = new DTensor<CPU, double>();
 	t->Reshape({100, 500, 100});	
@@ -96,7 +95,7 @@ TEST(TensorTest, RandNorm)
 	EXPECT_LE(err, 1e-4);
 }
 
-TEST(TensorTest, Zero)
+TEST(CPUTensorTest, Zero)
 {
 	Tensor* t = new DTensor<CPU, float>();
 	t->Reshape({2, 3, 4});
@@ -107,7 +106,7 @@ TEST(TensorTest, Zero)
 	ASSERT_EQ(0, ans);
 }
 
-TEST(TensorTest, AsScalar)
+TEST(CPUTensorTest, AsScalar)
 {
 	Tensor* t = new DTensor<CPU, float>();
 	t->Reshape({1, 1, 1});
@@ -117,7 +116,7 @@ TEST(TensorTest, AsScalar)
 	ASSERT_EQ(0, mat.AsScalar());
 }
 
-TEST(TensorTest, Fill)
+TEST(CPUTensorTest, Fill)
 {
 	Tensor* t = new DTensor<CPU, int>();
 	t->Reshape({2, 3, 4});
@@ -129,9 +128,4 @@ TEST(TensorTest, Fill)
 		ans += mat.data->ptr[i];
 
 	ASSERT_EQ(48, ans);
-}
-
-TEST(TensorTest, Compile)
-{
-	EXPECT_EQ(1, 1);
 }

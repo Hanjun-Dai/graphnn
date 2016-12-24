@@ -1,6 +1,6 @@
 #include "tensor/tensor.h"
 #include "tensor/t_data.h"
-#include "tensor/dense_tensor.h"
+#include "tensor/cpu_dense_tensor.h"
 
 namespace gnn
 {
@@ -14,5 +14,7 @@ TensorTemplate<mode, matType, Dtype>& Tensor::Derived()
 template TensorTemplate<CPU, DENSE, float>& Tensor::Derived<CPU, DENSE, float>(); 
 template TensorTemplate<CPU, DENSE, double>& Tensor::Derived<CPU, DENSE, double>(); 
 template TensorTemplate<CPU, DENSE, int>& Tensor::Derived<CPU, DENSE, int>(); 
-
+template TensorTemplate<GPU, DENSE, float>& Tensor::Derived<GPU, DENSE, float>(); 
+template TensorTemplate<GPU, DENSE, double>& Tensor::Derived<GPU, DENSE, double>(); 
+template TensorTemplate<GPU, DENSE, int>& Tensor::Derived<GPU, DENSE, int>(); 
 }

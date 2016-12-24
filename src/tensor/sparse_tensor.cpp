@@ -1,6 +1,6 @@
 #include "tensor/sparse_tensor.h"
 #include "tensor/t_data.h"
-#include "tensor/dense_tensor.h"
+#include "tensor/cpu_dense_tensor.h"
 #include "util/mem_holder.h"
 #include <cstring>
 #include <cassert>
