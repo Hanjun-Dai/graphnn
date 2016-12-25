@@ -6,12 +6,12 @@ Tested under Ubuntu 14.04 and Mac OSX 10.10.5
 
 ##### Download and install cuda from https://developer.nvidia.com/cuda-toolkit
 
-    wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.5-18_amd64.deb
-    sudo dpkg -i cuda-repo-ubuntu1404_7.5-18_amd64.deb
+    wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_8.0.44-1_amd64.deb
+    sudo dpkg -i cuda-repo-ubuntu1404_8.0.44-1_amd64.deb
     sudo apt-get update
     sudo apt-get install cuda
     
-  in .bashrc, add the following path
+  in .bashrc, add the following path (suppose you installed to the default path)
   
     export CUDA_HOME=/usr/local/cuda
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
@@ -24,19 +24,12 @@ Tested under Ubuntu 14.04 and Mac OSX 10.10.5
     source {path_to_your_intel_root/name_of_parallel_tool_box}/bin/psxevars.sh
     export MKL_ROOT={path_to_your_intel_root}/mkl
     
-##### Install cppformat
+##### Install cppformat (now called fmtlib)
 
-    check https://github.com/cppformat/cppformat for help
-  
-##### Install Spiral-wht
+    check https://github.com/fmtlib/fmt for help
+   
+##### Install cppformat (now called fmtlib)
 
-    wget http://www.ece.cmu.edu/~spiral/software/spiral-wht-1.8.tgz
-    tar -zxvf spiral-wht-1.8.tgz
-    cd spiral-wht-1.8
-    ./configure
-    make
-    make install
-    
 #### Build static library
 
     cp make_common.example make_common
