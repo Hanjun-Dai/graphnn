@@ -80,7 +80,8 @@ __global__ void MatColReduceKernel(dstDtype* dst, srcDtype *orig_ptr, Functor f,
     	}
 		__syncthreads();
     }
-    dst[blockIdx.x] = buffer[0];
+    if (threadIdx.x == 0)
+    	dst[blockIdx.x] = buffer[0];
 }
 
 class MatColReduce
