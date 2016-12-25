@@ -75,6 +75,9 @@ void TensorVarTemplate<mode, DENSE, Dtype>::OnesGrad()
 template class TensorVarTemplate<CPU, DENSE, float>;
 template class TensorVarTemplate<CPU, DENSE, double>;
 template class TensorVarTemplate<CPU, DENSE, int>;
+template class TensorVarTemplate<GPU, DENSE, float>;
+template class TensorVarTemplate<GPU, DENSE, double>;
+template class TensorVarTemplate<GPU, DENSE, int>;
 
 //============ SPARSE Tensor Variable ==================
 
@@ -107,5 +110,8 @@ MatType TensorVarTemplate<mode, SPARSE, Dtype>::GetMatType()
 template class TensorVarTemplate<CPU, SPARSE, float>;
 template class TensorVarTemplate<CPU, SPARSE, double>;
 template class TensorVarTemplate<CPU, SPARSE, int>;
+template class TensorVarTemplate<GPU, SPARSE, float>;
+template class TensorVarTemplate<GPU, SPARSE, double>;
+template class TensorVarTemplate<GPU, SPARSE, int>;
 
 }

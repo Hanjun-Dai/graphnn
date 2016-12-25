@@ -1,4 +1,5 @@
-#include "tensor/gpu_binary_functor.h"
+#include "tensor/gpu_dense_tensor.h"
+#define min(x, y) (x < y ? x : y)
 
 namespace gnn
 {

@@ -77,5 +77,7 @@ void MatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 
 template class MatMul<CPU, float>;
 template class MatMul<CPU, double>;
+template class MatMul<GPU, float>;
+template class MatMul<GPU, double>;
 
 }

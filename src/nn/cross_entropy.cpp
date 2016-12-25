@@ -74,5 +74,4 @@ void CrossEntropy<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> 
 template class CrossEntropy<CPU, float>;
 template class CrossEntropy<CPU, double>;
 
-
 }

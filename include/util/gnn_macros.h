@@ -126,7 +126,7 @@ inline EleType Dtype2Enum<int>() { return EleType::INT32; }
  */
 struct CPU
 {
-  static const MatMode mode = MatMode::cpu;
+  static const MatMode type = MatMode::cpu;
 };
 
 /**
@@ -134,7 +134,7 @@ struct CPU
  */
 struct GPU
 {
-	static const MatMode mode = MatMode::gpu;
+	static const MatMode type = MatMode::gpu;
 };
 
 /**

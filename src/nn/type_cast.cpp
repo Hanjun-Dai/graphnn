@@ -29,5 +29,7 @@ void TypeCast<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& op
 
 template class TypeCast<CPU, float>;
 template class TypeCast<CPU, double>;
+template class TypeCast<GPU, float>;
+template class TypeCast<GPU, double>;
 
 }

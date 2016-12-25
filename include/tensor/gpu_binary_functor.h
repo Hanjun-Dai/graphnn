@@ -92,9 +92,6 @@ public:
 	}
 };
 
-template<typename dstType, typename srcType>
-void TypeCastCopy(dstType* dst, srcType* src, size_t count);
-
 }
 
 #endif
