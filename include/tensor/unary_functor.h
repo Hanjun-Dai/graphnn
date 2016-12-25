@@ -63,6 +63,15 @@ template<typename mode, typename Dtype>
 class UnaryInv {};
 
 /**
+ * @brief      relu
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryReLU {};
+
+/**
  * @brief      Functor to square an element; CPU doesn't need this;
  *
  * @tparam     mode   { GPU }

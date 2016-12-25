@@ -119,6 +119,26 @@ public:
 	}
 };
 
+
+/**
+ * @brief      UnaryReLU
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnaryReLU<GPU, Dtype>
+{
+public:
+	/**
+	 * inverse dst
+	 */
+	__device__ inline void operator()(Dtype& dst)
+	{
+		if (dst < 0)
+			dst = 0;
+	}
+};
+
 /**
  * @brief      UnarySquare
  *

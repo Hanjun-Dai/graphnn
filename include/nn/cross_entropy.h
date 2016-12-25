@@ -15,7 +15,7 @@ template<typename Dtype>
 void CalcCrossEntropy(DTensor<CPU, Dtype>& prob, SpTensor<CPU, Dtype>& label, DTensor<CPU, Dtype>& out);
 
 template<typename Dtype>
-void CalcCrossEntropy(DTensor<GPU, Dtype>& prob, SpTensor<GPU, Dtype>& label, DTensor<CPU, Dtype>& out);
+void CalcCrossEntropy(DTensor<GPU, Dtype>& prob, SpTensor<GPU, Dtype>& label, DTensor<GPU, Dtype>& out);
 
 /**
  * @brief      Operator for cross entropy

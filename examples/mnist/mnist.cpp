@@ -14,7 +14,7 @@ Dtype lr = 0.001;
 int dev_id;
 std::vector< Dtype* > images_train, images_test;
 std::vector< int > labels_train, labels_test;
-typedef CPU mode;
+typedef GPU mode;
 
 void LoadParams(const int argc, const char** argv)
 {
@@ -102,6 +102,8 @@ void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int 
 int main(const int argc, const char** argv)
 {
 	LoadParams(argc, argv); 
+    GpuHandle::Init(dev_id, 1);
+
     LoadRaw(f_train_feat, f_train_label, images_train, labels_train);
     LoadRaw(f_test_feat, f_test_label, images_test, labels_test);
     std::cerr << images_train.size() << " images for training" << std::endl;
@@ -111,8 +113,8 @@ int main(const int argc, const char** argv)
     auto var_loss = targets.first;
     auto var_acc = targets.second;
 
-    //MomentumSGDOptimizer<mode, Dtype> optmz(&pset, lr, 0.9, 0);
-    AdamOptimizer<mode, Dtype> optmz(&pset, lr);
+    MomentumSGDOptimizer<mode, Dtype> optmz(&pset, lr, 0.9, 0);
+    //AdamOptimizer<mode, Dtype> optmz(&pset, lr);
     optmz.clipping_enabled = false;
 
 	Dtype loss, err_rate;  
@@ -141,5 +143,6 @@ int main(const int argc, const char** argv)
                 optmz.Update();
         }
     }
+    GpuHandle::Destroy();
 	return 0;
 }

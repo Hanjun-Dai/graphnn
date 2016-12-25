@@ -62,5 +62,7 @@ void ReLU<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& opera
 
 template class ReLU<CPU, float>;
 template class ReLU<CPU, double>;
+template class ReLU<GPU, float>;
+template class ReLU<GPU, double>;
 
 }

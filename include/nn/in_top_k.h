@@ -13,7 +13,7 @@ template<typename Dtype>
 void IsInTopK(DTensor<CPU, Dtype>& pred, DTensor<CPU, int>& label, DTensor<CPU, int>& out, int k);
 
 template<typename Dtype>
-void IsInTopK(DTensor<GPU, Dtype>& pred, DTensor<GPU, int>& label, DTensor<CPU, int>& out, int k);
+void IsInTopK(DTensor<GPU, Dtype>& pred, DTensor<GPU, int>& label, DTensor<GPU, int>& out, int k);
 
 /**
  * @brief      Operator: whether the true label is in top-k of prediction
