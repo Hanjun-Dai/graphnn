@@ -1,58 +1,72 @@
 #include "nn_common.h"
 #include <set>
 
+using namespace gnn;
+
 void InitModel()
 {
-    init_const_dict["n2n"] = &graph;
-	init_const_dict["subgraph_pool"] = &graph;
-    
 	const Dtype init_scale = 0.01;
-	
-	auto* n2nsum_param = add_const<Node2NodeMsgParam>(model, "n2n");
-	auto* subgsum_param = add_const<SubgraphMsgParam>(model, "subgraph_pool");
-	
-    auto* w_n2l = add_diff< LinearParam >(model, "input-node-to-latent", cfg::node_dim, cfg::conv_size, 0, init_scale, BiasOption::NONE);
-    auto* p_node_conv = add_diff< LinearParam >(model, "linear-node-conv", cfg::conv_size, cfg::conv_size, 0, init_scale, BiasOption::NONE);  
+	auto graph = add_const< GraphVar >(fg, "graph", true);
 
-	auto* h1_weight = add_diff<LinearParam>(model, "h1_weight", cfg::conv_size, cfg::n_hidden, 0, init_scale);
-	auto* h2_weight = add_diff<LinearParam>(model, "h2_weight", cfg::n_hidden, cfg::num_class, 0, init_scale);
+	auto n2nsum_param = af< Node2NodeMsgPass<mode, Dtype> >(fg, {graph});
+	auto subgsum_param = af< SubgraphMsgPass<mode, Dtype> >(fg, {graph});
 
-	auto* node_input = cl<InputLayer>("data", gnn, {});
-	auto* label_layer = cl<InputLayer>("label", gnn, {});
-    auto* input_message = cl<ParamLayer>(gnn, {node_input}, {w_n2l}); 
-	auto* input_potential_layer = cl<ReLULayer>(gnn, {input_message}); 
+	auto w_n2l = add_diff<DTensorVar>(model, "input-node-to-latent", {(uint)cfg::node_dim, cfg::conv_size});	
+	auto p_node_conv = add_diff< DTensorVar >(model, "linear-node-conv", {cfg::conv_size, cfg::conv_size});
+	auto h1_weight = add_diff<DTensorVar>(model, "h1_weight", {cfg::conv_size, cfg::n_hidden});
+	auto h2_weight = add_diff<DTensorVar>(model, "h2_weight", {cfg::n_hidden, (uint)cfg::num_class});
 
+	w_n2l->value.SetRandN(0, init_scale);
+	p_node_conv->value.SetRandN(0, init_scale);
+	h1_weight->value.SetRandN(0, init_scale);
+	h2_weight->value.SetRandN(0, init_scale);
+    fg.AddParam(w_n2l);
+    fg.AddParam(p_node_conv);
+    fg.AddParam(h1_weight);
+    fg.AddParam(h2_weight);
+    
+	auto node_input = add_const< DTensorVar<mode, Dtype> >(fg, "data", true);
+	auto label = add_const< SpTensorVar<mode, Dtype> >(fg, "label", true);
+
+	auto input_message = af<MatMul>(fg, {node_input, w_n2l});
+	auto input_potential_layer = af<ReLU>(fg, {input_message}); 
 	int lv = 0;
-	ILayer<mode, Dtype>* cur_message_layer = input_potential_layer;
+	auto cur_message_layer = input_potential_layer;
 	while (lv < cfg::max_lv)
-	{	
-		lv++; 
-		auto* n2npool = cl<ParamLayer>(gnn, {cur_message_layer}, {n2nsum_param});
+	{
+		lv++;
+		auto n2npool = af<MatMul>(fg, {n2nsum_param, cur_message_layer});
+		auto node_linear = af<MatMul>(fg, {n2npool, p_node_conv});
+		auto merged_linear = af<ElewiseAdd>(fg, {node_linear, input_message});
+		cur_message_layer = af<ReLU>(fg, {merged_linear}); 
+	}
 
-		auto* node_linear = cl<ParamLayer>(gnn, {n2npool}, {p_node_conv});
+	auto y_potential = af<MatMul>(fg, {subgsum_param, cur_message_layer});
+	auto hidden = af<MatMul>(fg, {y_potential, h1_weight});
+	auto reluact_out_nn = af<ReLU>(fg, {hidden}); 
+	auto output = af< MatMul >(fg, {reluact_out_nn, h2_weight});
 
-		auto* merged_linear = cl<CAddLayer>(gnn, {node_linear, input_message});  
+	auto ce = af< CrossEntropy >(fg, {output, label}, true);
+	auto loss = af< ReduceMean >(fg, {ce});
 
-		cur_message_layer = cl<ReLULayer>(gnn, {merged_linear}); 
-	}			
-	
-	auto* y_potential = cl<ParamLayer>(gnn, {cur_message_layer}, {subgsum_param});
+	auto truth = af< ArgMax >(fg, {label});
+    auto cmp = af< InTopK<mode, Dtype> >(fg, std::make_pair(output, truth));
+    auto real_cmp = af< TypeCast<mode, Dtype> >(fg, {cmp});
 
-	auto* hidden = cl<ParamLayer>(gnn, {y_potential}, {h1_weight});
-	
-	auto* reluact_out_nn = cl<ReLULayer>(gnn, {hidden}); 
-	
-	auto* output = cl<ParamLayer>("output", gnn, {reluact_out_nn}, {h2_weight});
-	
-    cl<ClassNLLCriterionLayer>("classnll", gnn, {output, label_layer}, true);
-    cl<ErrCntCriterionLayer>("errcnt", gnn, {output, label_layer});
+	auto acc = af< ReduceMean >(fg, { real_cmp });	
+
+	targets.clear();
+	targets.push_back(loss);
+	targets.push_back(acc);
+
+	objs.clear();
+	objs.push_back(loss);
 }
 
 int main(int argc, const char** argv)
 {
 	cfg::LoadParams(argc, argv);			
-
-	GPUHandle::Init(cfg::dev_id);	
+	GpuHandle::Init(cfg::dev_id, 1);
 
 	LoadIndexes(cfg::train_idx_file, train_idx);
 	LoadIndexes(cfg::test_idx_file, test_idx);
@@ -73,8 +87,7 @@ int main(int argc, const char** argv)
 	InitModel();
 
     MainLoop(); 
-	
-	GPUHandle::Destroy();
-    
+
+    GpuHandle::Destroy();
 	return 0;
 }

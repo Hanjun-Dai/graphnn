@@ -10,8 +10,8 @@ typedef float Dtype;
 struct cfg
 {
     static int dev_id, iter; 
-    static int max_lv, conv_size, fp_len;
-    static unsigned n_hidden;
+    static int max_lv, fp_len;
+    static unsigned n_hidden, conv_size;
     static unsigned batch_size; 
     static unsigned max_epoch; 
     static unsigned test_interval; 
@@ -87,7 +87,7 @@ int cfg::node_dim = 0;
 int cfg::num_class = 0;
 int cfg::iter = 0;
 int cfg::max_lv = 4;
-int cfg::conv_size = 20;
+unsigned cfg::conv_size = 20;
 int cfg::fp_len = 512;
 
 unsigned cfg::n_hidden = 100;

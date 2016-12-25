@@ -2,7 +2,7 @@ include make_common
 
 build_root = build
 
-include_dirs = $(CUDA_HOME)/include $(MKL_ROOT)/include include/matrix include/graphnn
+include_dirs = $(CUDA_HOME)/include $(MKL_ROOT)/include include
 CXXFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += $(addprefix -I,$(include_dirs))
 NVCCFLAGS += -std=c++11 --use_fast_math
@@ -19,12 +19,12 @@ lib_dir = $(build_root)/lib
 gnn_lib = $(lib_dir)/libgnn.a
 
 test_src = $(shell $(FIND) test/ -name "*.cpp" -printf "%P\n")
-test_prog = $(subst .cpp,,$(test_src))
+test_objs = $(subst .cpp,.o,$(test_src))
 test_build_root = $(build_root)/test
-test_target = $(addprefix $(test_build_root)/,$(test_prog))
-DEPS += ${test_target:=.d}
+test_target = $(addprefix $(test_build_root)/,$(test_objs))
+DEPS += ${test_target:.o=.d}
 
-all: $(gnn_lib) $(test_target)
+all: $(gnn_lib)
 
 $(gnn_lib): $(objs)
 	$(dir_guard)
@@ -39,9 +39,18 @@ $(obj_build_root)/cxx/%.o: src/%.cpp
 	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^)
 
-$(test_build_root)/%: test/%.cpp $(gnn_lib)
+.PHONY: test
+
+test: $(test_build_root)/test_main
+	./$(test_build_root)/test_main
+
+$(test_build_root)/%.o: test/%.cpp
 	$(dir_guard)
-	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.cpp, $^) -L$(lib_dir) -lgnn $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^)
+
+$(test_build_root)/test_main: $(test_target) $(gnn_lib)
+	$(dir_guard)
+	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.o, $^) -L$(lib_dir) -lgnn $(LDFLAGS) -lpthread -lgtest -lgtest_main
 
 clean:
 	rm -rf build

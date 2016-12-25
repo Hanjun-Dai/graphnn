@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <fstream>
-#include "graph_struct.h"
+#include "util/graph_struct.h"
+
+using namespace gnn;
 
 struct Graph
 {

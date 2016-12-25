@@ -5,7 +5,7 @@ include $(GNN_HOME)/make_common
 lib_dir := $(GNN_HOME)/build/lib
 gnn_lib := $(lib_dir)/libgnn.a
 
-include_dirs := $(CUDA_HOME)/include $(MKL_ROOT)/include $(GNN_HOME)/include/matrix $(GNN_HOME)/include/graphnn
+include_dirs := $(CUDA_HOME)/include $(MKL_ROOT)/include $(GNN_HOME)/include include
 CXXFLAGS += $(addprefix -I,$(include_dirs))
 
 all: build/mnist
