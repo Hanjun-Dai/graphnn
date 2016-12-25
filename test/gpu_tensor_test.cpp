@@ -68,11 +68,11 @@ TEST(GPUTensorTest, RandNorm)
 TEST(GPUTensorTest, Fill)
 {
 	GpuHandle::Init(0, 1);
-	DTensor<GPU, float> mat;
+	DTensor<GPU, double> mat;
 	mat.Reshape({100, 100, 100});
 	mat.Fill(2.0);
 
-	float ans = mat.ASum();
+	double ans = mat.ASum();
 
 	ASSERT_EQ(2 * 100 * 100 * 100, ans);
 	GpuHandle::Destroy();
@@ -82,13 +82,13 @@ TEST(GPUTensorTest, ArgMax)
 {
 	GpuHandle::Init(0, 1);
 
-	DTensor<CPU, float> d_cpu;
+	DTensor<CPU, double> d_cpu;
 	DTensor<CPU, int> idx_cpu, buf;
 	d_cpu.Reshape({10, 1023});
 	d_cpu.SetRandN(0.0, 1.0);
 	d_cpu.ArgMax(idx_cpu);
 
-	DTensor<GPU, float> d_gpu;
+	DTensor<GPU, double> d_gpu;
 	DTensor<GPU, int> idx_gpu;
 	d_gpu.CopyFrom(d_cpu);
 	d_gpu.ArgMax(idx_gpu);
@@ -105,7 +105,7 @@ TEST(GPUTensorTest, GeMM)
 {
 	GpuHandle::Init(0, 1);
 
-	DTensor<CPU, float> x, y, z, zz;
+	DTensor<CPU, double> x, y, z, zz;
 	x.Reshape({10, 20});
 	y.Reshape({30, 20});
 
@@ -113,7 +113,7 @@ TEST(GPUTensorTest, GeMM)
 	y.SetRandN(0.0, 1.0);
 	z.MM(x, y, Trans::N, Trans::T, 1.0, 0.0);
 
-	DTensor<GPU, float> gx, gy, gz;
+	DTensor<GPU, double> gx, gy, gz;
 	gx.CopyFrom(x);
 	gy.CopyFrom(y);
 	gz.MM(gx, gy, Trans::N, Trans::T, 1.0, 0.0);
@@ -129,8 +129,8 @@ TEST(GPUTensorTest, Softmax)
 {
 	GpuHandle::Init(0, 1);
 
-	DTensor<CPU, float> x, y;
-	DTensor<GPU, float> gx;
+	DTensor<CPU, double> x, y;
+	DTensor<GPU, double> gx;
 	x.Reshape({20, 200});
 	x.SetRandN(0.0, 1.0);
 	gx.CopyFrom(x);

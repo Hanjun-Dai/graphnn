@@ -141,7 +141,7 @@ void TensorTemplate<GPU, DENSE, double>::MM(DTensor<GPU, double>& a, DTensor<GPU
 	Reshape({m, n});
 	WITH_GPUCTX(ctx, {
 		cublasDgemm(ctx.cublasHandle, 
-	                GPU_T(transB), GPU_T(transB), 
+	                GPU_T(transB), GPU_T(transA), 
 	                n, m, k,
 	                &alpha, b.data->ptr, b.cols(), a.data->ptr, a.cols(), 
 	                &beta, data->ptr, this->cols());

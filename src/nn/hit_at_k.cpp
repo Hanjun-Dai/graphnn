@@ -67,5 +67,7 @@ void HitAtK<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& oper
 
 template class HitAtK<CPU, float>;
 template class HitAtK<CPU, double>;
+template class HitAtK<GPU, float>;
+template class HitAtK<GPU, double>;
 
 }
