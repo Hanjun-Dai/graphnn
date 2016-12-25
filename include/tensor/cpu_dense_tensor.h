@@ -247,6 +247,19 @@ public:
 	virtual MatMode GetMatMode() override;
 
 	/**
+	 * @brief      deeply copy src to this tensor
+	 *
+	 * @param      src   the CPU dense tensor with same data type
+	 */
+	void CopyFrom(DTensor<CPU, int>& src);		
+	/**
+	 * @brief      deeply copy src to this tensor
+	 *
+	 * @param      src   the GPU dense tensor with same data type
+	 */
+	void CopyFrom(DTensor<GPU, int>& src);
+
+	/**
 	 * @brief      shallow copy (only set the shared_ptr)
 	 *
 	 * @param      src   The source

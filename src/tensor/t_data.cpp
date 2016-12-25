@@ -12,6 +12,12 @@ TDataTemplate<CPU, DENSE, Dtype>::TDataTemplate()
 }
 
 template<typename Dtype>
+TDataTemplate<CPU, DENSE, Dtype>::~TDataTemplate()
+{
+	MemHolder<CPU>::DelArr(this->ptr);
+}
+
+template<typename Dtype>
 void TDataTemplate<CPU, DENSE, Dtype>::Resize(size_t new_size)
 {
 	if (new_size > this->mem_size)
@@ -36,6 +42,14 @@ TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate()
 }
 
 template<typename mode, typename Dtype>
+TDataTemplate<mode, SPARSE, Dtype>::~TDataTemplate()
+{
+	MemHolder<mode>::DelArr(val);
+	MemHolder<mode>::DelArr(col_idx);
+	MemHolder<mode>::DelArr(row_ptr);	
+}
+
+template<typename mode, typename Dtype>
 TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate(int newNzCap, int newPtrCap)
 		: TData()
 {
@@ -50,5 +64,7 @@ TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate(int newNzCap, int newPtrCap)
 template class TDataTemplate<CPU, SPARSE, float>;
 template class TDataTemplate<CPU, SPARSE, double>;
 template class TDataTemplate<CPU, SPARSE, int>;
-
+template class TDataTemplate<GPU, SPARSE, float>;
+template class TDataTemplate<GPU, SPARSE, double>;
+template class TDataTemplate<GPU, SPARSE, int>;
 }

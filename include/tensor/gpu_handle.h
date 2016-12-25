@@ -14,6 +14,7 @@
 #define NUM_RND_BLOCKS                      96
 #define NUM_RND_THREADS_PER_BLOCK           128
 #define NUM_RND_STREAMS                     (NUM_RND_BLOCKS * NUM_RND_THREADS_PER_BLOCK)
+#define c_uCudaThreadNum 1024
 
 #define WITH_GPUCTX(ctx, ...) \
 	auto ctx = GpuHandle::AquireCtx(); \
