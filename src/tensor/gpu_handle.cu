@@ -5,6 +5,9 @@
 namespace gnn
 {
 
+namespace gnn
+{
+
 __global__ void SetupRandKernel(curandState_t *state, unsigned long long seed) 
 {
     const unsigned int tidx = NUM_RND_THREADS_PER_BLOCK * blockIdx.x + threadIdx.x;

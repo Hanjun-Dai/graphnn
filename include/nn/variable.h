@@ -69,6 +69,9 @@ public:
 
 class GraphStruct;
 
+/**
+ * @brief      Class for graph variable
+ */
 class GraphVar : public Variable
 {
 public:
@@ -77,6 +80,10 @@ public:
 	virtual EleType GetEleType();
 
 	virtual void SetRef(void* p) override;	
+
+	/**
+	 * the actual graph
+	 */
 	GraphStruct* graph;
 };
 
