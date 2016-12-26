@@ -11,6 +11,9 @@
 #include <thread>
 #include <queue>
 
+namespace gnn
+{
+
 #define NUM_RND_BLOCKS                      96
 #define NUM_RND_THREADS_PER_BLOCK           128
 #define NUM_RND_STREAMS                     (NUM_RND_BLOCKS * NUM_RND_THREADS_PER_BLOCK)
@@ -45,4 +48,5 @@ private:
 	static bool* inUse;
 };
 
+}
 #endif

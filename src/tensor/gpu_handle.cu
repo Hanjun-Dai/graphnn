@@ -1,6 +1,9 @@
 #include "tensor/gpu_handle.h"
 #include "util/gnn_macros.h"
 
+namespace gnn
+{
+
 __global__ void SetupRandKernel(curandState_t *state, unsigned long long seed) 
 {
     const unsigned int tidx = NUM_RND_THREADS_PER_BLOCK * blockIdx.x + threadIdx.x;
@@ -82,3 +85,5 @@ unsigned int GpuHandle::streamcnt = 1U;
 std::queue< int > GpuHandle::resources;
 std::mutex GpuHandle::r_loc;
 bool* GpuHandle::inUse = NULL;
+
+}
