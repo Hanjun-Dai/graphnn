@@ -180,23 +180,6 @@ __global__ void CSRMMKernel(Dtype alpha, int* ptr, int* col_idx, Dtype* val, Dty
     }
 }
 
-
-template<typename Dtype>
-__global__ void CSRMMKernel_T(Dtype alpha, int n_ptr, int* ptr, int* row_idx, Dtype* val, Dtype* dense_data, int src_cols, Dtype* dst, int dst_cols)
-{
-    int cur_col = blockDim.x * blockIdx.x + threadIdx.x;
-    if (cur_col < dst_cols)
-    {
-        for (int x = 0; x < n_ptr - 1; ++x)
-        {
-            for (int t = ptr[x]; t < ptr[x + 1]; ++t)
-            {
-                dst[row_idx[t] * dst_cols + cur_col] += alpha * val[t] * dense_data[x * src_cols + cur_col];
-            }
-        }
-    }
-}
-
 template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
 {
