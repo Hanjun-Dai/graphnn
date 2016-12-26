@@ -7,20 +7,8 @@
 #include "config.h"
 #include "utils.h"
 #include "fmt/format.h"
-#include "tensor/dense_tensor.h"
-#include "tensor/sparse_tensor.h"
-#include "nn/matmul.h"
-#include "nn/factor_graph.h"
-#include "nn/msg_pass.h"
-#include "nn/relu.h"
-#include "nn/expr_sugar.h"
-#include "nn/elewise_add.h"
-#include "nn/optimizer.h"
-#include "nn/param_set.h"
-#include "nn/reduce_mean.h"
-#include "nn/in_top_k.h"
-#include "nn/cross_entropy.h"
-#include "nn/arg_max.h"
+#include "tensor/tensor_all.h"
+#include "nn/nn_all.h"
 
 using namespace gnn;
 

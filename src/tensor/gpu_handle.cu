@@ -30,6 +30,8 @@ void GpuHandle::Init(int dev_id, unsigned int _streamcnt)
 		inUse[id] = false;
 		resources.push(id);
 	}
+	cudaStreamCreate(&cudaRandStream);
+
 	curandCreateGenerator(&curandgenerator, CURAND_RNG_PSEUDO_DEFAULT);
 	
 	curandSetPseudoRandomGeneratorSeed(curandgenerator, time(NULL));
@@ -50,6 +52,8 @@ GpuContext GpuHandle::AquireCtx()
 
 	ASSERT(!inUse[cur_pos], "logic error: in-use resource is found available");
 	inUse[cur_pos] = true;	
+	cublasSetStream(cublashandles[cur_pos], cudaStreamPerThread);
+	cusparseSetStream(cusparsehandles[cur_pos], cudaStreamPerThread);
 	return GpuContext(cur_pos, cublashandles[cur_pos], cusparsehandles[cur_pos]);
 }
 
@@ -64,6 +68,7 @@ void GpuHandle::ReleaseCtx(const GpuContext& ctx)
 
 void GpuHandle::Destroy()
 {
+	cudaStreamDestroy(cudaRandStream);
 	for (unsigned int id = 0; id < streamcnt; ++id)
 	{
 		cublasDestroy_v2(cublashandles[id]);
@@ -84,6 +89,6 @@ curandGenerator_t GpuHandle::curandgenerator;
 unsigned int GpuHandle::streamcnt = 1U;
 std::queue< int > GpuHandle::resources;
 std::mutex GpuHandle::r_loc;
+std::mutex GpuHandle::rand_lock;
 bool* GpuHandle::inUse = NULL;
-
-}
+cudaStream_t GpuHandle::cudaRandStream;

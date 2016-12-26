@@ -62,6 +62,7 @@ void ReduceMean<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 
 template class ReduceMean<CPU, float>;
 template class ReduceMean<CPU, double>;
-
+template class ReduceMean<GPU, float>;
+template class ReduceMean<GPU, double>;
 
 }

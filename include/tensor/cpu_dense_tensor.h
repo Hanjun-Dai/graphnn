@@ -1,5 +1,5 @@
-#ifndef DENSE_TENSOR_H
-#define DENSE_TENSOR_H
+#ifndef CPU_DENSE_TENSOR_H
+#define CPU_DENSE_TENSOR_H
 
 #include "tensor.h"
 #include "t_data.h"
@@ -247,6 +247,19 @@ public:
 	virtual MatMode GetMatMode() override;
 
 	/**
+	 * @brief      deeply copy src to this tensor
+	 *
+	 * @param      src   the CPU dense tensor with same data type
+	 */
+	void CopyFrom(DTensor<CPU, int>& src);		
+	/**
+	 * @brief      deeply copy src to this tensor
+	 *
+	 * @param      src   the GPU dense tensor with same data type
+	 */
+	void CopyFrom(DTensor<GPU, int>& src);
+
+	/**
 	 * @brief      shallow copy (only set the shared_ptr)
 	 *
 	 * @param      src   The source
@@ -276,49 +289,6 @@ public:
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */
 	std::shared_ptr< DenseData<CPU, int> > data;
-};
-
-/**
- * @brief      GPU DENSE specialization of tensor
- *
- * @tparam     Dtype   float/double
- */
-template<typename Dtype>
-class TensorTemplate<GPU, DENSE, Dtype> : public Tensor
-{
-public:
-
-	TensorTemplate();
-
-	virtual void Reshape(std::vector<size_t> l) override;
-	virtual MatType GetMatType() override;
-	virtual MatMode GetMatMode() override;
-
-	/**
-	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
-	 */
-	std::shared_ptr< DenseData<GPU, Dtype> > data;
-};
-
-/**
- * @brief      GPU DENSE int tensor specialization; this tensor is not used for heavy computation
- * 				(e.g., matmul)
- */
-template<>
-class TensorTemplate<GPU, DENSE, int> : public Tensor
-{
-public:
-
-	TensorTemplate();
-
-	virtual void Reshape(std::vector<size_t> l) override;
-	virtual MatType GetMatType() override;
-	virtual MatMode GetMatMode() override;
-	
-	/**
-	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
-	 */	
-	std::shared_ptr< DenseData<GPU, int> > data;
 };
 
 }

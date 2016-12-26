@@ -1,6 +1,6 @@
-#include "tensor/sparse_tensor.h"
+#include "tensor/cpu_sparse_tensor.h"
 #include "tensor/t_data.h"
-#include "tensor/dense_tensor.h"
+#include "tensor/cpu_dense_tensor.h"
 #include "util/mem_holder.h"
 #include <cstring>
 #include <cassert>
@@ -115,7 +115,19 @@ void TensorTemplate<CPU, SPARSE, int>::ShallowCopy(SpTensor<CPU, int>& src)
 
 void TensorTemplate<CPU, SPARSE, int>::ResizeSp(int newNNZ, int newNPtr)
 {
+	if (this->data == nullptr)
+		this->data = std::make_shared< SparseData<CPU, int> >();
 
+	if (newNNZ > data->nzCap || newNPtr > data->ptrCap)
+	{
+		if (newNNZ > data->nzCap)
+			data->nzCap = std::max(newNNZ, data->nzCap * 2);
+		if (newNPtr > data->ptrCap)
+			data->ptrCap = std::max(newNPtr, data->ptrCap * 2);
+		data = std::make_shared< SparseData<CPU, int> >(data->nzCap, data->ptrCap);
+	}
+	data->nnz = newNNZ;
+	data->len_ptr = newNPtr;
 }
 
 template class TensorTemplate<CPU, SPARSE, int>;

@@ -1,7 +1,8 @@
-#include "tensor/dense_tensor.h"
-#include "tensor/sparse_tensor.h"
+#include "tensor/cpu_dense_tensor.h"
+#include "tensor/gpu_dense_tensor.h"
+#include "tensor/cpu_sparse_tensor.h"
 #include "tensor/t_data.h"
-#include "tensor/unary_functor.h"
+#include "tensor/cpu_unary_functor.h"
 #include "tensor/mkl_helper.h"
 #include "util/mem_holder.h"
 #include <cstring>
@@ -11,18 +12,18 @@ namespace gnn
 {
 
 template<typename Dtype>
-TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate() : data(nullptr)
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate() : Tensor(), data(nullptr)
 {
 }
 
 template<typename Dtype>
-TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l)
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l) : Tensor()
 {
 	Reshape(l);
 }
 
 template<typename Dtype>
-TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(TShape s)
+TensorTemplate<CPU, DENSE, Dtype>::TensorTemplate(TShape s) : Tensor()
 {
 	Reshape(s.dims);
 }
@@ -60,6 +61,8 @@ void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<CPU, Dtype>& src)
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<GPU, Dtype>& src)
 {
+	Reshape(src.shape.dims);
+	cudaMemcpy(data->ptr, src.data->ptr, sizeof(Dtype) * this->shape.Count(), cudaMemcpyDeviceToHost);
 }
 
 template<typename Dtype>
@@ -79,7 +82,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 template<typename Dtype>
 Dtype TensorTemplate<CPU, DENSE, Dtype>::AsScalar()
 {
-	assert(this->shape.Count() == 1);
+	ASSERT(this->shape.Count() == 1, "can only convert trivial tensor to scalar");
 	return this->data->ptr[0];	
 }
 
@@ -265,7 +268,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(DTensor<CPU, Dtype>& src)
 	if (this->shape == src.shape)
 	{
 		MKL_Mul(this->shape.Count(), src.data->ptr, this->data->ptr, this->data->ptr);
-	} else { // require broad casting
+	} else { // require broadcasting
 		ASSERT(this->rank() == src.rank(), "broadcasting only support same rank tensors; please do reshape manually");
 		for (size_t i = 0; i < this->rank(); ++i)
 			if (shape.dims[i] != src.shape.dims[i])
@@ -367,6 +370,18 @@ MatType TensorTemplate<CPU, DENSE, int>::GetMatType()
 MatMode TensorTemplate<CPU, DENSE, int>::GetMatMode()
 {
 	return MatMode::cpu;
+}
+
+void TensorTemplate<CPU, DENSE, int>::CopyFrom(DTensor<CPU, int>& src)
+{
+	Reshape(src.shape.dims);
+	memcpy(data->ptr, src.data->ptr, sizeof(int) * shape.Count());
+}
+
+void TensorTemplate<CPU, DENSE, int>::CopyFrom(DTensor<GPU, int>& src)
+{
+	Reshape(src.shape.dims);
+	cudaMemcpy(data->ptr, src.data->ptr, sizeof(int) * this->shape.Count(), cudaMemcpyDeviceToHost);
 }
 
 void TensorTemplate<CPU, DENSE, int>::ShallowCopy(DTensor<CPU, int>& src)

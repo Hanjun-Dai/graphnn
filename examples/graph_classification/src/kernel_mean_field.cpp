@@ -66,6 +66,7 @@ void InitModel()
 int main(int argc, const char** argv)
 {
 	cfg::LoadParams(argc, argv);			
+	GpuHandle::Init(cfg::dev_id, 1);
 
 	LoadIndexes(cfg::train_idx_file, train_idx);
 	LoadIndexes(cfg::test_idx_file, test_idx);
@@ -86,6 +87,7 @@ int main(int argc, const char** argv)
 	InitModel();
 
     MainLoop(); 
-	    
+
+    GpuHandle::Destroy();
 	return 0;
 }

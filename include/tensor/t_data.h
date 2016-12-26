@@ -2,6 +2,7 @@
 #define T_DATA_H
 
 #include "tensor.h"
+#include <thrust/device_vector.h>
 
 namespace gnn{
 
@@ -41,7 +42,7 @@ class TDataTemplate<CPU, DENSE, Dtype> : public TData
 public:
 
 	TDataTemplate();
-
+	~TDataTemplate();
 	/**
 	 * @brief      resize the allocated memory; only when the new size is 
 	 * 				larger than the old one, will we do memory realloc
@@ -71,9 +72,26 @@ class TDataTemplate<GPU, DENSE, Dtype> : public TData
 public:
 
 	TDataTemplate();
+	~TDataTemplate();
+	/**
+	 * @brief      resize the allocated memory; only when the new size is 
+	 * 				larger than the old one, will we do memory realloc
+	 *
+	 * @param[in]  new_size  the new size
+	 */	
 	void Resize(size_t new_size);
-
+	/**
+	 * the pointer to the memory space
+	 */
 	Dtype* ptr;
+
+	/**
+	 * thrust wrapper of ptr
+	 */
+	thrust::device_ptr<Dtype> dev_ptr;
+	/**
+	 * the memory size
+	 */	
 	size_t mem_size;
 };
 
@@ -88,6 +106,7 @@ class TDataTemplate<mode, SPARSE, Dtype> : public TData
 {
 public:
 	TDataTemplate();
+	~TDataTemplate();
 	/**
 	 * @brief      constructor
 	 *

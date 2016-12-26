@@ -31,6 +31,11 @@ Dtype IOptimizer<mode, Dtype>::ClipGradients()
 	return 1.0;	
 }
 
+template class IOptimizer<CPU, float>;
+template class IOptimizer<CPU, double>;
+template class IOptimizer<GPU, float>;
+template class IOptimizer<GPU, double>;
+
 template<typename mode, typename Dtype>
 MomentumSGDOptimizer<mode, Dtype>::MomentumSGDOptimizer(ParamSet<mode, Dtype>* _param_set, 
 			Dtype _init_lr, Dtype _momentum, Dtype _l2_penalty) : 
@@ -64,6 +69,8 @@ void MomentumSGDOptimizer<mode, Dtype>::Update()
 
 template class MomentumSGDOptimizer<CPU, float>;
 template class MomentumSGDOptimizer<CPU, double>;
+template class MomentumSGDOptimizer<GPU, float>;
+template class MomentumSGDOptimizer<GPU, double>;
 
 template<typename mode, typename Dtype>
 AdamOptimizer<mode, Dtype>::AdamOptimizer(ParamSet<mode, Dtype>* _param_set, Dtype _init_lr, Dtype _l2_penalty, 
@@ -123,5 +130,7 @@ void AdamOptimizer<mode, Dtype>::Update()
 
 template class AdamOptimizer<CPU, float>;
 template class AdamOptimizer<CPU, double>;
+template class AdamOptimizer<GPU, float>;
+template class AdamOptimizer<GPU, double>;
 
 }
