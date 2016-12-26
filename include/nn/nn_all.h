@@ -16,6 +16,7 @@
 #include "nn/param_set.h"
 #include "nn/reduce_mean.h"
 #include "nn/relu.h"
+#include "nn/softmax.h"
 #include "nn/type_cast.h"
 #include "nn/variable.h"
 

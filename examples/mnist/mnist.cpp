@@ -57,8 +57,8 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
 	auto h2 = af< MatMul >(g, {h1, w2});	
 	h2 = af< ReLU >(g, {h2});
 	auto output = af< MatMul >(g, {h2, wo});
-
-	auto ce = af< CrossEntropy >(g, {output, y}, true);
+        auto prob = af< Softmax >(g, {output});
+	auto ce = af< CrossEntropy >(g, {prob, y}, false);
 	auto loss = af< ReduceMean >(g, {ce});
 
     auto label = af< ArgMax >(g, {y});    
