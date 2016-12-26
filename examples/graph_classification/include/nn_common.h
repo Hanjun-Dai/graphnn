@@ -12,7 +12,7 @@
 
 using namespace gnn;
 
-typedef CPU mode;
+typedef GPU mode;
 
 std::vector< Graph > graph_data;
 std::vector<int> labels;

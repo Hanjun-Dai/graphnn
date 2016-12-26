@@ -27,8 +27,8 @@ using SparseData = TDataTemplate<mode, SPARSE, Dtype>;
  */
 class TData
 {
-private:
-	virtual void dummy() {};
+public:
+	virtual ~TData() {}
 };
 
 /**
@@ -42,7 +42,7 @@ class TDataTemplate<CPU, DENSE, Dtype> : public TData
 public:
 
 	TDataTemplate();
-	~TDataTemplate();
+	virtual ~TDataTemplate();
 	/**
 	 * @brief      resize the allocated memory; only when the new size is 
 	 * 				larger than the old one, will we do memory realloc
@@ -72,7 +72,7 @@ class TDataTemplate<GPU, DENSE, Dtype> : public TData
 public:
 
 	TDataTemplate();
-	~TDataTemplate();
+	virtual ~TDataTemplate();
 	/**
 	 * @brief      resize the allocated memory; only when the new size is 
 	 * 				larger than the old one, will we do memory realloc
@@ -106,7 +106,7 @@ class TDataTemplate<mode, SPARSE, Dtype> : public TData
 {
 public:
 	TDataTemplate();
-	~TDataTemplate();
+	virtual ~TDataTemplate();
 	/**
 	 * @brief      constructor
 	 *

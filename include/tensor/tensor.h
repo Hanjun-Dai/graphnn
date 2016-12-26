@@ -40,6 +40,7 @@ using SpTensor = TensorTemplate<mode, SPARSE, Dtype>;
 class Tensor
 {
 public:
+	virtual ~Tensor() {}
 	/**
 	 * @brief      get derived subclass from the pointer to this abstract class
 	 *

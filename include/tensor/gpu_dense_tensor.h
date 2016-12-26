@@ -22,6 +22,7 @@ class TensorTemplate<GPU, DENSE, Dtype> : public Tensor
 public:
 
 	TensorTemplate();
+	virtual ~TensorTemplate() {}	
 	TensorTemplate(std::vector<size_t> l);
 	TensorTemplate(TShape s);
 
@@ -244,7 +245,7 @@ class TensorTemplate<GPU, DENSE, int> : public Tensor
 public:
 
 	TensorTemplate();
-
+	virtual ~TensorTemplate() {}
 	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;

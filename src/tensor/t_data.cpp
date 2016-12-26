@@ -22,9 +22,9 @@ void TDataTemplate<CPU, DENSE, Dtype>::Resize(size_t new_size)
 {
 	if (new_size > this->mem_size)
 	{
-		this->mem_size = new_size;
+		this->mem_size = std::max(new_size, this->mem_size * 2);
 		MemHolder<CPU>::DelArr(this->ptr);
-		MemHolder<CPU>::MallocArr(this->ptr, sizeof(Dtype) * new_size);
+		MemHolder<CPU>::MallocArr(this->ptr, sizeof(Dtype) * this->mem_size);
 	}
 }
 

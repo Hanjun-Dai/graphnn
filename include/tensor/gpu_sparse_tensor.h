@@ -18,7 +18,7 @@ class TensorTemplate<GPU, SPARSE, Dtype> : public Tensor
 public:
 
 	TensorTemplate();
-
+	virtual ~TensorTemplate() {}
 	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
@@ -65,7 +65,7 @@ class TensorTemplate<GPU, SPARSE, int> : public Tensor
 public:
 
 	TensorTemplate();
-
+	virtual ~TensorTemplate() {}
 	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;

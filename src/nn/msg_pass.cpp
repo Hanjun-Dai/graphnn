@@ -12,7 +12,8 @@ void BindWeight(SpTensor<CPU, Dtype>*& target, SpTensor<CPU, Dtype>& output)
 template<typename Dtype>
 void BindWeight(SpTensor<CPU, Dtype>*& target, SpTensor<GPU, Dtype>& output)
 {
-	target = new SpTensor<CPU, Dtype>();
+	if (target == nullptr)
+		target = new SpTensor<CPU, Dtype>();
 }
 
 template<typename mode, typename Dtype>

@@ -14,6 +14,7 @@ TEST(CPUTensorTest, ReshapeSize)
 	auto& mat = t->Derived<CPU, DENSE, float>();
 
 	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);
+	delete t;
 }
 
 TEST(CPUTensorTest, BroadcastMulCol)
@@ -70,6 +71,7 @@ TEST(CPUTensorTest, RandUniform)
 	s /= mat.shape.Count();
 	double err = fabs(s - 1.0);
 	EXPECT_LE(err, 1e-3);
+	delete t;
 }
 
 TEST(CPUTensorTest, RandNorm)
@@ -93,6 +95,7 @@ TEST(CPUTensorTest, RandNorm)
 	ss = sqrt(ss / mat.shape.Count());
 	err = fabs(ss - 0.1);
 	EXPECT_LE(err, 1e-4);
+	delete t;
 }
 
 TEST(CPUTensorTest, Zero)
@@ -104,6 +107,7 @@ TEST(CPUTensorTest, Zero)
 
 	int ans = mat.ASum();
 	ASSERT_EQ(0, ans);
+	delete t;
 }
 
 TEST(CPUTensorTest, AsScalar)
@@ -114,6 +118,7 @@ TEST(CPUTensorTest, AsScalar)
 	mat.Zeros();
 
 	ASSERT_EQ(0, mat.AsScalar());
+	delete t;
 }
 
 TEST(CPUTensorTest, Fill)
@@ -128,4 +133,5 @@ TEST(CPUTensorTest, Fill)
 		ans += mat.data->ptr[i];
 
 	ASSERT_EQ(48, ans);
+	delete t;
 }

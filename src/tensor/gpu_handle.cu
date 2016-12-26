@@ -1,5 +1,9 @@
 #include "tensor/gpu_handle.h"
 #include "util/gnn_macros.h"
+#include "util/mem_holder.h"
+
+namespace gnn
+{
 
 __global__ void SetupRandKernel(curandState_t *state, unsigned long long seed) 
 {
@@ -76,6 +80,7 @@ void GpuHandle::Destroy()
 	delete[] inUse;
 	curandDestroyGenerator(curandgenerator);
     cudaFree(devRandStates);
+    MemHolder<GPU>::Clear();
 	streamcnt = 0U;
 }
 
@@ -89,3 +94,5 @@ std::mutex GpuHandle::r_loc;
 std::mutex GpuHandle::rand_lock;
 bool* GpuHandle::inUse = NULL;
 cudaStream_t GpuHandle::cudaRandStream;
+
+}

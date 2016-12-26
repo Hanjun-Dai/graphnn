@@ -22,9 +22,9 @@ void TDataTemplate<GPU, DENSE, Dtype>::Resize(size_t new_size)
 {
 	if (new_size > this->mem_size)
 	{
-		this->mem_size = new_size;
+		this->mem_size = new_size > this->mem_size * 2 ? new_size : this->mem_size * 2;
 		MemHolder<GPU>::DelArr(this->ptr);
-		MemHolder<GPU>::MallocArr(this->ptr, sizeof(Dtype) * new_size);
+		MemHolder<GPU>::MallocArr(this->ptr, sizeof(Dtype) * this->mem_size);
 		cudaMemset(this->ptr, 0, sizeof(Dtype) * this->mem_size);
 		dev_ptr = thrust::device_pointer_cast(ptr);
 	}
