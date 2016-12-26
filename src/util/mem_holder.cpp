@@ -31,7 +31,7 @@ std::mutex MemHolder<mode>::r_loc;
 
 template<typename mode>
 template<typename T>
-void MemHolder<mode>::DelArr(T*& p)
+void MemHolder<mode>::Recycle(T*& p)
 {
 	r_loc.lock();
 	if (p)
@@ -39,6 +39,26 @@ void MemHolder<mode>::DelArr(T*& p)
 		auto id = reinterpret_cast<std::uintptr_t>(p);
 		if (pt_info.count(id))
 			avail_pt_map.insert(std::make_pair(pt_info[id].first, (void*)p));
+		p = nullptr;
+	}
+	r_loc.unlock();
+}
+
+template<typename mode>
+template<typename T>
+void MemHolder<mode>::ForceDel(T*& p)
+{
+	r_loc.lock();
+	if (p)
+	{
+		auto id = reinterpret_cast<std::uintptr_t>(p);
+		auto it = pt_info.find(id);
+		ASSERT(it != pt_info.end(), "pointer not found");
+		if (mode::type == MatMode::cpu)
+			free(it->second.second);
+		else
+			cudaFree(it->second.second);
+		pt_info.erase(it);
 		p = nullptr;
 	}
 	r_loc.unlock();
@@ -57,19 +77,12 @@ void MemHolder<mode>::MallocArr(T*& p, size_t nBytes)
 			Malloc<mode>(p, nBytes);
 			auto id = reinterpret_cast<std::uintptr_t>(p);
 			ASSERT(pt_info.count(id) == 0, "pointer duplicates");
-			if (mode::type == MatMode::gpu)
-				std::cerr << "allocate gpu" << id << std::endl;
-			else{
-				std::cerr << "allocate cpu" << id << std::endl;
-			// 	void *array[10];
-   //          size_t size;
-   //          size = backtrace(array, 10);
-   //          backtrace_symbols_fd(array, size, STDERR_FILENO); 
-			}
 			pt_info[id] = std::make_pair(nBytes, (void*)p);
 		} else {
 			p = (T*)it->second;
 			avail_pt_map.erase(it);
+			auto id = reinterpret_cast<std::uintptr_t>(p);
+			ASSERT(pt_info.count(id), "unknown pointer");
 		}
 	}
 	else p = nullptr;
@@ -93,17 +106,25 @@ void MemHolder<mode>::Clear()
 template class MemHolder<CPU>;
 template class MemHolder<GPU>;
 
-template void MemHolder<CPU>::DelArr<float>(float*& p); 
-template void MemHolder<CPU>::DelArr<double>(double*& p); 
-template void MemHolder<CPU>::DelArr<int>(int*& p); 
+template void MemHolder<CPU>::ForceDel<float>(float*& p); 
+template void MemHolder<CPU>::ForceDel<double>(double*& p); 
+template void MemHolder<CPU>::ForceDel<int>(int*& p); 
+
+template void MemHolder<CPU>::Recycle<float>(float*& p); 
+template void MemHolder<CPU>::Recycle<double>(double*& p); 
+template void MemHolder<CPU>::Recycle<int>(int*& p); 
 
 template void MemHolder<CPU>::MallocArr<float>(float*& p, size_t nBytes); 
 template void MemHolder<CPU>::MallocArr<double>(double*& p, size_t nBytes); 
 template void MemHolder<CPU>::MallocArr<int>(int*& p, size_t nBytes); 
 
-template void MemHolder<GPU>::DelArr<float>(float*& p); 
-template void MemHolder<GPU>::DelArr<double>(double*& p); 
-template void MemHolder<GPU>::DelArr<int>(int*& p); 
+template void MemHolder<GPU>::ForceDel<float>(float*& p); 
+template void MemHolder<GPU>::ForceDel<double>(double*& p); 
+template void MemHolder<GPU>::ForceDel<int>(int*& p); 
+
+template void MemHolder<GPU>::Recycle<float>(float*& p); 
+template void MemHolder<GPU>::Recycle<double>(double*& p); 
+template void MemHolder<GPU>::Recycle<int>(int*& p); 
 
 template void MemHolder<GPU>::MallocArr<float>(float*& p, size_t nBytes); 
 template void MemHolder<GPU>::MallocArr<double>(double*& p, size_t nBytes); 

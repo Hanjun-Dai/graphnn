@@ -354,12 +354,7 @@ void TensorTemplate<CPU, DENSE, int>::Reshape(std::vector<size_t> l)
 	if (this->data == nullptr)
 		this->data = std::make_shared< DenseData<CPU, int> >();
 
-	if (this->shape.Count() > this->data->mem_size)
-	{
-		this->data->mem_size = this->shape.Count();
-		MemHolder<CPU>::DelArr(this->data->ptr);
-		MemHolder<CPU>::MallocArr(this->data->ptr, sizeof(int) * this->shape.Count());
-	}
+	this->data->Resize(this->shape.Count());
 }
 
 MatType TensorTemplate<CPU, DENSE, int>::GetMatType()

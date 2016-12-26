@@ -274,3 +274,46 @@ TEST(GPUTensorTest, InvSqrSqrtNorm2)
 	EXPECT_LE(fabs(x.Norm2() - gx.Norm2()), 1e-4);
 	GpuHandle::Destroy();
 }
+
+TEST(GPUTensorTest, SparseMM)
+{
+	GpuHandle::Init(0, 1);
+	SpTensor<CPU, float> a;
+	a.Reshape({2, 3});
+	a.ResizeSp(3, 3);
+	a.data->row_ptr[0] = 0; 
+	a.data->row_ptr[1] = 1;
+	a.data->row_ptr[2] = 3;
+	a.data->val[0] = 2.0;
+	a.data->val[1] = 1.0;
+	a.data->val[2] = 3.0;
+	a.data->col_idx[0] = 1;
+	a.data->col_idx[1] = 0;
+	a.data->col_idx[2] = 2;
+
+	DTensor<CPU, float> b({2, 4});
+	for (int i = 0; i < 8; ++i)
+		b.data->ptr[i] = i;
+
+	SpTensor<GPU, float> ga;
+	ga.CopyFrom(a);
+	DTensor<GPU, float> gb;
+	gb.CopyFrom(b);
+
+	DTensor<GPU, float> gc;
+	gc.MM(ga, gb, Trans::T, Trans::N, 1.0, 0.0);
+
+	DTensor<CPU, float> c;
+	c.CopyFrom(gc);
+
+	//c.MM(a, b, Trans::T, Trans::N, 1.0, 0.0);
+	for (size_t i = 0; i < c.rows(); ++i)
+		{
+			for (size_t j = 0; j < c.cols(); ++j)
+				std::cerr << c.data->ptr[i * c.cols() + j] << " ";
+			std::cerr << std::endl;
+		}
+
+
+	GpuHandle::Destroy();	
+}

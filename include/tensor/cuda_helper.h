@@ -147,6 +147,28 @@ inline void Cuda_GeaM(cublasHandle_t& handle, cublasOperation_t transa, cublasOp
 		cublasDgeam(handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc);
 }
 
+inline void Cuda_CSRMM(cusparseHandle_t& handle, cusparseOperation_t transA, int m, int n, int k, int nnz, 
+                    const float *alpha, const float *csrValA, const int *csrRowPtrA, const int *csrColIndA, 
+                    const float *B, int ldb, const float *beta, float *C, int ldc)
+{
+        cusparseMatDescr_t descrA;
+        cusparseCreateMatDescr(&descrA);
+        cusparseSetMatType(descrA, CUSPARSE_MATRIX_TYPE_GENERAL);
+        cusparseSetMatIndexBase(descrA, CUSPARSE_INDEX_BASE_ZERO);
+        cusparseScsrmm(handle, transA, m, n, k, nnz, alpha, descrA, csrValA, csrRowPtrA, csrColIndA, B, ldb, beta, C, ldc);
+}
+
+inline void Cuda_CSRMM(cusparseHandle_t& handle, cusparseOperation_t transA, int m, int n, int k, int nnz, 
+                    const double *alpha, const double *csrValA, const int *csrRowPtrA, const int *csrColIndA, 
+                    const double *B, int ldb, const double *beta, double *C, int ldc)
+{
+        cusparseMatDescr_t descrA;
+        cusparseCreateMatDescr(&descrA);
+        cusparseSetMatType(descrA, CUSPARSE_MATRIX_TYPE_GENERAL);
+        cusparseSetMatIndexBase(descrA, CUSPARSE_INDEX_BASE_ZERO);
+        cusparseDcsrmm(handle, transA, m, n, k, nnz, alpha, descrA, csrValA, csrRowPtrA, csrColIndA, B, ldb, beta, C, ldc);       
+}                    
+
 inline void Cuda_Axpy(cublasHandle_t& handle, int n, const float *alpha, const float *x, float *y)
 {
 		cublasSaxpy(handle, n, alpha, x, 1, y, 1);

@@ -21,14 +21,17 @@ class MemHolder
 {
 public:
 	/**
-	 * @brief      delete an array allocated before (must be the head pointer)
+	 * @brief      recycle an array allocated before (must be the head pointer)
 	 *
 	 * @param      p     { the head pointer }
 	 *
 	 * @tparam     T     { the data type }
 	 */
 	template<typename T>
-	static void DelArr(T*& p);
+	static void Recycle(T*& p);
+
+	template<typename T>
+	static void ForceDel(T*& p);
 
 	/**
 	 * @brief      allocate new array of memory 

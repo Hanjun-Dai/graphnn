@@ -206,7 +206,6 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
 
 	Reshape({m, n});
     this->Scale(beta);
-    
     if (transA == Trans::N)
     {
         int thread_num = min(c_uCudaThreadNum, this->shape.Count());
@@ -214,9 +213,20 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
         CSRMMKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (alpha, a.data->row_ptr, a.data->col_idx, a.data->val, b.data->ptr, b.cols(), this->data->ptr, this->cols(), this->shape.Count());
     } else 
     {
-        int thread_num = min(c_uCudaThreadNum, this->cols());   
-        int blocksPerGrid = (this->cols() + thread_num - 1) / thread_num;
-        CSRMMKernel_T <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (alpha, a.data->len_ptr, a.data->row_ptr, a.data->col_idx, a.data->val, b.data->ptr, b.cols(), this->data->ptr, this->cols());
+        DTensor<GPU, Dtype> bt(b.shape);
+        DTensor<GPU, Dtype> c({m, n});
+        WITH_GPUCTX(ctx, {
+            Dtype one = 1.0;
+            Dtype zero = 0.0;
+            Cuda_GeaM(ctx.cublasHandle, cublasOperation_t::CUBLAS_OP_T, cublasOperation_t::CUBLAS_OP_T, 
+                    b.rows(), b.cols(), &one, b.data->ptr, b.cols(), &zero, b.data->ptr, b.cols(), bt.data->ptr, b.rows());
+                               
+            Cuda_CSRMM(ctx.cusparseHandle, CUSPARSE_OPERATION_TRANSPOSE, 
+                    a.rows(), b.cols(), a.cols(), a.data->nnz, &alpha, 
+                    a.data->val, a.data->row_ptr, a.data->col_idx, bt.data->ptr, bt.rows(), &beta, c.data->ptr, c.rows());                
+            Cuda_GeaM(ctx.cublasHandle, cublasOperation_t::CUBLAS_OP_T, cublasOperation_t::CUBLAS_OP_T, 
+                    cols(), rows(), &one, c.data->ptr, c.rows(), &zero, c.data->ptr, c.rows(), data->ptr, n);
+        });
     }
 }
 
@@ -504,12 +514,7 @@ void TensorTemplate<GPU, DENSE, int>::Reshape(std::vector<size_t> l)
 	if (this->data == nullptr)
 		this->data = std::make_shared< DenseData<GPU, int> >();
 
-	if (this->shape.Count() > this->data->mem_size)
-	{
-		this->data->mem_size = this->shape.Count();
-		MemHolder<GPU>::DelArr(this->data->ptr);
-		MemHolder<GPU>::MallocArr(this->data->ptr, sizeof(int) * this->shape.Count());
-	}
+    this->data->Resize(this->shape.Count());
 }
 
 MatType TensorTemplate<GPU, DENSE, int>::GetMatType()

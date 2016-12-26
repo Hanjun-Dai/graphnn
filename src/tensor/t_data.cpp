@@ -14,7 +14,7 @@ TDataTemplate<CPU, DENSE, Dtype>::TDataTemplate()
 template<typename Dtype>
 TDataTemplate<CPU, DENSE, Dtype>::~TDataTemplate()
 {
-	MemHolder<CPU>::DelArr(this->ptr);
+	MemHolder<CPU>::Recycle(this->ptr);
 }
 
 template<typename Dtype>
@@ -22,8 +22,8 @@ void TDataTemplate<CPU, DENSE, Dtype>::Resize(size_t new_size)
 {
 	if (new_size > this->mem_size)
 	{
-		this->mem_size = std::max(new_size, this->mem_size * 2);
-		MemHolder<CPU>::DelArr(this->ptr);
+		this->mem_size = new_size;
+		MemHolder<CPU>::ForceDel(this->ptr);
 		MemHolder<CPU>::MallocArr(this->ptr, sizeof(Dtype) * this->mem_size);
 	}
 }
@@ -44,9 +44,9 @@ TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate()
 template<typename mode, typename Dtype>
 TDataTemplate<mode, SPARSE, Dtype>::~TDataTemplate()
 {
-	MemHolder<mode>::DelArr(val);
-	MemHolder<mode>::DelArr(col_idx);
-	MemHolder<mode>::DelArr(row_ptr);	
+	MemHolder<mode>::Recycle(val);
+	MemHolder<mode>::Recycle(col_idx);
+	MemHolder<mode>::Recycle(row_ptr);	
 }
 
 template<typename mode, typename Dtype>
