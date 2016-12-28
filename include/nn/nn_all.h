@@ -12,6 +12,7 @@
 #include "nn/is_equal.h"
 #include "nn/matmul.h"
 #include "nn/msg_pass.h"
+#include "nn/multi_matmul.h"
 #include "nn/optimizer.h"
 #include "nn/param_set.h"
 #include "nn/reduce_mean.h"

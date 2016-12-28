@@ -77,7 +77,7 @@ class GraphVar : public Variable
 public:
 	GraphVar(std::string _name);
 
-	virtual EleType GetEleType();
+	virtual EleType GetEleType() override;
 
 	virtual void SetRef(void* p) override;	
 
