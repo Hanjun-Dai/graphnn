@@ -14,7 +14,7 @@ Dtype lr = 0.001;
 int dev_id;
 std::vector< Dtype* > images_train, images_test;
 std::vector< int > labels_train, labels_test;
-typedef CPU mode;
+typedef GPU mode;
 
 void LoadParams(const int argc, const char** argv)
 {

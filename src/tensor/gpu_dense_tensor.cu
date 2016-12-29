@@ -78,7 +78,7 @@ void TensorTemplate<GPU, DENSE, Dtype>::ShallowCopy(DTensor<GPU, Dtype>& src)
 template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Zeros()
 {
-	if (this->data->mem_size)
+	if (shape.Count())
 		cudaMemset(data->ptr, 0, this->shape.Count() * sizeof(Dtype));
 }
 
@@ -530,7 +530,7 @@ void TensorTemplate<GPU, DENSE, int>::ShallowCopy(DTensor<GPU, int>& src)
 
 void TensorTemplate<GPU, DENSE, int>::Zeros()
 {
-    if (this->data->mem_size)
+    if (shape.Count())
         cudaMemset(data->ptr, 0, this->shape.Count() * sizeof(int));
 }
 

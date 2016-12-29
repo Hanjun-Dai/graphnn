@@ -75,8 +75,8 @@ void TensorTemplate<CPU, DENSE, Dtype>::ShallowCopy(DTensor<CPU, Dtype>& src)
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 {
-	if (this->data->mem_size)
-	   memset(this->data->ptr, 0, sizeof(Dtype) * this->data->mem_size);
+	if (shape.Count())
+	   memset(this->data->ptr, 0, sizeof(Dtype) * shape.Count());
 }
 
 template<typename Dtype>

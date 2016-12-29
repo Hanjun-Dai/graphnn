@@ -18,10 +18,13 @@ TShape::TShape(std::vector<size_t> l)
 void TShape::Reshape(std::vector<size_t> l)
 {
 	this->dims = l;
-	cnt.resize(l.size());
-	cnt[cnt.size() - 1] = this->dims[cnt.size() - 1];
-	for (int i = (int)cnt.size() - 2; i >= 0; --i)
-		cnt[i] = cnt[i + 1] * this->dims[i];
+	if (l.size())
+	{
+		cnt.resize(l.size());
+		cnt[cnt.size() - 1] = this->dims[cnt.size() - 1];
+		for (int i = (int)cnt.size() - 2; i >= 0; --i)
+			cnt[i] = cnt[i + 1] * this->dims[i];
+	}
 }
 
 // size_t TShape::Count(uint dim)
