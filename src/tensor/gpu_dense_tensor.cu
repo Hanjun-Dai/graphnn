@@ -212,11 +212,8 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
         CSRMMKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (alpha, a.data->row_ptr, a.data->col_idx, a.data->val, b.data->ptr, b.cols(), this->data->ptr, this->cols(), this->shape.Count());
     } else 
     {
-        int thread_num = min(c_uCudaThreadNum, this->cols());
-        int blocksPerGrid = (this->cols() + thread_num - 1) / thread_num;
-        CSRMMKernel_T <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (alpha, a.data->len_ptr, a.data->row_ptr, a.data->col_idx, a.data->val, b.data->ptr, b.cols(), this->data->ptr, this->cols());
-/*        DTensor<GPU, Dtype> bt(b.shape);
         DTensor<GPU, Dtype> c({m, n});
+        DTensor<GPU, Dtype> bt(b.shape);
         WITH_GPUCTX(ctx, {
             Dtype one = 1.0;
             Dtype zero = 0.0;
@@ -225,10 +222,10 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
                                
             Cuda_CSRMM(ctx.cusparseHandle, CUSPARSE_OPERATION_TRANSPOSE, 
                     a.rows(), b.cols(), a.cols(), a.data->nnz, &alpha, 
-                    a.data->val, a.data->row_ptr, a.data->col_idx, bt.data->ptr, bt.rows(), &beta, c.data->ptr, c.rows());                
-            Cuda_GeaM(ctx.cublasHandle, cublasOperation_t::CUBLAS_OP_T, cublasOperation_t::CUBLAS_OP_T, 
-                    cols(), rows(), &one, c.data->ptr, c.rows(), &zero, c.data->ptr, c.rows(), data->ptr, n);
-        }); */
+                    a.data->val, a.data->row_ptr, a.data->col_idx, bt.data->ptr, bt.rows(), &zero, c.data->ptr, c.rows());                
+            Cuda_GeaM(ctx.cublasHandle, cublasOperation_t::CUBLAS_OP_T, cublasOperation_t::CUBLAS_OP_N, 
+                    cols(), rows(), &one, c.data->ptr, c.rows(), &one, data->ptr, cols(), data->ptr, n);
+        });
     }
 }
 
