@@ -181,6 +181,22 @@ __global__ void CSRMMKernel(Dtype alpha, int* ptr, int* col_idx, Dtype* val, Dty
 }
 
 template<typename Dtype>
+__global__ void CSRMMKernel_T(Dtype alpha, int n_ptr, int* ptr, int* row_idx, Dtype* val, Dtype* dense_data, int src_cols, Dtype* dst, int dst_cols)
+{
+    int cur_col = blockDim.x * blockIdx.x + threadIdx.x;
+    if (cur_col < dst_cols)
+    {
+        for (int x = 0; x < n_ptr - 1; ++x)
+        {
+            for (int t = ptr[x]; t < ptr[x + 1]; ++t)
+            {
+                dst[row_idx[t] * dst_cols + cur_col] += alpha * val[t] * dense_data[x * src_cols + cur_col];
+            }
+        }
+    }
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
 {
     assert(transB == Trans::N);
@@ -196,8 +212,8 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
         CSRMMKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (alpha, a.data->row_ptr, a.data->col_idx, a.data->val, b.data->ptr, b.cols(), this->data->ptr, this->cols(), this->shape.Count());
     } else 
     {
-        DTensor<GPU, Dtype> bt(b.shape);
         DTensor<GPU, Dtype> c({m, n});
+        DTensor<GPU, Dtype> bt(b.shape);
         WITH_GPUCTX(ctx, {
             Dtype one = 1.0;
             Dtype zero = 0.0;
@@ -206,9 +222,9 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
                                
             Cuda_CSRMM(ctx.cusparseHandle, CUSPARSE_OPERATION_TRANSPOSE, 
                     a.rows(), b.cols(), a.cols(), a.data->nnz, &alpha, 
-                    a.data->val, a.data->row_ptr, a.data->col_idx, bt.data->ptr, bt.rows(), &beta, c.data->ptr, c.rows());                
-            Cuda_GeaM(ctx.cublasHandle, cublasOperation_t::CUBLAS_OP_T, cublasOperation_t::CUBLAS_OP_T, 
-                    cols(), rows(), &one, c.data->ptr, c.rows(), &zero, c.data->ptr, c.rows(), data->ptr, n);
+                    a.data->val, a.data->row_ptr, a.data->col_idx, bt.data->ptr, bt.rows(), &zero, c.data->ptr, c.rows());                
+            Cuda_GeaM(ctx.cublasHandle, cublasOperation_t::CUBLAS_OP_T, cublasOperation_t::CUBLAS_OP_N, 
+                    cols(), rows(), &one, c.data->ptr, c.rows(), &one, data->ptr, cols(), data->ptr, n);
         });
     }
 }
