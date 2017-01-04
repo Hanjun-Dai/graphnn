@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "tensor/tensor_all.h"
+#include "tensor/mkl_helper.h"
 #include <type_traits>
 
 using namespace gnn;
@@ -14,6 +15,17 @@ TEST(CPUTensorTest, ReshapeSize)
 	auto& mat = t->Derived<CPU, DENSE, float>();
 
 	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);
+	delete t;
+}
+
+TEST(CPUTensorTest, norm2)
+{
+	Tensor* t = new DTensor<CPU, float>();
+	t->Reshape({3, 3});
+	auto& mat = t->Derived<CPU, DENSE, float>();
+	mat.Fill(1.0);
+	auto nn = MKL_Norm2(mat.shape.Count(), mat.data->ptr);
+	std::cerr << nn << std::endl;
 	delete t;
 }
 

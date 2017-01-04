@@ -182,6 +182,14 @@ public:
 	void Axpby(Dtype a, DTensor<CPU, Dtype>& x, Dtype b);
 
 	/**
+	 * @brief      broadcast operation
+	 *
+	 * @param      src   The rhs operator
+	 * @param[in]  opr   The actual calculation
+	 */
+	void BCast(DTensor<CPU, Dtype>& src, std::function<void(Dtype&, Dtype&)> opr);
+
+	/**
 	 * @brief      element-wise multiplication between dense and sparse tensor
 	 * 				the same shape of two tensors is required.
 	 *
@@ -197,6 +205,15 @@ public:
 	 * @param      src   The other dense tensor
 	 */
 	void ElewiseMul(DTensor<CPU, Dtype>& src);
+
+	/**
+	 * @brief      element-wise division between two dense tensors; broadcasting
+	 * 				is enabled, but we assume the result tensor keeps the shape of this
+	 * 				current tensor (caller).
+	 *
+	 * @param      src   The other dense tensor
+	 */
+	void ElewiseDiv(DTensor<CPU, Dtype>& src);	
 
 	/**
 	 * @brief      multipy the tensor with a scalar

@@ -7,6 +7,7 @@
 #include "util/mem_holder.h"
 #include <cstring>
 #include <cassert>
+#include <functional>
 
 namespace gnn 
 {
@@ -263,37 +264,58 @@ void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(SpTensor<CPU, Dtype>& src)
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::BCast(DTensor<CPU, Dtype>& src, std::function<void(Dtype&, Dtype&)> opr)
+{
+	ASSERT(this->rank() == src.rank(), "broadcasting only support same rank tensors; please do reshape manually");
+	for (size_t i = 0; i < this->rank(); ++i)
+		if (shape.dims[i] != src.shape.dims[i])
+			ASSERT(src.shape.dims[i] == 1, "shape mismatch, broadcasting failed");
+	
+	int r = rank();
+	size_t src_idx;
+	std::vector<size_t> cur_pos(r), src_pos(r);
+	for (auto& c : cur_pos)
+		c = 0;
+	auto ele_cnt = shape.Count();
+	for (size_t i = 0; i < ele_cnt; ++i)
+	{
+		for (int i = 0; i < r; ++i)
+			src_pos[i] = cur_pos[i] >= src.shape.dims[i] ? 0 : cur_pos[i];
+		src_idx = src.shape.Coor2Idx(src_pos);
+		opr(data->ptr[i], src.data->ptr[src_idx]);
+		cur_pos[r - 1] += 1;
+		for (int i = r - 1; i > 0; --i)
+			if (cur_pos[i] >= shape.dims[i])
+			{
+				cur_pos[i] -= shape.dims[i];
+				cur_pos[i - 1]++;
+			}
+	}
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(DTensor<CPU, Dtype>& src)
 {
 	if (this->shape == src.shape)
 	{
 		MKL_Mul(this->shape.Count(), src.data->ptr, this->data->ptr, this->data->ptr);
 	} else { // require broadcasting
-		ASSERT(this->rank() == src.rank(), "broadcasting only support same rank tensors; please do reshape manually");
-		for (size_t i = 0; i < this->rank(); ++i)
-			if (shape.dims[i] != src.shape.dims[i])
-				ASSERT(src.shape.dims[i] == 1, "shape mismatch, broadcasting failed");
-		
-		int r = rank();
-		size_t src_idx;
-		std::vector<size_t> cur_pos(r), src_pos(r);
-		for (auto& c : cur_pos)
-			c = 0;
-		auto ele_cnt = shape.Count();
-		for (size_t i = 0; i < ele_cnt; ++i)
-		{
-			for (int i = 0; i < r; ++i)
-				src_pos[i] = cur_pos[i] >= src.shape.dims[i] ? 0 : cur_pos[i];
-			src_idx = src.shape.Coor2Idx(src_pos);
-			data->ptr[i] *= src.data->ptr[src_idx];
-			cur_pos[r - 1] += 1;
-			for (int i = r - 1; i > 0; --i)
-				if (cur_pos[i] >= shape.dims[i])
-				{
-					cur_pos[i] -= shape.dims[i];
-					cur_pos[i - 1]++;
-				}
-		}
+		BCast(src, [](Dtype& dst, Dtype& src){ 
+			dst *= src; 
+		});
+	}
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::ElewiseDiv(DTensor<CPU, Dtype>& src)
+{
+	if (this->shape == src.shape)
+	{
+		MKL_Mul(this->shape.Count(), src.data->ptr, this->data->ptr, this->data->ptr);
+	} else { // require broadcasting
+		BCast(src, [](Dtype& dst, Dtype& src){ 
+			dst /= src; 
+		});
 	}
 }
 
