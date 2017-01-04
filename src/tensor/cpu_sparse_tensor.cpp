@@ -1,4 +1,5 @@
 #include "tensor/cpu_sparse_tensor.h"
+#include "tensor/gpu_sparse_tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/cpu_dense_tensor.h"
 #include "util/mem_holder.h"
@@ -58,6 +59,16 @@ void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
 	memcpy(data->val, src.data->val, sizeof(Dtype) * src.data->nnz);
 	memcpy(data->col_idx, src.data->col_idx, sizeof(int) * src.data->nnz);
 	memcpy(data->row_ptr, src.data->row_ptr, sizeof(int) * src.data->len_ptr);
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
+{
+	this->shape = src.shape;
+	ResizeSp(src.data->nnz, src.data->len_ptr);
+	cudaMemcpy(data->val, src.data->val, sizeof(Dtype) * src.data->nnz, cudaMemcpyDeviceToHost);
+	cudaMemcpy(data->col_idx, src.data->col_idx, sizeof(int) * src.data->nnz, cudaMemcpyDeviceToHost);
+	cudaMemcpy(data->row_ptr, src.data->row_ptr, sizeof(int) * src.data->len_ptr, cudaMemcpyDeviceToHost);
 }
 
 template<typename Dtype>

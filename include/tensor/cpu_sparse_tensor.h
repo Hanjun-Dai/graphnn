@@ -24,7 +24,8 @@ public:
 	virtual MatMode GetMatMode() override;
 	
 	void CopyFrom(SpTensor<CPU, Dtype>& src);
-
+	void CopyFrom(SpTensor<GPU, Dtype>& src);
+	
 	/**
 	 * @brief      shallow copy (only set the shared_ptr)
 	 *
