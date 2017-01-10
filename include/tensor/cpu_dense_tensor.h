@@ -244,6 +244,10 @@ public:
 	void Sqrt();
 
 	/**
+	 * @brief      set each element x to be 1 / (1 + exp(-x))
+	 */
+	void Sigmoid();
+	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */
 	std::shared_ptr< DenseData<CPU, Dtype> > data;

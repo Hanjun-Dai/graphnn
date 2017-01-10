@@ -3,6 +3,7 @@
 
 #include "unary_functor.h"
 #include <chrono>
+#include <cmath>
 
 namespace gnn
 {
@@ -36,6 +37,24 @@ private:
 	 * scalar to be set
 	 */
 	Dtype scalar;
+};
+
+/**
+ * @brief      CPU specialization of UnarySigmoid
+ *
+ * @tparam     Dtype  { float/double/int }
+ */
+template<typename Dtype>
+class UnarySigmoid<CPU, Dtype>
+{
+public:
+	/**
+	 * dst = 1 / (1 + exp(-dst))
+	 */
+	inline void operator()(Dtype& dst)
+	{
+		dst = 1.0 / (1.0 + exp(-dst));
+	}
 };
 
 /**

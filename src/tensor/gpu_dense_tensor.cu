@@ -501,6 +501,12 @@ void TensorTemplate<GPU, DENSE, Dtype>::Sqrt()
 	UnaryEngine<GPU>::Exec<UnarySqrt>(this->data->ptr, this->shape.Count());
 }
 
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Sigmoid()
+{
+    UnaryEngine<GPU>::Exec<UnarySigmoid>(this->data->ptr, this->shape.Count());
+}
+
 template class TensorTemplate<GPU, DENSE, float>;
 template class TensorTemplate<GPU, DENSE, double>;
 

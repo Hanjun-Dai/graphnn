@@ -130,12 +130,30 @@ class UnaryReLU<GPU, Dtype>
 {
 public:
 	/**
-	 * inverse dst
+	 * rectify dst
 	 */
 	__device__ inline void operator()(Dtype& dst)
 	{
 		if (dst < 0)
 			dst = 0;
+	}
+};
+
+/**
+ * @brief      UnarySigmoid
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnarySigmoid<GPU, Dtype>
+{
+public:
+	/**
+	 * dst = 1 / (1 + exp(-dst))
+	 */
+	__device__ inline void operator()(Dtype& dst)
+	{
+		dst = 1.0 / (1.0 + cuda_exp(-dst));
 	}
 };
 

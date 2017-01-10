@@ -72,6 +72,15 @@ template<typename mode, typename Dtype>
 class UnaryReLU {};
 
 /**
+ * @brief      sigmoid
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnarySigmoid {};
+
+/**
  * @brief      Functor to square an element; CPU doesn't need this;
  *
  * @tparam     mode   { GPU }
