@@ -99,6 +99,15 @@ template<typename mode, typename Dtype>
 class UnarySqrt {};
 
 /**
+ * @brief      Functor to log an element; CPU doesn't need this;
+ *
+ * @tparam     mode   { GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryLog {};
+
+/**
  * @brief      Class for unary engine.
  *
  * @tparam     mode  CPU/GPU

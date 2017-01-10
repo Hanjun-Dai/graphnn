@@ -2,8 +2,10 @@
 #define NN_ALL_H
 
 #include "nn/arg_max.h"
+#include "nn/binary_logloss.h"
 #include "nn/cross_entropy.h"
 #include "nn/elewise_add.h"
+#include "nn/elewise_mul.h"
 #include "nn/expr_sugar.h"
 #include "nn/factor.h"
 #include "nn/factor_graph.h"

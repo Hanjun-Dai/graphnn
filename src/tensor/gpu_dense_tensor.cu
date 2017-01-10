@@ -474,6 +474,12 @@ void TensorTemplate<GPU, DENSE, Dtype>::ElewiseMul(DTensor<GPU, Dtype>& src)
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::ElewiseDiv(DTensor<GPU, Dtype>& src)
+{
+    ASSERT(false, "elewisediv in gpu is not impl");
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Inv()
 {
 	UnaryEngine<GPU>::Exec<UnaryInv>(this->data->ptr, this->shape.Count());
@@ -505,6 +511,12 @@ template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Sigmoid()
 {
     UnaryEngine<GPU>::Exec<UnarySigmoid>(this->data->ptr, this->shape.Count());
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Log()
+{
+    UnaryEngine<GPU>::Exec<UnaryLog>(this->data->ptr, this->shape.Count());
 }
 
 template class TensorTemplate<GPU, DENSE, float>;

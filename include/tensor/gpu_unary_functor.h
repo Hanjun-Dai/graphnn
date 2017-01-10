@@ -158,6 +158,24 @@ public:
 };
 
 /**
+ * @brief      UnaryLog
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnaryLog<GPU, Dtype>
+{
+public:
+	/**
+	 * dst = 1 / (1 + exp(-dst))
+	 */
+	__device__ inline void operator()(Dtype& dst)
+	{
+		dst = cuda_log(dst);
+	}
+};
+
+/**
  * @brief      UnarySquare
  *
  * @tparam     Dtype  { float/double }

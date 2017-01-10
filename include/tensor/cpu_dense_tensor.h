@@ -248,6 +248,11 @@ public:
 	 */
 	void Sigmoid();
 	/**
+	 * @brief      set each element x to be log(x)
+	 */
+	void Log();
+
+	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */
 	std::shared_ptr< DenseData<CPU, Dtype> > data;

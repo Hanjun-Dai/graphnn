@@ -202,6 +202,15 @@ public:
 	void ElewiseMul(DTensor<GPU, Dtype>& src);
 
 	/**
+	 * @brief      element-wise division between two dense tensors; broadcasting
+	 * 				is enabled, but we assume the result tensor keeps the shape of this
+	 * 				current tensor (caller).
+	 *
+	 * @param      src   The other dense tensor
+	 */
+	void ElewiseDiv(DTensor<GPU, Dtype>& src);	
+	
+	/**
 	 * @brief      multipy the tensor with a scalar
 	 *
 	 * @param[in]  scalar  The scalar to be multiplied
@@ -232,7 +241,11 @@ public:
 	 * @brief      set each element x to be 1 / (1 + exp(-x))
 	 */
 	void Sigmoid();
-				
+	/**
+	 * @brief      set each element x to be log(x)
+	 */
+	void Log();
+					
 	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */

@@ -365,6 +365,12 @@ void TensorTemplate<CPU, DENSE, Dtype>::Sigmoid()
 	UnaryEngine<CPU>::Exec<UnarySigmoid>(this->data->ptr, this->shape.Count());
 }
 
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Log()
+{
+	MKL_Log(this->shape.Count(), data->ptr, data->ptr);
+}
+
 template class TensorTemplate<CPU, DENSE, float>;
 template class TensorTemplate<CPU, DENSE, double>;
 
