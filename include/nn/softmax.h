@@ -3,8 +3,9 @@
 
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
-#include <memory>
 #include "nn/variable.h"
+
+#include <memory>
 
 namespace gnn
 {

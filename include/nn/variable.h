@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+
+#include "fmt/format.h"
 #include "tensor/tensor.h"
 #include "tensor/cpu_dense_tensor.h"
 #include "tensor/gpu_dense_tensor.h"

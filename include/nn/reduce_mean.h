@@ -2,7 +2,6 @@
 #define REDUCE_MEAN_H
 
 #include "util/gnn_macros.h"
-#include "fmt/format.h"
 #include "nn/factor.h"
 #include "nn/variable.h"
 

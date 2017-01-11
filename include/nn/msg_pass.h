@@ -3,7 +3,6 @@
 
 #include "util/gnn_macros.h"
 #include "util/graph_struct.h"
-#include "fmt/format.h"
 #include "nn/factor.h"
 #include "nn/variable.h"
 #include <memory>
