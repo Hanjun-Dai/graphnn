@@ -4,8 +4,9 @@ build_root = build
 
 include_dirs = $(CUDA_HOME)/include $(MKL_ROOT)/include include
 CXXFLAGS += $(addprefix -I,$(include_dirs))
+CXXFLAGS += -fPIC
 NVCCFLAGS += $(addprefix -I,$(include_dirs))
-NVCCFLAGS += -std=c++11 --use_fast_math
+NVCCFLAGS += -std=c++11 --use_fast_math --compiler-options '-fPIC'
 
 cu_files = $(shell $(FIND) src/ -name "*.cu" -printf "%P\n")
 cpp_files = $(shell $(FIND) src/ -name "*.cpp" -printf "%P\n")
