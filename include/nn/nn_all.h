@@ -3,6 +3,7 @@
 
 #include "nn/arg_max.h"
 #include "nn/binary_logloss.h"
+#include "nn/concat_cols.h"
 #include "nn/cross_entropy.h"
 #include "nn/elewise_add.h"
 #include "nn/elewise_mul.h"

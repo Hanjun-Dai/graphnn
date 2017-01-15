@@ -29,6 +29,23 @@ TEST(CPUTensorTest, norm2)
 	delete t;
 }
 
+TEST(CPUTensorTest, Concat)
+{
+	DTensor<CPU, float> x, y, z;
+	x.Reshape({5, 3});
+	y.Reshape({5, 2});
+	x.Fill(1.0);
+	y.Fill(2.0);
+	z.ConcatCols({&x, &y});
+
+	for (int i = 0; i < (int)z.rows(); ++i)
+		for (int j = 0; j < (int)z.cols(); ++j)
+			if (j < 3)
+				ASSERT_EQ(z.data->ptr[i * z.cols() + j], 1.0);
+			else
+				ASSERT_EQ(z.data->ptr[i * z.cols() + j], 2.0);
+}
+
 TEST(CPUTensorTest, BroadcastMulCol)
 {
 	DTensor<CPU, float> x, y;

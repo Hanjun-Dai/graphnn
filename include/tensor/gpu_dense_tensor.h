@@ -185,6 +185,22 @@ public:
 	void Axpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b);
 
 	/**
+	 * @brief      concatenate cols of {matrix}
+	 *
+	 * @param[in]  src_list  The matrix list
+	 */
+	void ConcatCols(std::vector< DTensor<GPU, Dtype>* > src_list);
+
+	/**
+	 * @brief      copy cols from src
+	 *
+	 * @param      src        The source matrix
+	 * @param[in]  col_start  The col start
+	 * @param[in]  col_cnt    The col count
+	 */
+	void CopyColsFrom(DTensor<GPU, Dtype>& src, size_t col_start, size_t col_cnt); 
+
+	/**
 	 * @brief      element-wise multiplication between dense and sparse tensor
 	 * 				the same shape of two tensors is required.
 	 *
@@ -250,6 +266,18 @@ public:
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */
 	std::shared_ptr< DenseData<GPU, Dtype> > data;
+
+private:
+	/**
+	 * @brief      Gets the pointer buffer, where each element point to the data->ptr of each tensor
+	 *
+	 * @param      mat_list  The Tensor (matrix) list
+	 */
+	void GetPointerBuf(std::vector< DTensor<GPU, Dtype>* >& mat_list);
+	/**
+	 * device vector for holding list of pointers
+	 */
+	thrust::device_vector<Dtype*> pointer_buf;
 };
 
 /**

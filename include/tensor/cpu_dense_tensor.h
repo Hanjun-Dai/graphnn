@@ -190,6 +190,22 @@ public:
 	void BCast(DTensor<CPU, Dtype>& src, std::function<void(Dtype&, Dtype&)> opr);
 
 	/**
+	 * @brief      concatenate cols of {matrix}
+	 *
+	 * @param[in]  src_list  The matrix list
+	 */
+	void ConcatCols(std::vector< DTensor<CPU, Dtype>* > src_list);
+
+	/**
+	 * @brief      copy cols from src
+	 *
+	 * @param      src        The source matrix
+	 * @param[in]  col_start  The col start
+	 * @param[in]  col_cnt    The col count
+	 */
+	void CopyColsFrom(DTensor<CPU, Dtype>& src, size_t col_start, size_t col_cnt); 
+
+	/**
 	 * @brief      element-wise multiplication between dense and sparse tensor
 	 * 				the same shape of two tensors is required.
 	 *

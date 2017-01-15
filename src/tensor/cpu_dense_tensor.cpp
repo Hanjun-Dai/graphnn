@@ -294,6 +294,45 @@ void TensorTemplate<CPU, DENSE, Dtype>::BCast(DTensor<CPU, Dtype>& src, std::fun
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::ConcatCols(std::vector< DTensor<CPU, Dtype>* > src_list)
+{
+    ASSERT(src_list.size(), "no operator for concat");    
+    size_t new_rows = src_list[0]->rows(), new_cols = src_list[0]->cols(); 
+    for (size_t i = 1; i < src_list.size(); ++i)
+    {
+        ASSERT(src_list[i]->rows() == new_rows, "should have same # rows");
+        new_cols += src_list[i]->cols();
+    }
+    Reshape({new_rows, new_cols});
+
+    size_t dst_offset = 0;
+    for (size_t row = 0; row < this->rows(); ++row)
+    {
+        for (size_t p = 0; p < src_list.size(); ++p)
+        {
+            size_t col_cnt = src_list[p]->cols();
+            memcpy(this->data->ptr + dst_offset, src_list[p]->data->ptr + row * col_cnt, sizeof(Dtype) * col_cnt);
+            dst_offset += col_cnt;
+        }
+    }
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::CopyColsFrom(DTensor<CPU, Dtype>& src, size_t col_start, size_t col_cnt)
+{
+    ASSERT(col_start + col_cnt <= src.cols(), "cols out of range");   
+    this->Reshape({src.rows(), col_cnt});
+    
+    size_t offset = col_start;
+    for (size_t i = 0; i < src.rows(); ++i)
+    {
+        memcpy(this->data->ptr + i * col_cnt, src.data->ptr + offset, sizeof(Dtype) * col_cnt);
+        offset += src.cols();
+    }
+} 
+
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(DTensor<CPU, Dtype>& src)
 {
 	if (this->shape == src.shape)

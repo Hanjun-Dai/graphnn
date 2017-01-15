@@ -17,17 +17,20 @@ namespace gnn
 template<typename Dtype>
 TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate() : Tensor(), data(nullptr)
 {
+    pointer_buf.clear();
 }
 
 template<typename Dtype>
 TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l) : Tensor()
 {
+    pointer_buf.clear();
 	Reshape(l);
 }
 
 template<typename Dtype>
 TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate(TShape s) : Tensor()
 {
+    pointer_buf.clear();
 	Reshape(s.dims);
 }
 
@@ -346,6 +349,77 @@ void TensorTemplate<GPU, DENSE, Dtype>::Axpy(Dtype a, DTensor<GPU, Dtype>& x)
 		Cuda_Axpy(ctx.cublasHandle, this->shape.Count(), &a, x.data->ptr, data->ptr);
 	});
 }
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::GetPointerBuf(std::vector< DTensor<GPU, Dtype>* >& mat_list)
+{
+    if (mat_list.size() > pointer_buf.size())
+    {
+        pointer_buf.resize(mat_list.size());
+    }
+    for (size_t i = 0; i < mat_list.size(); ++i)
+        pointer_buf[i] = mat_list[i]->data->ptr;
+}
+
+template<typename Dtype>
+__global__ void ConcatColsKernel(Dtype* dst, Dtype** src_list, const int other_cols, const int this_cols, int numElements)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    
+    if (i < numElements) 
+    {
+        int cur_col = i % this_cols;
+        Dtype* src = src_list[cur_col / other_cols];
+        
+        int src_offset = (i / this_cols) * other_cols + cur_col % other_cols;  
+        dst[i] = src[src_offset];      
+    }
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::ConcatCols(std::vector< DTensor<GPU, Dtype>* > src_list)
+{
+    ASSERT(src_list.size(), "no operator for concat");    
+    size_t new_rows = src_list[0]->rows(), new_cols = src_list[0]->cols(); 
+    for (size_t i = 1; i < src_list.size(); ++i)
+    {
+        ASSERT(src_list[i]->rows() == new_rows, "should have same # rows");
+        ASSERT(src_list[0]->cols() == src_list[i]->cols(), "gpu version only support concat matrices with same #cols");
+        new_cols += src_list[i]->cols();
+    }
+    Reshape({new_rows, new_cols});
+
+    GetPointerBuf(src_list); 
+    int thread_num = min(c_uCudaThreadNum, this->shape.Count());
+    int blocksPerGrid = (this->shape.Count() + thread_num - 1) / thread_num;
+
+    ConcatColsKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (this->data->ptr, thrust::raw_pointer_cast(&pointer_buf[0]), src_list[0]->cols(), this->cols(), this->shape.Count());    
+}
+
+template<typename Dtype>
+__global__ void GetColsFromKernel(Dtype* dst, Dtype* src, const int src_cols, const int col_start, const int dst_cols, int numElements)
+{
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    
+    if (i < numElements) 
+    {
+        int cur_row = i / dst_cols;        
+        int cur_col = i % dst_cols;
+        dst[i] = src[col_start + cur_row * src_cols + cur_col];            
+    }
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::CopyColsFrom(DTensor<GPU, Dtype>& src, size_t col_start, size_t col_cnt)
+{
+    ASSERT(col_start + col_cnt <= src.cols(), "cols out of range");   
+    this->Reshape({src.rows(), col_cnt});
+
+    int thread_num = min(c_uCudaThreadNum, this->shape.Count());
+    int blocksPerGrid = (this->shape.Count() + thread_num - 1) / thread_num;
+
+    GetColsFromKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>>(this->data->ptr, src.data->ptr, src.cols(), col_start, col_cnt, this->shape.Count());
+} 
 
 template<typename Dtype>
 __global__ void SpAxpyKernel(Dtype* dst, int* row_ptr, int* col_idx, Dtype* val, int nnz, int n_rows, int n_cols, Dtype alpha)
