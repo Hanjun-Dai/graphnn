@@ -6,22 +6,32 @@ namespace gnn
 
 template<typename Dtype>
 TDataTemplate<CPU, DENSE, Dtype>::TDataTemplate()
-		: TData(), ptr(nullptr), mem_size(0)
+		: TData(), ptr(nullptr), mem_size(0), is_referring(false)
 {
 
+}
+
+template<typename Dtype>
+TDataTemplate<CPU, DENSE, Dtype>::TDataTemplate(Dtype* src_ptr, size_t offset, size_t _msize)
+		: TData(), is_referring(true)
+{
+	this->mem_size = _msize;
+	this->ptr = src_ptr + offset;
 }
 
 template<typename Dtype>
 TDataTemplate<CPU, DENSE, Dtype>::~TDataTemplate()
 {
-	MemHolder<CPU>::Recycle(this->ptr);
+	if (!is_referring)
+		MemHolder<CPU>::Recycle(this->ptr);
 }
 
 template<typename Dtype>
 void TDataTemplate<CPU, DENSE, Dtype>::Resize(size_t new_size)
-{
+{	
 	if (new_size > this->mem_size)
 	{
+		ASSERT(!is_referring, "cannot modify view only tensor");
 		this->mem_size = new_size;
 		MemHolder<CPU>::ForceDel(this->ptr);
 		MemHolder<CPU>::MallocArr(this->ptr, sizeof(Dtype) * this->mem_size);

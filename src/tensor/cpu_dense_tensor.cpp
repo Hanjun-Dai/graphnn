@@ -67,6 +67,24 @@ void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<GPU, Dtype>& src)
 }
 
 template<typename Dtype>
+DTensor<CPU, Dtype> TensorTemplate<CPU, DENSE, Dtype>::GetRowRef(size_t row_start, size_t row_cnt)
+{
+	DTensor<CPU, Dtype> result;
+	size_t col;
+	if ((int)shape.dims.size() > 1)
+		col = shape.Count(1);
+	else
+		col = 1;
+	result.data = std::make_shared< DenseData<CPU, Dtype> >( data->ptr, row_start * col, row_cnt * col);
+	
+	auto dims = this->shape.dims;
+	dims[0] = row_cnt;
+	result.shape.Reshape(dims);
+
+	return result;	
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::ShallowCopy(DTensor<CPU, Dtype>& src)
 {
 	this->shape = src.shape;

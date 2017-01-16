@@ -215,11 +215,11 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
         CSRMMKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (alpha, a.data->row_ptr, a.data->col_idx, a.data->val, b.data->ptr, b.cols(), this->data->ptr, this->cols(), this->shape.Count());
     } else 
     {
-        /*
+        
         int thread_num = min(c_uCudaThreadNum, this->cols());    
         int blocksPerGrid = (this->cols() + thread_num - 1) / thread_num;
         CSRMMKernel_T <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (alpha, a.data->len_ptr, a.data->row_ptr, a.data->col_idx, a.data->val, b.data->ptr, b.cols(), this->data->ptr, this->cols());
-        */
+        /*
         DTensor<GPU, Dtype> c({m, n});
         DTensor<GPU, Dtype> bt(b.shape);
         WITH_GPUCTX(ctx, {
@@ -234,6 +234,7 @@ void TensorTemplate<GPU, DENSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU,
             Cuda_GeaM(ctx.cublasHandle, cublasOperation_t::CUBLAS_OP_T, cublasOperation_t::CUBLAS_OP_N, 
                     cols(), rows(), &one, c.data->ptr, c.rows(), &one, data->ptr, cols(), data->ptr, n);
          });
+         */
     }
 }
 
@@ -633,6 +634,24 @@ void TensorTemplate<GPU, DENSE, int>::CopyFrom(DTensor<GPU, int>& src)
 {
     Reshape(src.shape.dims);
     cudaMemcpy(this->data->ptr, src.data->ptr, sizeof(int) * shape.Count(), cudaMemcpyDeviceToDevice);
+}
+
+template<typename Dtype>
+DTensor<GPU, Dtype> TensorTemplate<GPU, DENSE, Dtype>::GetRowRef(size_t row_start, size_t row_cnt)
+{
+    DTensor<GPU, Dtype> result;
+    size_t col;
+    if ((int)shape.dims.size() > 1)
+        col = shape.Count(1);
+    else
+        col = 1;
+    result.data = std::make_shared< DenseData<GPU, Dtype> >( data->ptr, row_start * col, row_cnt * col);
+    
+    auto dims = this->shape.dims;
+    dims[0] = row_cnt;
+    result.shape.Reshape(dims);
+
+    return result;  
 }
 
 void TensorTemplate<GPU, DENSE, int>::ShallowCopy(DTensor<GPU, int>& src)

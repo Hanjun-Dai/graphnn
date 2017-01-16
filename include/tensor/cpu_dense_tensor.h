@@ -62,6 +62,14 @@ public:
 	void ShallowCopy(DTensor<CPU, Dtype>& src);
 
 	/**
+	 * @brief      get reference of rows
+	 *
+	 * @param[in]  row_start  The row start
+	 * @param[in]  row_cnt    The row count
+	 */
+	DTensor<CPU, Dtype> GetRowRef(size_t row_start, size_t row_cnt);
+	
+	/**
 	 * @brief      set this tensor to be zero
 	 */
 	void Zeros(); 

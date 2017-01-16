@@ -118,7 +118,6 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 			}
 		if (!necessary)
 			continue;
-
 		factor->Forward(operands, outputs);
 		for (auto p : outputs)
 		{
@@ -248,7 +247,8 @@ void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets,
 		if (!isConst[i])
 		{
 			auto* diff_var = dynamic_cast<IDifferentiable*>(var_list[i].get());
-			diff_var->ZeroGrad();
+			if (diff_var)
+				diff_var->ZeroGrad();
 		}
 
 	for (auto p : targets)
@@ -256,7 +256,8 @@ void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets,
 		ASSERT(varEdges[p->name].second.size() == 0, "only allow backprop from top variables");
 		ASSERT(!isConst[VarIdx(p)], "cannot calc grad for const variable");
 		auto* diff_var = dynamic_cast<IDifferentiable*>(p.get());
-		diff_var->OnesGrad();
+		if (diff_var)
+			diff_var->OnesGrad();
 	}
 
 	if (n_thread == 1)

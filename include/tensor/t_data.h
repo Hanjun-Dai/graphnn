@@ -42,6 +42,8 @@ class TDataTemplate<CPU, DENSE, Dtype> : public TData
 public:
 
 	TDataTemplate();
+	TDataTemplate(Dtype* src_ptr, size_t offset, size_t _msize);
+
 	virtual ~TDataTemplate();
 	/**
 	 * @brief      resize the allocated memory; only when the new size is 
@@ -59,6 +61,11 @@ public:
 	 * the memory size
 	 */
 	size_t mem_size;
+
+	/**
+	 * whether this data struct is referring to others
+	 */
+	bool is_referring;
 };
 
 /**
@@ -72,6 +79,8 @@ class TDataTemplate<GPU, DENSE, Dtype> : public TData
 public:
 
 	TDataTemplate();
+	TDataTemplate(Dtype* src_ptr, size_t offset, size_t _msize);
+
 	virtual ~TDataTemplate();
 	/**
 	 * @brief      resize the allocated memory; only when the new size is 
@@ -93,6 +102,11 @@ public:
 	 * the memory size
 	 */	
 	size_t mem_size;
+	
+	/**
+	 * whether this data struct is referring to others
+	 */
+	bool is_referring;	
 };
 
 /**

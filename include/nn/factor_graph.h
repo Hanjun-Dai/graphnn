@@ -60,6 +60,12 @@ auto to_var_array(Tuple&& tuple)
     return to_var_array(std::forward<Tuple>(tuple), make_indices<Tuple>());
 }
 
+template<typename T>
+std::array< std::shared_ptr<T>, 1> to_var_array(std::shared_ptr<T>& tuple)
+{
+	return {{ tuple }};
+}
+
 /**
  * @brief      the computation graph; responsible for representing the factor graph, as well as the execution
  */
@@ -95,13 +101,14 @@ public:
 	 *
 	 * @param[in]  factor      The factor
 	 * @param[in]  vars_in     The variables (inputs) to the factor
-	 * @param[in]  var_out     The variable (output) produced by the factor
+	 * @param[in]  vars_out    The variables (outputs) produced by the factor
 	 *
 	 * @tparam     FactorPtr   { the factor class type }
 	 * @tparam     VarPtrList  { for the variable class }
+	 * @tparam     VarOutList  { for the variable class }
 	 */
-	template<typename FactorPtr, typename VarPtrList>
-	void AddFactor(FactorPtr factor, VarPtrList vars_in, VarPtr var_out)
+	template<typename FactorPtr, typename VarPtrList, typename VarOutList>
+	void AddFactor(FactorPtr factor, VarPtrList vars_in, VarOutList vars_out)
 	{
 		// must be a new factor
 		ASSERT(factor_dict.count(factor->name) == 0 && factorEdges.count(factor->name) == 0, 
@@ -114,13 +121,20 @@ public:
 			ASSERT(var_dict.count(vars_in[i]->name), "the operand " << vars_in[i]->name << " must be registered beforehand");
 			in_list[i] = vars_in[i];
 		}
+
 		// check output vars
-		ASSERT(var_dict.count(var_out->name), "the output var " << var_out->name << " is supposed to be registered beforehand");
-		VarList out_list(1);
-		out_list[0] = var_out;
+		VarList out_list(vars_out.size());
+		for (size_t i = 0; i < vars_out.size(); ++i)
+		{
+			AddVar(vars_out[i]);
+			if (factor->properr == PropErr::N)
+				isConst[VarIdx(vars_out[i])] = true;
+			out_list[i] = vars_out[i];
+		}
 		
 		// f -> out_var
-		varEdges[var_out->name].first.push_back(factor);
+		for (auto p : vars_out)
+			varEdges[p->name].first.push_back(factor);
 		// in_var -> f
 		for (auto p : vars_in)
 			varEdges[p->name].second.push_back(factor);
@@ -269,17 +283,17 @@ protected:
 	 */
 	std::queue<std::string> q;
 
-	template<typename FacType, typename VarPtr, typename... Args>
-	friend typename FacType::OutType af(FactorGraph& g, std::vector< VarPtr > operands, 
+	template<typename FacType, typename OprList, typename... Args>
+	friend typename FacType::OutType af(FactorGraph& g, OprList operands, 
 										Args&&... args)
 	{
 		auto fname = fmt::sprintf("%s_%d", FacType::StrType(), g.factorEdges.size());
 		auto f = std::make_shared<FacType>(fname, std::forward<Args>(args)...);
 		auto out_vars = f->CreateOutVar();
-		g.AddVar(out_vars);
-		if (f->properr == PropErr::N)
-			g.isConst[g.VarIdx(out_vars)] = true;
-		g.AddFactor(f, operands, out_vars);
+
+		auto vars_out = to_var_array( out_vars );
+		g.AddFactor(f, operands, vars_out);	
+		
 		return out_vars;
 	}
 };

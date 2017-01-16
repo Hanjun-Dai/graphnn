@@ -16,7 +16,7 @@ void Malloc(Dtype*& p, size_t nBytes)
 		p = (Dtype*) malloc(nBytes);
 	else {
 		cudaError_t t = cudaMalloc(&p, nBytes);
-		assert(t != cudaErrorMemoryAllocation);			
+		assert(t == cudaSuccess);
 	}
 }
 
