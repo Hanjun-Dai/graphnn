@@ -79,6 +79,24 @@ void TensorTemplate<GPU, DENSE, Dtype>::ShallowCopy(DTensor<GPU, Dtype>& src)
 }
 
 template<typename Dtype>
+DTensor<GPU, Dtype> TensorTemplate<GPU, DENSE, Dtype>::GetRowRef(size_t row_start, size_t row_cnt)
+{
+    DTensor<GPU, Dtype> result;
+    size_t col;
+    if ((int)shape.dims.size() > 1)
+        col = shape.Count(1);
+    else
+        col = 1;
+    result.data = std::make_shared< DenseData<GPU, Dtype> >( data->ptr, row_start * col, row_cnt * col);
+
+    auto dims = this->shape.dims;
+    dims[0] = row_cnt;
+    result.shape.Reshape(dims);
+
+    return result;
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Zeros()
 {
 	if (shape.Count())
@@ -634,24 +652,6 @@ void TensorTemplate<GPU, DENSE, int>::CopyFrom(DTensor<GPU, int>& src)
 {
     Reshape(src.shape.dims);
     cudaMemcpy(this->data->ptr, src.data->ptr, sizeof(int) * shape.Count(), cudaMemcpyDeviceToDevice);
-}
-
-template<typename Dtype>
-DTensor<GPU, Dtype> TensorTemplate<GPU, DENSE, Dtype>::GetRowRef(size_t row_start, size_t row_cnt)
-{
-    DTensor<GPU, Dtype> result;
-    size_t col;
-    if ((int)shape.dims.size() > 1)
-        col = shape.Count(1);
-    else
-        col = 1;
-    result.data = std::make_shared< DenseData<GPU, Dtype> >( data->ptr, row_start * col, row_cnt * col);
-    
-    auto dims = this->shape.dims;
-    dims[0] = row_cnt;
-    result.shape.Reshape(dims);
-
-    return result;  
 }
 
 void TensorTemplate<GPU, DENSE, int>::ShallowCopy(DTensor<GPU, int>& src)

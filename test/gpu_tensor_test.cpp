@@ -20,6 +20,7 @@ TEST(GPUTensorTest, ReshapeSize)
 
 TEST(GPUTensorTest, ConcatWithSameCols)
 {
+	GpuHandle::Init(0, 1);
 	DTensor<CPU, float> x, y, z, tmp;
 	x.Reshape({5, 3});
 	y.Reshape({5, 3});
@@ -38,8 +39,26 @@ TEST(GPUTensorTest, ConcatWithSameCols)
 	tmp.Axpy(-1.0, z);
 
 	EXPECT_LE(tmp.ASum(), 1e-6);
+	GpuHandle::Destroy();
 }
 
+TEST(GPUTensorTest, RowRef)
+{
+	GpuHandle::Init(0, 1);
+	DTensor<CPU, float> x, tmp;
+	DTensor<GPU, float> y;
+	x.Reshape({5, 3});
+	x.SetRandU(-1.0, 3.0);
+	y.CopyFrom(x);
+
+	auto p = x.GetRowRef(1, 2);
+	auto q = y.GetRowRef((size_t)1, (size_t)2);
+	tmp.CopyFrom(q);
+
+	tmp.Axpy(-1.0, p);
+	EXPECT_LE(tmp.ASum(), 1e-6);
+	GpuHandle::Destroy();
+}
 
 TEST(GPUTensorTest, RandUniform)
 {
