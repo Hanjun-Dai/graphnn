@@ -108,6 +108,20 @@ public:
 	 * @return     CPU/GPU enum
 	 */
 	virtual MatMode GetMatMode() = 0;
+	
+	/**
+	 * @brief      save to disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	virtual void Serialize(FILE* fid);
+
+	/**
+	 * @brief      load from disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	virtual void Deserialize(FILE* fid);
 
 	/**
 	 * Tensor shape

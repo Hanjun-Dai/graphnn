@@ -17,6 +17,31 @@ void ParamSet<mode, Dtype>::AddParam(std::shared_ptr< DTensorVar<mode, Dtype> > 
 	params[param->name] = param;
 }
 
+template<typename mode, typename Dtype>
+void ParamSet<mode, Dtype>::Save(std::string filename)
+{
+	FILE* fid = fopen(filename.c_str(), "wb");
+
+	for (auto& p : params)
+	{
+		std::cerr << p.first << std::endl;
+		p.second->Serialize(fid);
+	}
+
+	fclose(fid);
+}
+
+template<typename mode, typename Dtype>
+void ParamSet<mode, Dtype>::Load(std::string filename)
+{
+	FILE* fid = fopen(filename.c_str(), "rb");
+
+	for (auto& p : params)
+		p.second->Deserialize(fid);
+
+	fclose(fid);
+}
+
 template class ParamSet<CPU, float>;
 template class ParamSet<CPU, double>;
 template class ParamSet<GPU, float>;

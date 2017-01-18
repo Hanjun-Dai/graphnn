@@ -27,6 +27,20 @@ public:
 	virtual MatMode GetMatMode() override;
 
 	/**
+	 * @brief      save to disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	virtual void Serialize(FILE* fid) override;
+
+	/**
+	 * @brief      load from disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	virtual void Deserialize(FILE* fid) override;
+	
+	/**
 	 * @brief      deeply copy src to this tensor
 	 *
 	 * @param      src   the CPU dense tensor with same data type
@@ -297,6 +311,20 @@ public:
 	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
+
+	/**
+	 * @brief      save to disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	virtual void Serialize(FILE* fid) override;
+
+	/**
+	 * @brief      load from disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	virtual void Deserialize(FILE* fid) override;
 
 	/**
 	 * @brief      deeply copy src to this tensor

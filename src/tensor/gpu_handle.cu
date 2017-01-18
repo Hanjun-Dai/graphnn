@@ -69,6 +69,7 @@ void GpuHandle::ReleaseCtx(const GpuContext& ctx)
 
 void GpuHandle::Destroy()
 {
+	cudaDeviceSynchronize();
 	cudaStreamDestroy(cudaRandStream);
 	for (unsigned int id = 0; id < streamcnt; ++id)
 	{

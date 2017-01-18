@@ -53,6 +53,24 @@ MatMode TensorTemplate<CPU, DENSE, Dtype>::GetMatMode()
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Serialize(FILE* fid)
+{
+	Tensor::Serialize(fid);
+	assert(fwrite(&(data->mem_size), sizeof(size_t), 1, fid) == 1);
+	assert(fwrite(data->ptr, sizeof(Dtype), data->mem_size, fid) == data->mem_size);
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Deserialize(FILE* fid)
+{
+	Tensor::Deserialize(fid);	
+	size_t new_mem_size;
+	assert(fread(&(new_mem_size), sizeof(size_t), 1, fid) == 1);
+	this->data->Resize(new_mem_size);
+	assert(fread(data->ptr, sizeof(Dtype), new_mem_size, fid) == new_mem_size);	
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<CPU, Dtype>& src)
 {
 	Reshape(src.shape.dims);
@@ -456,6 +474,22 @@ MatType TensorTemplate<CPU, DENSE, int>::GetMatType()
 MatMode TensorTemplate<CPU, DENSE, int>::GetMatMode()
 {
 	return MatMode::cpu;
+}
+
+void TensorTemplate<CPU, DENSE, int>::Serialize(FILE* fid)
+{
+	Tensor::Serialize(fid);
+	assert(fwrite(&(data->mem_size), sizeof(size_t), 1, fid) == 1);
+	assert(fwrite(data->ptr, sizeof(int), data->mem_size, fid) == data->mem_size);
+}
+
+void TensorTemplate<CPU, DENSE, int>::Deserialize(FILE* fid)
+{
+	Tensor::Deserialize(fid);	
+	size_t new_mem_size;
+	assert(fread(&(new_mem_size), sizeof(size_t), 1, fid) == 1);
+	this->data->Resize(new_mem_size);
+	assert(fread(data->ptr, sizeof(int), new_mem_size, fid) == new_mem_size);
 }
 
 void TensorTemplate<CPU, DENSE, int>::CopyFrom(DTensor<CPU, int>& src)

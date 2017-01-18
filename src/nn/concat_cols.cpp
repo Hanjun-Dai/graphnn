@@ -37,16 +37,17 @@ void ConcatCols<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
 	size_t col_start = 0;
 
-	DTensor<mode, Dtype> buf;	
+	DTensor<mode, Dtype> buf;		
 	for (size_t i = 0; i < operands.size(); ++i)
-	{
-		auto& grad_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad;
+	{		
 		if (!isConst[i])
 		{
+			auto& grad_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad;
 			buf.CopyColsFrom(cur_grad, col_start, grad_i.cols());
 			grad_i.Axpy(1.0, buf);
 		}
-		col_start += grad_i.cols();
+		auto& state_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->value;
+		col_start += state_i.cols();
 	}
 }
 

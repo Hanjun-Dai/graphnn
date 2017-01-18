@@ -72,6 +72,18 @@ void TensorVarTemplate<mode, DENSE, Dtype>::OnesGrad()
 	grad.Fill(1);
 }
 
+template<typename mode, typename Dtype>
+void TensorVarTemplate<mode, DENSE, Dtype>::Serialize(FILE* fid)
+{
+	value.Serialize(fid);
+}
+
+template<typename mode, typename Dtype>
+void TensorVarTemplate<mode, DENSE, Dtype>::Deserialize(FILE* fid)
+{
+	value.Deserialize(fid);
+}
+
 template class TensorVarTemplate<CPU, DENSE, float>;
 template class TensorVarTemplate<CPU, DENSE, double>;
 template class TensorVarTemplate<CPU, DENSE, int>;

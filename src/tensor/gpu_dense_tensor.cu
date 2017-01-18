@@ -58,6 +58,32 @@ MatMode TensorTemplate<GPU, DENSE, Dtype>::GetMatMode()
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Serialize(FILE* fid)
+{
+    Tensor::Serialize(fid);
+    assert(fwrite(&(data->mem_size), sizeof(size_t), 1, fid) == 1);
+    Dtype* buf;
+    MemHolder<CPU>::MallocArr(buf, sizeof(Dtype) * data->mem_size);
+    cudaMemcpy(buf, data->ptr, sizeof(Dtype) * data->mem_size, cudaMemcpyDeviceToHost);
+    assert(fwrite(buf, sizeof(Dtype), data->mem_size, fid) == data->mem_size);
+    MemHolder<CPU>::Recycle(buf);
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Deserialize(FILE* fid)
+{
+    Tensor::Deserialize(fid);
+    size_t new_mem_size;
+    assert(fread(&(new_mem_size), sizeof(size_t), 1, fid) == 1);
+    Dtype* buf;
+    MemHolder<CPU>::MallocArr(buf, sizeof(Dtype) * new_mem_size);
+    this->data->Resize(new_mem_size);
+    assert(fread(buf, sizeof(Dtype), new_mem_size, fid) == new_mem_size);
+    cudaMemcpy(data->ptr, buf, sizeof(Dtype) * new_mem_size, cudaMemcpyHostToDevice);
+    MemHolder<CPU>::Recycle(buf);
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::CopyFrom(DTensor<CPU, Dtype>& src)
 {
 	Reshape(src.shape.dims);
@@ -381,17 +407,16 @@ void TensorTemplate<GPU, DENSE, Dtype>::GetPointerBuf(std::vector< DTensor<GPU, 
 }
 
 template<typename Dtype>
-__global__ void ConcatColsKernel(Dtype* dst, Dtype** src_list, const int other_cols, const int this_cols, int numElements)
+__global__ void ConcatColsKernel(Dtype* dst, Dtype* src, const int other_cols, const int this_cols, int col_offset, int numElements)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
     
     if (i < numElements) 
     {
-        int cur_col = i % this_cols;
-        Dtype* src = src_list[cur_col / other_cols];
-        
-        int src_offset = (i / this_cols) * other_cols + cur_col % other_cols;  
-        dst[i] = src[src_offset];      
+        int cur_col = i % other_cols + col_offset;
+        int cur_row = i / other_cols;
+
+        dst[cur_row * this_cols + cur_col] = src[i];
     }
 }
 
@@ -403,16 +428,19 @@ void TensorTemplate<GPU, DENSE, Dtype>::ConcatCols(std::vector< DTensor<GPU, Dty
     for (size_t i = 1; i < src_list.size(); ++i)
     {
         ASSERT(src_list[i]->rows() == new_rows, "should have same # rows");
-        ASSERT(src_list[0]->cols() == src_list[i]->cols(), "gpu version only support concat matrices with same #cols");
         new_cols += src_list[i]->cols();
     }
     Reshape({new_rows, new_cols});
 
-    GetPointerBuf(src_list); 
-    int thread_num = min(c_uCudaThreadNum, this->shape.Count());
-    int blocksPerGrid = (this->shape.Count() + thread_num - 1) / thread_num;
+    new_cols = 0;
+    for (size_t i = 0; i < src_list.size(); ++i)
+    {
+        int thread_num = min(c_uCudaThreadNum, src_list[i]->shape.Count());
+        int blocksPerGrid = (src_list[i]->shape.Count() + thread_num - 1) / thread_num;
 
-    ConcatColsKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (this->data->ptr, thrust::raw_pointer_cast(&pointer_buf[0]), src_list[0]->cols(), this->cols(), this->shape.Count());    
+        ConcatColsKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (this->data->ptr, src_list[i]->data->ptr, src_list[i]->cols(), this->cols(), new_cols, src_list[i]->shape.Count());
+        new_cols += src_list[i]->cols();
+    }
 }
 
 template<typename Dtype>
@@ -640,6 +668,30 @@ MatType TensorTemplate<GPU, DENSE, int>::GetMatType()
 MatMode TensorTemplate<GPU, DENSE, int>::GetMatMode()
 {
 	return MatMode::gpu;
+}
+
+void TensorTemplate<GPU, DENSE, int>::Serialize(FILE* fid)
+{
+    Tensor::Serialize(fid);
+    assert(fwrite(&(data->mem_size), sizeof(size_t), 1, fid) == 1);
+    int* buf;
+    MemHolder<CPU>::MallocArr(buf, sizeof(int) * data->mem_size);
+    cudaMemcpy(buf, data->ptr, sizeof(int) * data->mem_size, cudaMemcpyDeviceToHost);
+    assert(fwrite(buf, sizeof(int), data->mem_size, fid) == data->mem_size);
+    MemHolder<CPU>::Recycle(buf);
+}
+
+void TensorTemplate<GPU, DENSE, int>::Deserialize(FILE* fid)
+{
+    Tensor::Deserialize(fid);
+    size_t new_mem_size;
+    assert(fread(&(new_mem_size), sizeof(size_t), 1, fid) == 1);
+    int* buf;
+    MemHolder<CPU>::MallocArr(buf, sizeof(int) * new_mem_size);
+    this->data->Resize(new_mem_size);
+    assert(fread(buf, sizeof(int), new_mem_size, fid) == new_mem_size);
+    cudaMemcpy(data->ptr, buf, sizeof(int) * new_mem_size, cudaMemcpyHostToDevice);
+    MemHolder<CPU>::Recycle(buf);    
 }
 
 void TensorTemplate<GPU, DENSE, int>::CopyFrom(DTensor<CPU, int>& src)

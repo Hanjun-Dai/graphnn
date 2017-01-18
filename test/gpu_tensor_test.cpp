@@ -18,11 +18,11 @@ TEST(GPUTensorTest, ReshapeSize)
 	GpuHandle::Destroy();
 }
 
-TEST(GPUTensorTest, ConcatWithSameCols)
+TEST(GPUTensorTest, Concat)
 {
 	GpuHandle::Init(0, 1);
 	DTensor<CPU, float> x, y, z, tmp;
-	x.Reshape({5, 3});
+	x.Reshape({5, 6});
 	y.Reshape({5, 3});
 
 	x.SetRandU(-1.0, 3.0);

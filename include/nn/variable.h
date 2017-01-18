@@ -219,6 +219,21 @@ public:
 	virtual void ZeroGrad() override;
 
 	virtual void OnesGrad() override;
+
+	/**
+	 * @brief      save to disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	void Serialize(FILE* fid);
+
+	/**
+	 * @brief      load from disk
+	 *
+	 * @param      fid   The file handle
+	 */
+	void Deserialize(FILE* fid);
+	
 	/**
 	 * the actual value of this variable
 	 */

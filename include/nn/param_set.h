@@ -28,6 +28,20 @@ public:
 	void AddParam(std::shared_ptr< DTensorVar<mode, Dtype> > param);
 
 	/**
+	 * @brief      save the params into disk
+	 *
+	 * @param[in]  filename  The filename
+	 */
+	void Save(std::string filename);
+
+	/**
+	 * @brief      load params from disk
+	 *
+	 * @param[in]  filename  The filename
+	 */
+	void Load(std::string filename);
+	
+	/**
 	 * the dictionary: param name -> param shared pointer
 	 */
 	std::map<std::string, std::shared_ptr< DTensorVar<mode, Dtype> > > params;
