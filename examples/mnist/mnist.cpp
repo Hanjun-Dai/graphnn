@@ -99,6 +99,8 @@ void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int 
     input.CopyFrom(x_cpu);
     label.CopyFrom(y_cpu);
 }
+
+
 int main(const int argc, const char** argv)
 {
 	LoadParams(argc, argv); 
@@ -119,7 +121,7 @@ int main(const int argc, const char** argv)
 
 	Dtype loss, err_rate;  
     
-	for (int epoch = 0; epoch < 2; ++epoch)
+	for (int epoch = 0; epoch < 10; ++epoch)
     {
         pset.Save(fmt::sprintf("epoch_%d.model", epoch));
         std::cerr << "testing" << std::endl;
@@ -146,6 +148,5 @@ int main(const int argc, const char** argv)
         }
     }
     GpuHandle::Destroy();
-    std::cerr << "done" << std::endl;
 	return 0;
 }

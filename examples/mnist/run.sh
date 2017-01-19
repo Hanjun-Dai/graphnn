@@ -20,4 +20,5 @@ DATA_ROOT=data
     -train_label $DATA_ROOT/train-labels-idx1-ubyte \
     -test_feat $DATA_ROOT/t10k-images-idx3-ubyte \
     -test_label $DATA_ROOT/t10k-labels-idx1-ubyte \
-    -device 0
+    -device 0 \
+    2>&1 | tee log.txt

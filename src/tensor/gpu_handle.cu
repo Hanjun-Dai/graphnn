@@ -81,7 +81,6 @@ void GpuHandle::Destroy()
 	delete[] inUse;
 	curandDestroyGenerator(curandgenerator);
     cudaFree(devRandStates);
-    MemHolder<GPU>::Clear();
 	streamcnt = 0U;
 }
 

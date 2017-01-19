@@ -37,8 +37,8 @@ void MemHolder<mode>::Recycle(T*& p)
 	if (p)
 	{
 		auto id = reinterpret_cast<std::uintptr_t>(p);
-		if (pt_info.count(id))
-			avail_pt_map.insert(std::make_pair(pt_info[id].first, (void*)p));
+		ASSERT(pt_info.count(id), "recycling a pointer which is not allocated by me");
+		avail_pt_map.insert(std::make_pair(pt_info[id].first, (void*)p));
 		p = nullptr;
 	}
 	r_loc.unlock();
@@ -74,33 +74,19 @@ void MemHolder<mode>::MallocArr(T*& p, size_t nBytes)
 		auto it = avail_pt_map.lower_bound(nBytes);
 		if (it == avail_pt_map.end()) // no available pointer found
 		{
-			Malloc<mode>(p, nBytes);
+			Malloc<mode>(p, nBytes);			
 			auto id = reinterpret_cast<std::uintptr_t>(p);
 			ASSERT(pt_info.count(id) == 0, "pointer duplicates");
 			pt_info[id] = std::make_pair(nBytes, (void*)p);
 		} else {
-			p = (T*)it->second;
-			avail_pt_map.erase(it);
+			p = (T*)it->second;			
 			auto id = reinterpret_cast<std::uintptr_t>(p);
 			ASSERT(pt_info.count(id), "unknown pointer");
+			avail_pt_map.erase(it);
 		}
 	}
 	else p = nullptr;
 	r_loc.unlock();
-}
-
-template<typename mode>
-void MemHolder<mode>::Clear()
-{
-	for (auto p : pt_info)
-	{
-		if (mode::type == MatMode::cpu)
-			free(p.second.second);
-		else
-			cudaFree(p.second.second);
-	}
-	avail_pt_map.clear();
-	pt_info.clear();
 }
 
 template class MemHolder<CPU>;

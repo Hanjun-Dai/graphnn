@@ -24,7 +24,6 @@ void ParamSet<mode, Dtype>::Save(std::string filename)
 
 	for (auto& p : params)
 	{
-		std::cerr << p.first << std::endl;
 		p.second->Serialize(fid);
 	}
 

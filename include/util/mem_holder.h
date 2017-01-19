@@ -48,7 +48,6 @@ public:
 	static std::map< std::uintptr_t, std::pair< size_t, void* > > pt_info;
 	static std::mutex r_loc;
 
-	static void Clear();
 };
 
 }
