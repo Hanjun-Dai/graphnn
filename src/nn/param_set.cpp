@@ -41,6 +41,17 @@ void ParamSet<mode, Dtype>::Load(std::string filename)
 	fclose(fid);
 }
 
+template<typename mode, typename Dtype>
+void ParamSet<mode, Dtype>::DeepCopyFrom(ParamSet<mode, Dtype>& src)
+{
+	for (auto& p : src.params)
+	{
+		if (params.count(p.first) == 0)
+			params[p.first] = std::make_shared< DTensorVar<mode, Dtype> >(p.first);
+		params[p.first]->value.CopyFrom(p.second->value);
+	}
+}
+
 template class ParamSet<CPU, float>;
 template class ParamSet<CPU, double>;
 template class ParamSet<GPU, float>;

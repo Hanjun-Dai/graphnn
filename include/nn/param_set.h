@@ -40,6 +40,13 @@ public:
 	 * @param[in]  filename  The filename
 	 */
 	void Load(std::string filename);
+
+	/**
+	 * @brief      deeply copy from another param set
+	 *
+	 * @param      src   The source param set
+	 */
+	void DeepCopyFrom(ParamSet<mode, Dtype>& src);
 	
 	/**
 	 * the dictionary: param name -> param shared pointer
