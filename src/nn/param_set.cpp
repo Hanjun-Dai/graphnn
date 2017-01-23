@@ -20,8 +20,8 @@ void ParamSet<mode, Dtype>::AddParam(std::shared_ptr< DTensorVar<mode, Dtype> > 
 template<typename mode, typename Dtype>
 void ParamSet<mode, Dtype>::Save(std::string filename)
 {
-	FILE* fid = fopen(filename.c_str(), "wb");
-
+	FILE* fid = fopen(filename.c_str(), "wb");	
+	ASSERT(fid, "file " + filename + " is not found");
 	for (auto& p : params)
 	{
 		p.second->Serialize(fid);
@@ -34,7 +34,7 @@ template<typename mode, typename Dtype>
 void ParamSet<mode, Dtype>::Load(std::string filename)
 {
 	FILE* fid = fopen(filename.c_str(), "rb");
-
+	ASSERT(fid, "file " + filename + " is not found");
 	for (auto& p : params)
 		p.second->Deserialize(fid);
 
