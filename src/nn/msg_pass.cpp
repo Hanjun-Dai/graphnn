@@ -17,7 +17,7 @@ void BindWeight(SpTensor<CPU, Dtype>*& target, SpTensor<GPU, Dtype>& output)
 }
 
 template<typename mode, typename Dtype>
-IMsgPass<mode, Dtype>::IMsgPass(std::string _name) : Factor(_name, PropErr::N), cpu_weight(nullptr)
+IMsgPass<mode, Dtype>::IMsgPass(std::string _name, bool _average) : Factor(_name, PropErr::N), cpu_weight(nullptr), average(_average)
 {
 
 }
@@ -59,7 +59,7 @@ void Node2NodeMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 		auto& list = graph->in_edges->head[i];
 		for (size_t j = 0; j < list.size(); ++j)
 		{
-			data->val[nnz] = 1.0;
+			data->val[nnz] = this->average ? 1.0 / list.size() : 1.0;
 			data->col_idx[nnz] = list[j].second;
 			nnz++;
 		}
@@ -88,7 +88,7 @@ void Edge2NodeMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 		auto& list = graph->in_edges->head[i];
 		for (size_t j = 0; j < list.size(); ++j)
 		{
-			data->val[nnz] = 1.0;
+			data->val[nnz] = this->average ? 1.0 / list.size() : 1.0;
 			data->col_idx[nnz] = list[j].first;
 			nnz++;
 		}
@@ -181,7 +181,7 @@ void SubgraphMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 		auto& list = graph->subgraph->head[i];
 		for (size_t j = 0; j < list.size(); ++j)
 		{
-			data->val[nnz] = 1.0;
+			data->val[nnz] = this->average ? 1.0 / list.size() : 1.0;
 			data->col_idx[nnz] = list[j];
 			nnz++;
 		}

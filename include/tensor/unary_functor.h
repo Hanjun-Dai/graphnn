@@ -81,6 +81,15 @@ template<typename mode, typename Dtype>
 class UnarySigmoid {};
 
 /**
+ * @brief      tanh
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryTanh {};
+
+/**
  * @brief      Functor to square an element; CPU doesn't need this;
  *
  * @tparam     mode   { GPU }

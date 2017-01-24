@@ -2,7 +2,7 @@
 #define GPU_UNARY_FUNCTOR_H
 
 #include "unary_functor.h"
-
+#include "cuda_helper.h"
 #define min(x, y) (x < y ? x : y)
 
 namespace gnn
@@ -156,6 +156,27 @@ public:
 		dst = 1.0 / (1.0 + cuda_exp(-dst));
 	}
 };
+
+/**
+ * @brief      UnaryTanh
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnaryTanh<GPU, Dtype>
+{
+public:
+	/**
+	 * dst = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+	 */
+	__device__ inline void operator()(Dtype& dst)
+	{
+        Dtype x = cuda_exp(dst);
+        Dtype y = cuda_exp(-dst);
+        dst = (x - y) / (x + y);
+	}
+};
+
 
 /**
  * @brief      UnaryLog

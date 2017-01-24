@@ -25,7 +25,7 @@ public:
 		return "IMsgPass";
 	}
 	
-	IMsgPass(std::string _name);
+	IMsgPass(std::string _name, bool _average);
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						std::vector< std::shared_ptr<Variable> >& outputs) override;
 protected:
@@ -42,6 +42,7 @@ protected:
 	 * on cpu
 	 */
 	SpTensor<CPU, Dtype>* cpu_weight;
+	bool average;
 };
 
 template<typename mode, typename Dtype>
@@ -66,9 +67,10 @@ public:
 		return std::make_shared< SpTensorVar<mode, Dtype> >(out_name);
 	}
 
-	Node2NodeMsgPass(std::string _name) : IMsgPass<mode, Dtype>(_name) {} 
+	Node2NodeMsgPass(std::string _name, bool _average = false) : IMsgPass<mode, Dtype>(_name, _average) {} 
 protected:
 	virtual void InitCPUWeight(GraphStruct* graph) override;
+
 };
 
 template<typename mode, typename Dtype>
@@ -93,7 +95,7 @@ public:
 		return std::make_shared< SpTensorVar<mode, Dtype> >(out_name);
 	}
 
-	Edge2NodeMsgPass(std::string _name) : IMsgPass<mode, Dtype>(_name) {} 
+	Edge2NodeMsgPass(std::string _name, bool _average = false) : IMsgPass<mode, Dtype>(_name, _average) {} 
 protected:
 	virtual void InitCPUWeight(GraphStruct* graph) override;
 };
@@ -120,7 +122,7 @@ public:
 		return std::make_shared< SpTensorVar<mode, Dtype> >(out_name);
 	}
 
-	Node2EdgeMsgPass(std::string _name) : IMsgPass<mode, Dtype>(_name) {} 
+	Node2EdgeMsgPass(std::string _name, bool _average = false) : IMsgPass<mode, Dtype>(_name, _average) {} 
 protected:
 	virtual void InitCPUWeight(GraphStruct* graph) override;
 };
@@ -147,7 +149,7 @@ public:
 		return std::make_shared< SpTensorVar<mode, Dtype> >(out_name);
 	}
 
-	Edge2EdgeMsgPass(std::string _name) : IMsgPass<mode, Dtype>(_name) {} 
+	Edge2EdgeMsgPass(std::string _name, bool _average = false) : IMsgPass<mode, Dtype>(_name, _average) {} 
 protected:
 	virtual void InitCPUWeight(GraphStruct* graph) override;
 };
@@ -174,7 +176,7 @@ public:
 		return std::make_shared< SpTensorVar<mode, Dtype> >(out_name);
 	}
 
-	SubgraphMsgPass(std::string _name) : IMsgPass<mode, Dtype>(_name) {} 
+	SubgraphMsgPass(std::string _name, bool _average = false) : IMsgPass<mode, Dtype>(_name, _average) {} 
 protected:
 	virtual void InitCPUWeight(GraphStruct* graph) override;
 };
