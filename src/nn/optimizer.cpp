@@ -36,6 +36,33 @@ template class IOptimizer<CPU, double>;
 template class IOptimizer<GPU, float>;
 template class IOptimizer<GPU, double>;
 
+//==============================================================================
+
+template<typename mode, typename Dtype>
+SGDOptimizer<mode, Dtype>::SGDOptimizer(ParamSet<mode, Dtype>* _param_set, 
+			Dtype _init_lr, Dtype _l2_penalty) : 
+			IOptimizer<mode, Dtype>(_param_set, _init_lr, _l2_penalty)
+{
+}			
+
+template<typename mode, typename Dtype>
+void SGDOptimizer<mode, Dtype>::Update()
+{            
+    for (auto& param_pair : this->param_set->params)
+    {        
+        auto& param = param_pair.second;
+        param->value.Axpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
+        param->grad.Zeros();
+    }
+}
+
+template class SGDOptimizer<CPU, float>;
+template class SGDOptimizer<CPU, double>;
+template class SGDOptimizer<GPU, float>;
+template class SGDOptimizer<GPU, double>;
+
+//==============================================================================
+
 template<typename mode, typename Dtype>
 MomentumSGDOptimizer<mode, Dtype>::MomentumSGDOptimizer(ParamSet<mode, Dtype>* _param_set, 
 			Dtype _init_lr, Dtype _momentum, Dtype _l2_penalty) : 

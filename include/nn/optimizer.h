@@ -71,6 +71,29 @@ public:
 };
 
 /**
+ * @brief      Class for simple sgd optimizer.
+ *
+ * @tparam     mode   { CPU/GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class SGDOptimizer: public IOptimizer<mode, Dtype>
+{
+public:
+
+	/**
+	 * @brief      constructor
+	 *
+	 * @param      m            The parameter set
+	 * @param[in]  _init_lr     The initialize lr
+	 * @param[in]  _l2_penalty  The l2 penalty coeff
+	 */
+	SGDOptimizer(ParamSet<mode, Dtype>* m, Dtype _init_lr, Dtype _l2_penalty = 0);
+
+	virtual void Update() override;
+};
+
+/**
  * @brief      Class for momentum sgd optimizer.
  *
  * @tparam     mode   { CPU/GPU }
