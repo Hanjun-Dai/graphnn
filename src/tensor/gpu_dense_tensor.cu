@@ -358,6 +358,86 @@ void TensorTemplate<GPU, DENSE, Dtype>::Softmax()
 }
 
 template<typename Dtype>
+__global__ void cunn_JaggedSoftMax_updateOutput_kernel(Dtype *orig_ptr, int batch_size, int* dim_list)
+{
+    __shared__ Dtype buffer[REDUCE_THREADS + 1];    
+    int offset = 0;
+    for (int i = 0; i < blockIdx.x; ++i)
+        offset += dim_list[i];
+    Dtype* dst = orig_ptr + offset;
+    
+    int dim = dim_list[blockIdx.x];
+
+    int i_start = threadIdx.x;
+    int i_end = dim;
+    int i_step = blockDim.x;
+    Dtype z;
+    // max?
+    if (i_start < dim)
+        buffer[threadIdx.x] = dst[i_start];
+    for (int i = i_start; i < i_end; i += i_step)
+    {
+        z = dst[i];
+        if(buffer[threadIdx.x] < z)
+            buffer[threadIdx.x] = z;
+    }
+
+    __syncthreads();
+
+    // reduce
+    if (threadIdx.x == 0)
+    {
+        z = buffer[0];
+        for (int i = 1; i < min(dim, blockDim.x); i++)
+        {
+            if(z < buffer[i])
+                z = buffer[i];
+        }
+        buffer[REDUCE_THREADS] = z;
+    }
+
+    __syncthreads();
+
+    // sum?
+    Dtype max_k = buffer[REDUCE_THREADS];
+    buffer[threadIdx.x] = 0;
+    for (int i = i_start; i < i_end; i += i_step) 
+    {
+        z = cuda_exp(dst[i] - max_k);
+        buffer[threadIdx.x] += z;
+        dst[i] = z;
+    }
+
+    __syncthreads();
+
+    // reduce
+    if (threadIdx.x == 0)
+    {
+        z = 0;
+        for (int i = 0; i < blockDim.x; i++)
+            z += buffer[i];
+        buffer[REDUCE_THREADS] = z;
+    }
+
+    __syncthreads();
+
+    // softmax
+    Dtype sum_k = buffer[REDUCE_THREADS];
+    for (int i = i_start; i < i_end; i += i_step)
+        dst[i] /= sum_k;
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::JaggedSoftmax(DTensor<GPU, int>& lens)
+{
+    ASSERT(rows() == shape.Count(), "input must be a column vector");
+
+    dim3 blocks(lens.shape.Count(), 1);
+    dim3 threads(REDUCE_THREADS);
+    cunn_JaggedSoftMax_updateOutput_kernel <<< blocks, threads, 0, cudaStreamPerThread >>> (this->data->ptr, lens.shape.Count(), lens.data->ptr);
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Scale(Dtype scalar)
 {
 	if (scalar == 0)

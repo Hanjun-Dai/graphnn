@@ -166,6 +166,13 @@ public:
 	void Softmax();
 
 	/**
+	 * @brief      inplace jagged softmax; apply to column vector
+	 *
+	 * @param      lens  The lens of each segment
+	 */
+	void JaggedSoftmax(DTensor<GPU, int>& lens);
+
+	/**
 	 * @brief      store the result of mean reduction
 	 *
 	 * @param      a    the operand

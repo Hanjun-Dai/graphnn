@@ -11,14 +11,10 @@ namespace gnn
 {
 
 template<typename Dtype>
-void JaggedSoftmaxAct(DTensor<CPU, Dtype>& output, DTensor<CPU, int>& lens);
-
-template<typename Dtype>
 void JaggedSoftmaxDeriv(DTensor<CPU, Dtype>& dst, DTensor<CPU, Dtype>& cur_output, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, int>& lens);
 
-// template<typename Dtype>
-// void SoftmaxDeriv(DTensor<GPU, Dtype>& dst, DTensor<GPU, Dtype>& cur_output, DTensor<GPU, Dtype>& cur_grad);
-
+template<typename Dtype>
+void JaggedSoftmaxDeriv(DTensor<GPU, Dtype>& dst, DTensor<GPU, Dtype>& cur_output, DTensor<GPU, Dtype>& cur_grad, DTensor<GPU, int>& lens);
 
 /**
  * @brief      the jagged softmax activation operator

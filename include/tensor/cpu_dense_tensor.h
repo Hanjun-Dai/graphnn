@@ -161,7 +161,14 @@ public:
 	 * @brief      do the softmax inplace, keep rows
 	 */
 	void Softmax();
-	
+
+	/**
+	 * @brief      inplace jagged softmax; apply to column vector
+	 *
+	 * @param      lens  The lens of each segment
+	 */
+	void JaggedSoftmax(DTensor<CPU, int>& lens);
+
 	/**
 	 * @brief      store the result of mean reduction
 	 *

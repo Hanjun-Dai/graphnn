@@ -29,22 +29,6 @@ void JaggedSoftmaxDeriv(DTensor<CPU, Dtype>& dst, DTensor<CPU, Dtype>& cur_outpu
     dst.Axpy(1.0, buf);
 }
 
-template<typename Dtype>
-void JaggedSoftmaxAct(DTensor<CPU, Dtype>& output, DTensor<CPU, int>& lens)
-{
-	ASSERT(output.rows() == output.shape.Count(), "input must be a column vector");
-
-	int total = 0;
-	for (size_t i = 0; i < lens.shape.Count(); ++i)
-	{
-		auto cur_simplex = output.GetRowRef(total, lens.data->ptr[i]);
-		cur_simplex.Reshape({(size_t)1, cur_simplex.shape.Count()});
-		cur_simplex.Softmax();
-		total += lens.data->ptr[i];
-	}
-	ASSERT( total == (int)output.shape.Count(), "length mismatch in jagged softmax");
-}
-
 template<typename mode, typename Dtype>
 JaggedSoftmax<mode, Dtype>::JaggedSoftmax(std::string _name, PropErr _properr) 
 					: Factor(_name, _properr)
@@ -65,7 +49,7 @@ void JaggedSoftmax<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> 
 
 	output.CopyFrom(input);
 
-	JaggedSoftmaxAct(output, lens);
+	output.JaggedSoftmax(lens);
 }
 
 template<typename mode, typename Dtype>
@@ -90,7 +74,7 @@ void JaggedSoftmax<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable>
 
 template class JaggedSoftmax<CPU, float>;
 template class JaggedSoftmax<CPU, double>;
-// template class JaggedSoftmax<GPU, float>;
-// template class JaggedSoftmax<GPU, double>;
+template class JaggedSoftmax<GPU, float>;
+template class JaggedSoftmax<GPU, double>;
 
 }

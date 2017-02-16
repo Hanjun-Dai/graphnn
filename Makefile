@@ -49,9 +49,9 @@ $(test_build_root)/%.o: test/%.cpp
 	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^)
 
-$(test_build_root)/test_main: $(test_target) $(gnn_lib)
+$(test_build_root)/test_main: test/test_main.cpp $(test_target) $(gnn_lib)
 	$(dir_guard)
-	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.o, $^) -L$(lib_dir) -lgnn $(LDFLAGS) -lpthread -lgtest -lgtest_main
+	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.o, $^) -L$(lib_dir) -lgnn $(LDFLAGS) -lpthread -lgtest
 
 clean:
 	rm -rf build

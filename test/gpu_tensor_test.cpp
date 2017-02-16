@@ -8,19 +8,16 @@ using namespace gnn;
 
 TEST(GPUTensorTest, ReshapeSize)
 {
-	GpuHandle::Init(0, 1);
 	Tensor* t = new DTensor<GPU, float>();
 	t->Reshape({2, 3, 4});
 
 	auto& mat = t->Derived<GPU, DENSE, float>();
 
-	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);
-	GpuHandle::Destroy();
+	ASSERT_EQ(2 * 3 * 4, mat.data->mem_size);	
 }
 
 TEST(GPUTensorTest, Concat)
 {
-	GpuHandle::Init(0, 1);
 	DTensor<CPU, float> x, y, z, tmp;
 	x.Reshape({5, 6});
 	y.Reshape({5, 3});
@@ -39,12 +36,10 @@ TEST(GPUTensorTest, Concat)
 	tmp.Axpy(-1.0, z);
 
 	EXPECT_LE(tmp.ASum(), 1e-6);
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, RowRef)
 {
-	GpuHandle::Init(0, 1);
 	DTensor<CPU, float> x, tmp;
 	DTensor<GPU, float> y;
 	x.Reshape({5, 3});
@@ -57,12 +52,10 @@ TEST(GPUTensorTest, RowRef)
 
 	tmp.Axpy(-1.0, p);
 	EXPECT_LE(tmp.ASum(), 1e-6);
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, RandUniform)
 {
-	GpuHandle::Init(0, 1);
 	Tensor* t = new DTensor<GPU, double>();
 	t->Reshape({101, 101, 101});	
 	auto& tmat = t->Derived<GPU, DENSE, double>();
@@ -76,12 +69,10 @@ TEST(GPUTensorTest, RandUniform)
 	s /= mat.shape.Count();
 	double err = fabs(s - 1.0);
 	EXPECT_LE(err, 1e-3);
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, RandNorm)
 {
-	GpuHandle::Init(0, 1);
 	Tensor* t = new DTensor<GPU, double>();
 	t->Reshape({100, 500, 100});	
 	auto& tmat = t->Derived<GPU, DENSE, double>();
@@ -104,12 +95,10 @@ TEST(GPUTensorTest, RandNorm)
 	ss = sqrt(ss / mat.shape.Count());
 	err = fabs(ss - 0.1);
 	EXPECT_LE(err, 1e-4);
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, Fill)
 {
-	GpuHandle::Init(0, 1);
 	DTensor<GPU, double> mat;
 	mat.Reshape({100, 100, 100});
 	mat.Fill(2.0);
@@ -117,13 +106,10 @@ TEST(GPUTensorTest, Fill)
 	double ans = mat.ASum();
 
 	ASSERT_EQ(2 * 100 * 100 * 100, ans);
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, ArgMax)
 {
-	GpuHandle::Init(0, 1);
-
 	DTensor<CPU, double> d_cpu;
 	DTensor<CPU, int> idx_cpu, buf;
 	d_cpu.Reshape({10, 1023});
@@ -140,13 +126,10 @@ TEST(GPUTensorTest, ArgMax)
 	{
 		ASSERT_EQ(idx_cpu.data->ptr[i], buf.data->ptr[i]);
 	}
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, GeMM)
 {
-	GpuHandle::Init(0, 1);
-
 	DTensor<CPU, double> x, y, z, zz;
 	x.Reshape({10, 20});
 	y.Reshape({30, 20});
@@ -163,14 +146,10 @@ TEST(GPUTensorTest, GeMM)
 	zz.CopyFrom(gz);
 	auto a1 = z.ASum(), a2 = gz.ASum();
 	EXPECT_LE(fabs(a1 - a2), 1e-4);
-
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, Softmax)
 {
-	GpuHandle::Init(0, 1);
-
 	DTensor<CPU, double> x, y;
 	DTensor<GPU, double> gx;
 	x.Reshape({20, 200});
@@ -184,14 +163,10 @@ TEST(GPUTensorTest, Softmax)
 	x.Axpy(-1.0, y);
 
 	EXPECT_LE(x.ASum(), 1e-4);
-
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, Mean)
 {
-	GpuHandle::Init(0, 1);
-
 	DTensor<CPU, float> x, dst_x;
 	DTensor<GPU, float> gx, dst_gx;
 	x.Reshape({20, 200});
@@ -202,14 +177,39 @@ TEST(GPUTensorTest, Mean)
 	dst_gx.Mean(gx);
 
 	EXPECT_LE(fabs(dst_x.AsScalar() - dst_gx.AsScalar()), 1e-5);
+}
 
-	GpuHandle::Destroy();
+TEST(GPUTensorTest, JaggedSoftmax)
+{
+	DTensor<CPU, float> x;
+	DTensor<CPU, int> len;
+
+	DTensor<GPU, float> gx;
+	DTensor<GPU, int> glen;	
+
+	x.Reshape({10, 1});
+	x.SetRandU(1, 2);
+	gx.CopyFrom(x);
+
+	len.Reshape({3, 1});
+	len.data->ptr[0] = 2;
+	len.data->ptr[1] = 3;
+	len.data->ptr[2] = 5;
+
+	glen.CopyFrom(len);
+
+	x.JaggedSoftmax(len);
+	gx.JaggedSoftmax(glen);
+
+	DTensor<CPU, float> y;
+	y.CopyFrom(gx);
+	y.Axpy(-1.0, x);
+
+	EXPECT_LE(y.ASum(), 1e-5);
 }
 
 TEST(GPUTensorTest, ElewiseMul)
 {
-	GpuHandle::Init(0, 1);
-
 	DTensor<CPU, float> x, y, tmp;
 	DTensor<GPU, float> gx, gy;
 	x.Reshape({20, 200});
@@ -228,13 +228,10 @@ TEST(GPUTensorTest, ElewiseMul)
 	x.Axpy(-1.0, tmp);
 
 	EXPECT_LE(x.ASum(), 1e-4);
-
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, BroadcastMulCol)
 {
-	GpuHandle::Init(0, 1);
 	DTensor<CPU, float> x, y;
 	x.Reshape({5, 3}); 
 	y.Reshape({5, 1});
@@ -257,12 +254,10 @@ TEST(GPUTensorTest, BroadcastMulCol)
 	for (int i = 0; i < (int)x.rows(); ++i)
 		for (int j = 0; j < (int)x.cols(); ++j)
 			ASSERT_EQ(x.data->ptr[i * x.cols() + j], (i + 1) * (j + 1));
-	GpuHandle::Destroy();		
 }
 
 TEST(GPUTensorTest, BroadcastMulRow)
 {
-	GpuHandle::Init(0, 1);
 	DTensor<CPU, float> x, y;
 	x.Reshape({30, 50}); 
 	y.Reshape({1, 50});
@@ -282,13 +277,10 @@ TEST(GPUTensorTest, BroadcastMulRow)
 	x.Axpy(-1, tx);
 
 	EXPECT_LE(x.ASum(), 1e-4);
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, InvSqrSqrtNorm2)
 {
-	GpuHandle::Init(0, 1);
-
 	DTensor<CPU, float> x, tmp;
 	x.Reshape({10, 10}); 
 	x.SetRandU(1, 3);
@@ -314,12 +306,10 @@ TEST(GPUTensorTest, InvSqrSqrtNorm2)
 	EXPECT_LE(tmp.ASum(), 1e-4);
 	
 	EXPECT_LE(fabs(x.Norm2() - gx.Norm2()), 1e-4);
-	GpuHandle::Destroy();
 }
 
 TEST(GPUTensorTest, SparseMM)
 {
-	GpuHandle::Init(0, 1);
 	SpTensor<CPU, float> a;
 	a.Reshape({2, 3});
 	a.ResizeSp(3, 3);
@@ -355,7 +345,4 @@ TEST(GPUTensorTest, SparseMM)
 				std::cerr << c.data->ptr[i * c.cols() + j] << " ";
 			std::cerr << std::endl;
 		}
-
-
-	GpuHandle::Destroy();	
 }

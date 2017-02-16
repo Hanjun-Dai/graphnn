@@ -229,6 +229,22 @@ void TensorTemplate<CPU, DENSE, Dtype>::Softmax()
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::JaggedSoftmax(DTensor<CPU, int>& lens)
+{
+	ASSERT(rows() == shape.Count(), "input must be a column vector");
+
+	int total = 0;
+	for (size_t i = 0; i < lens.shape.Count(); ++i)
+	{
+		auto cur_simplex = GetRowRef(total, lens.data->ptr[i]);
+		cur_simplex.Reshape({(size_t)1, cur_simplex.shape.Count()});
+		cur_simplex.Softmax();
+		total += lens.data->ptr[i];
+	}
+	ASSERT( total == (int)shape.Count(), "length mismatch in jagged softmax");	
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Mean(DTensor<CPU, Dtype>& a, int axis)
 {
 	ASSERT(axis == -1, "currently only support global mean");
