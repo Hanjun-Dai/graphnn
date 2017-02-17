@@ -38,9 +38,9 @@ FactorGraph g;
 
 std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVar<mode, Dtype> > > BuildGraph()
 {
-	auto w1 = add_diff<DTensorVar>(pset, "w1", {784, 1024});	
-	auto w2 = add_diff<DTensorVar>(pset, "w2", {1024, 1024});
-	auto wo = add_diff<DTensorVar>(pset, "wo", {1024, 10});
+	auto w1 = add_diff<DTensorVar>(pset, "w1", {785, 1024});	
+	auto w2 = add_diff<DTensorVar>(pset, "w2", {1025, 1024});
+	auto wo = add_diff<DTensorVar>(pset, "wo", {1025, 10});
 	w1->value.SetRandN(0, 0.01);
 	w2->value.SetRandN(0, 0.01);
 	wo->value.SetRandN(0, 0.01);
@@ -51,12 +51,12 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
 
 	auto x = add_const< DTensorVar<mode, Dtype> >(g, "x", true);
 	auto y = add_const< SpTensorVar<mode, Dtype> >(g, "y", true);
-	auto h1 = af< MatMul >(g, {x, w1});
+	auto h1 = af< FullyConnected >(g, {x, w1});
 
 	h1 = af< ReLU >(g, {h1});
-	auto h2 = af< MatMul >(g, {h1, w2});	
+	auto h2 = af< FullyConnected >(g, {h1, w2});	
 	h2 = af< ReLU >(g, {h2});
-	auto output = af< MatMul >(g, {h2, wo});
+	auto output = af< FullyConnected >(g, {h2, wo});
         auto prob = af< Softmax >(g, {output});
 	auto ce = af< CrossEntropy >(g, {prob, y}, false);
 	auto loss = af< ReduceMean >(g, {ce});
