@@ -10,13 +10,15 @@
 #include <map>
 #include <queue>
 
+#include <tuple>
+#include <array>
+
 namespace gnn
 {
 
 class Variable;
 
-#include <tuple>
-#include <array>
+}
 
 template<int... Indices>
 struct indices {
@@ -44,7 +46,7 @@ make_indices()
 
 template<typename Tuple, int... Indices>
 std::array<
-  std::shared_ptr<Variable>,
+  std::shared_ptr<gnn::Variable>,
     std::tuple_size<Bare<Tuple>>::value
 >
 to_var_array(Tuple&& tuple, indices<Indices...>)
@@ -65,6 +67,10 @@ std::array< std::shared_ptr<T>, 1> to_var_array(std::shared_ptr<T>& tuple)
 {
 	return {{ tuple }};
 }
+
+namespace gnn
+{
+
 
 /**
  * @brief      the computation graph; responsible for representing the factor graph, as well as the execution
