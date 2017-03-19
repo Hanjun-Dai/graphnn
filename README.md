@@ -32,8 +32,6 @@ Tested under Ubuntu 14.04 and Mac OSX 10.10.5
 ##### Install cppformat (now called fmtlib)
 
     check https://github.com/fmtlib/fmt for help
-   
-##### Install cppformat (now called fmtlib)
 
 #### Build static library
 
