@@ -2,7 +2,6 @@ build/
 .vscode/
 html/
 *~
-html/
 *.swp
 make_common
 **/mnist/data/
