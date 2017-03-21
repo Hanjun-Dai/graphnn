@@ -13,7 +13,7 @@ ParamSet<mode, Dtype>::ParamSet()
 template<typename mode, typename Dtype>
 void ParamSet<mode, Dtype>::AddParam(std::shared_ptr< DTensorVar<mode, Dtype> > param)
 {
-	assert(params.count(param->name) == 0);
+	ASSERT(params.count(param->name) == 0, "param " + param->name + " already created");
 	params[param->name] = param;
 }
 
