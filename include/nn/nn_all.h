@@ -13,6 +13,7 @@
 #include "nn/factor_graph.h"
 #include "nn/fully_connected.h"
 #include "nn/hit_at_k.h"
+#include "nn/identity.h"
 #include "nn/in_top_k.h"
 #include "nn/is_equal.h"
 #include "nn/jagged_softmax.h"
