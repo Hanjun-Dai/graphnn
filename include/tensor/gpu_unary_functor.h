@@ -188,11 +188,29 @@ class UnaryLog<GPU, Dtype>
 {
 public:
 	/**
-	 * dst = 1 / (1 + exp(-dst))
+	 * dst = log(dst)
 	 */
 	__device__ inline void operator()(Dtype& dst)
 	{
 		dst = cuda_log(dst);
+	}
+};
+
+/**
+ * @brief      UnaryExp
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnaryExp<GPU, Dtype>
+{
+public:
+	/**
+	 * dst = exp(dst)
+	 */
+	__device__ inline void operator()(Dtype& dst)
+	{
+		dst = cuda_exp(dst);
 	}
 };
 

@@ -117,6 +117,15 @@ template<typename mode, typename Dtype>
 class UnaryLog {};
 
 /**
+ * @brief      Functor to exp an element; CPU doesn't need this;
+ *
+ * @tparam     mode   { GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryExp {};
+
+/**
  * @brief      Class for unary engine.
  *
  * @tparam     mode  CPU/GPU

@@ -1,5 +1,5 @@
-#ifndef ELEWISE_ADD_H
-#define ELEWISE_ADD_H
+#ifndef ELEWISE_MINUS_H
+#define ELEWISE_MINUS_H
 
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
@@ -9,19 +9,18 @@ namespace gnn
 {
 
 /**
- * @brief      Operator: element-wise add of two or more tensors; broadcast only support
- * 				two-tensor add
+ * @brief      Operator: element-wise minus of two tensors; broadcast support
  *
  * @tparam     mode   { CPU/GPU }
  * @tparam     Dtype  { ele_type (float/double) }
  */
 template<typename mode, typename Dtype>
-class ElewiseAdd : public Factor
+class ElewiseMinus : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "ElewiseAdd";
+		return "ElewiseMinus";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;
@@ -41,10 +40,9 @@ public:
 	 * @brief      constructor
 	 *
 	 * @param[in]  _name     The name
-	 * @param[in]  _coeff 	 Coeff of each operand, default is 1.0
 	 * @param[in]  _properr  The properr
 	 */
-	ElewiseAdd(std::string _name, std::vector<Dtype> _coeff = std::vector<Dtype>(), PropErr _properr = PropErr::T);
+	ElewiseMinus(std::string _name, PropErr _properr = PropErr::T);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 std::vector< std::shared_ptr<Variable> >& outputs) override;
@@ -52,11 +50,6 @@ public:
 	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
 						std::vector< bool >& isConst, 
 						std::vector< std::shared_ptr<Variable> >& outputs) override;
-
-	/**
-	 * coefficient of each operand
-	 */
-	std::vector<Dtype> coeff;
 };
 
 }

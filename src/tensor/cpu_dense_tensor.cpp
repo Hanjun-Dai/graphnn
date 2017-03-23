@@ -245,6 +245,19 @@ void TensorTemplate<CPU, DENSE, Dtype>::JaggedSoftmax(DTensor<CPU, int>& lens)
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Sum(DTensor<CPU, Dtype>& a, int axis)
+{
+	ASSERT(axis == -1, "currently only support global sum");
+	Reshape({1});
+
+	Dtype s = 0;
+	auto cnt = a.shape.Count();
+	for (size_t i = 0; i < cnt; ++i)
+		s += a.data->ptr[i];
+	data->ptr[0] = s;
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Mean(DTensor<CPU, Dtype>& a, int axis)
 {
 	ASSERT(axis == -1, "currently only support global mean");
@@ -460,6 +473,12 @@ template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Log()
 {
 	MKL_Log(this->shape.Count(), data->ptr, data->ptr);
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Exp()
+{
+	MKL_Exp(this->shape.Count(), data->ptr, data->ptr);
 }
 
 template class TensorTemplate<CPU, DENSE, float>;

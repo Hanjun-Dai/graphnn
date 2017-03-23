@@ -170,6 +170,14 @@ public:
 	void JaggedSoftmax(DTensor<CPU, int>& lens);
 
 	/**
+	 * @brief      store the result of sum reduction
+	 *
+	 * @param      a    the operand
+	 * @param[in]  axis  The axis to be reduced; by default it is -1, which will do global reduce
+	 */
+	void Sum(DTensor<CPU, Dtype>& a, int axis = -1);
+	
+	/**
 	 * @brief      store the result of mean reduction
 	 *
 	 * @param      a    the operand
@@ -296,6 +304,10 @@ public:
 	 * @brief      set each element x to be log(x)
 	 */
 	void Log();
+	/**
+	 * @brief      set each element x to be exp(x)
+	 */
+	void Exp();
 
 	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)

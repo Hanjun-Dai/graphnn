@@ -453,6 +453,14 @@ void TensorTemplate<GPU, DENSE, Dtype>::Scale(Dtype scalar)
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Sum(DTensor<GPU, Dtype>& a, int axis)
+{
+    ASSERT(axis == -1, "currently only support global sum");
+    Reshape({1});
+    MatColReduce::Exec(this->data->ptr, a.data->ptr, 1, a.shape.Count(), SumReduce<Dtype>());
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Mean(DTensor<GPU, Dtype>& a, int axis)
 {
 	ASSERT(axis == -1, "currently only support global mean");
@@ -719,6 +727,12 @@ template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Log()
 {
     UnaryEngine<GPU>::Exec<UnaryLog>(this->data->ptr, this->shape.Count());
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Exp()
+{
+    UnaryEngine<GPU>::Exec<UnaryExp>(this->data->ptr, this->shape.Count());
 }
 
 template class TensorTemplate<GPU, DENSE, float>;

@@ -1,27 +1,34 @@
-#ifndef ELEWISE_ADD_H
-#define ELEWISE_ADD_H
+#ifndef ENTROPY_H
+#define ENTROPY_H
 
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
 #include "nn/variable.h"
 
+#include <memory>
+
 namespace gnn
 {
 
+template<typename Dtype>
+void CalcEntropy(DTensor<CPU, Dtype>& prob, DTensor<CPU, Dtype>& out);
+
+template<typename Dtype>
+void CalcEntropy(DTensor<GPU, Dtype>& prob, DTensor<GPU, Dtype>& out);
+
 /**
- * @brief      Operator: element-wise add of two or more tensors; broadcast only support
- * 				two-tensor add
+ * @brief      Operator for calculating entropy
  *
  * @tparam     mode   { CPU/GPU }
- * @tparam     Dtype  { ele_type (float/double) }
+ * @tparam     Dtype  { float/double }
  */
 template<typename mode, typename Dtype>
-class ElewiseAdd : public Factor
+class Entropy : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "ElewiseAdd";
+		return "Entropy";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;
@@ -29,7 +36,7 @@ public:
 	/**
 	 * @brief      Creates an out variable.
 	 *
-	 * @return     a tensor with the same shape as inputs
+	 * @return     { return a vector with same Dtype as prediction }
 	 */
 	OutType CreateOutVar()
 	{
@@ -40,24 +47,19 @@ public:
 	/**
 	 * @brief      constructor
 	 *
-	 * @param[in]  _name     The name
-	 * @param[in]  _coeff 	 Coeff of each operand, default is 1.0
-	 * @param[in]  _properr  The properr
+	 * @param[in]  _name          The name
+	 * @param[in]  _properr       Whether propagete error
 	 */
-	ElewiseAdd(std::string _name, std::vector<Dtype> _coeff = std::vector<Dtype>(), PropErr _properr = PropErr::T);
+	Entropy(std::string _name, PropErr _properr = PropErr::T);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+						std::vector< std::shared_ptr<Variable> >& outputs) override;
 
 	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
 						std::vector< bool >& isConst, 
 						std::vector< std::shared_ptr<Variable> >& outputs) override;
-
-	/**
-	 * coefficient of each operand
-	 */
-	std::vector<Dtype> coeff;
 };
 
 }
+
 #endif
