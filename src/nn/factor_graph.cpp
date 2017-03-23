@@ -75,6 +75,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 									std::map<std::string, void*> feed_dict)
 {
 	n_pending.resize(factor_list.size());
+	isFactorExecuted.resize(factor_list.size());
 
 	while (!q.empty())
 		q.pop();
@@ -83,6 +84,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 	{		
 		auto& in_list = factorEdges[factor_list[i]->name].first;
 		n_pending[i] = in_list.size();
+		isFactorExecuted[i] = false;
 	}
 
 	for (size_t i = 0; i < isReady.size(); ++i)
@@ -92,6 +94,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 			for (auto f : out_list)
 			{
 				auto& n_rest = n_pending[FacIdx(f)];
+				assert(n_rest);
 				if (--n_rest == 0)
 				{
 					//std::cerr << "factor " << f->name << std::endl;
@@ -119,6 +122,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 		if (!necessary)
 			continue;
 		factor->Forward(operands, outputs);
+		isFactorExecuted[FacIdx(factor)] = true;
 		for (auto p : outputs)
 		{
 			isReady[VarIdx(p)] = true;
@@ -127,6 +131,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 			for (auto f : out_list)
 			{
 				auto& n_rest = n_pending[FacIdx(f)];
+				assert(n_rest);
 				if (--n_rest == 0)
 				{
 					q.push(f->name);
@@ -174,6 +179,15 @@ FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> t
 
 void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 {
+	var_bp_pendings.resize(var_dict.size());
+	for (size_t i = 0; i < var_dict.size(); ++i)
+	{
+		auto& out_list = varEdges[var_list[i]->name].second;
+		var_bp_pendings[i] = 0;
+		for (auto f : out_list)
+			if (isFactorExecuted[FacIdx(f)])
+				var_bp_pendings[i]++;
+	}
 	for (size_t i = 0; i < factor_list.size(); ++i)
 	{		
 		auto& out_list = factorEdges[factor_list[i]->name].second;
@@ -191,6 +205,7 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 		for (auto& f : in_list)
 		{
 			auto& n_rest = n_pending[FacIdx(f)];
+			assert(n_rest);
 			if (--n_rest == 0)
 				q.push(f->name);
 		}
@@ -226,16 +241,20 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 
 		for (auto p : operands)
 		{
+			auto& n_var_bp = var_bp_pendings[VarIdx(p->name)];
+			assert(n_var_bp);
+			if (--n_var_bp)
+				continue;
 			auto& in_list = varEdges[p->name].first;
 			for (auto f : in_list)
 			{
 				auto& n_rest = n_pending[FacIdx(f)];
+				assert(n_rest);
 				if (--n_rest == 0)
 					q.push(f->name);
 			}
 		}		
 	}
-
 }
 
 void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets, 

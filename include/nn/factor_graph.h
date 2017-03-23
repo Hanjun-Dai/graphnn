@@ -280,9 +280,19 @@ protected:
 	std::vector<bool> isRequired;
 
 	/**
-	 * num of pending variables each factor have; when it is zero, this factor can be executed
+	 * num of pending variables each factor has; when it is zero, this factor can be executed
 	 */
 	std::vector<size_t> n_pending;
+
+	/**
+	 * whether the factor is executed during feedforward
+	 */
+	std::vector<size_t> isFactorExecuted;
+
+	/**
+	 * num of pending factors each var has during bp;
+	 */
+	std::vector<size_t> var_bp_pendings;
 
 	/**
 	 * queue data structure used for topo_sort/BFS
