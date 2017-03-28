@@ -188,33 +188,26 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 			if (isFactorExecuted[FacIdx(f)])
 				var_bp_pendings[i]++;
 	}
+
+	while (!q.empty())
+		q.pop();
+
 	for (size_t i = 0; i < factor_list.size(); ++i)
 	{		
 		auto& out_list = factorEdges[factor_list[i]->name].second;
 		n_pending[i] =0;
-		for (auto name : out_list)
-			if (isRequired[VarIdx(name)])
+		for (auto p_var : out_list)
+			if (isRequired[VarIdx(p_var)] && varEdges[p_var->name].second.size())
 				n_pending[i]++;
+		if (n_pending[i] == 0)
+			q.push(factor_list[i]->name);
 	}
-	while (!q.empty())
-		q.pop();
-	for (auto& p : targets)
-	{
-		auto& in_list = varEdges[p->name].first;
 
-		for (auto& f : in_list)
-		{
-			auto& n_rest = n_pending[FacIdx(f)];
-			assert(n_rest);
-			if (--n_rest == 0)
-				q.push(f->name);
-		}
-	}
 	std::vector<bool> info_const_list;
 
 	while (!q.empty())
 	{
-		auto& cur_name = q.front();		
+		auto& cur_name = q.front();
 		q.pop();
 
 		auto& factor = factor_dict[cur_name].second;
@@ -225,18 +218,36 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 		if (necessary)
 		{
 			info_const_list.resize(operands.size());
-			bool ok = false;
-			for (size_t i = 0; i < operands.size(); ++i)
+			bool has_grad = false, need_prop = false;
+			for (size_t i = 0; i < outputs.size(); ++i)
 			{
-				info_const_list[i] = isConst[VarIdx(operands[i])];
-				ok |= !info_const_list[i];
+				if (isConst[VarIdx(outputs[i])])
+				{
+					assert(!var_has_grad[VarIdx(outputs[i])]);
+					continue;
+				}
+				has_grad |= var_has_grad[VarIdx(outputs[i])];
 			}
-			necessary = ok;
+
+			if (has_grad)
+			{
+				for (size_t i = 0; i < operands.size(); ++i)
+				{
+					info_const_list[i] = isConst[VarIdx(operands[i])];
+					need_prop |= !info_const_list[i];
+				}
+			}
+			//std::cerr << factor->name << " " << has_grad << " " << need_prop << std::endl;
+			necessary = has_grad && need_prop;
 		}
 		
 		if (necessary)
 		{
 			factor->Backward(operands, info_const_list, outputs);
+			for (size_t i = 0; i < operands.size(); ++i)
+				if (!info_const_list[i])
+					var_has_grad[VarIdx(operands[i])] = true;
+			//std::cerr << "bp: " << factor->name << std::endl;
 		}
 
 		for (auto p : operands)
@@ -262,13 +273,17 @@ void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets,
 {
 	ASSERT(isReady.size() == var_dict.size() && n_pending.size() == factor_list.size() && isReady.size() == isRequired.size(), 
 		"unexpected change of computation graph in backward stage");
+	var_has_grad.resize(var_list.size());
 	for (size_t i = 0; i < var_list.size(); ++i)
+	{		
+		var_has_grad[i] = false;
 		if (!isConst[i])
 		{
 			auto* diff_var = dynamic_cast<IDifferentiable*>(var_list[i].get());
 			if (diff_var)
 				diff_var->ZeroGrad();
 		}
+	}
 
 	for (auto p : targets)
 	{
@@ -276,7 +291,10 @@ void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets,
 		ASSERT(!isConst[VarIdx(p)], "cannot calc grad for const variable");
 		auto* diff_var = dynamic_cast<IDifferentiable*>(p.get());
 		if (diff_var)
+		{
+			var_has_grad[VarIdx(p)] = true;
 			diff_var->OnesGrad();
+		}
 	}
 
 	if (n_thread == 1)

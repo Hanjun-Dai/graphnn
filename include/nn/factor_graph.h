@@ -295,6 +295,11 @@ protected:
 	std::vector<size_t> var_bp_pendings;
 
 	/**
+	 * whether the variable has gradient
+	 */
+	std::vector<size_t> var_has_grad;	
+
+	/**
 	 * queue data structure used for topo_sort/BFS
 	 */
 	std::queue<std::string> q;
