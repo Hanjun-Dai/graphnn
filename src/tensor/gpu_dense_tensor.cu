@@ -735,6 +735,12 @@ void TensorTemplate<GPU, DENSE, Dtype>::Exp()
     UnaryEngine<GPU>::Exec<UnaryExp>(this->data->ptr, this->shape.Count());
 }
 
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Truncate(Dtype lb, Dtype ub)
+{
+    UnaryEngine<GPU>::Exec<UnaryTruncate>(this->data->ptr, this->shape.Count(), lb, ub);
+}
+
 template class TensorTemplate<GPU, DENSE, float>;
 template class TensorTemplate<GPU, DENSE, double>;
 

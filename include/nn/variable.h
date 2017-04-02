@@ -69,6 +69,25 @@ public:
 	std::string name;
 };
 
+/**
+ * @brief      Class for void pointer variable.
+ */
+class VoidPtrVar : public Variable
+{
+public:
+	VoidPtrVar(std::string _name);
+
+	virtual EleType GetEleType() override;
+
+	virtual void SetRef(void* p) override;	
+
+	/**
+	 * the actual void ptr
+	 */
+	void* void_ptr;
+};
+
+
 class GraphStruct;
 
 /**

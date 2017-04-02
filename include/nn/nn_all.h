@@ -18,6 +18,7 @@
 #include "nn/hit_at_k.h"
 #include "nn/identity.h"
 #include "nn/in_top_k.h"
+#include "nn/interval_project.h"
 #include "nn/is_equal.h"
 #include "nn/jagged_softmax.h"
 #include "nn/l2_col_norm.h"

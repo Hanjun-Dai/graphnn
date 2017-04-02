@@ -481,6 +481,13 @@ void TensorTemplate<CPU, DENSE, Dtype>::Exp()
 	MKL_Exp(this->shape.Count(), data->ptr, data->ptr);
 }
 
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Truncate(Dtype lb, Dtype ub)
+{
+	ASSERT(lb <= ub, "the interval is invalid");
+	UnaryEngine<CPU>::Exec<UnaryTruncate>(this->data->ptr, this->shape.Count(), lb, ub);
+}
+
 template class TensorTemplate<CPU, DENSE, float>;
 template class TensorTemplate<CPU, DENSE, double>;
 

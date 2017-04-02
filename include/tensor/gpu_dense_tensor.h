@@ -302,7 +302,14 @@ public:
 	 * @brief      set each element x to be exp(x)
 	 */
 	void Exp();
-
+	/**
+	 * @brief      truncate the values outside of the range
+	 *
+	 * @param[in]  lb    The lower bound
+	 * @param[in]  ub    The upper bound
+	 */
+	void Truncate(Dtype lb, Dtype ub);
+	
 	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */

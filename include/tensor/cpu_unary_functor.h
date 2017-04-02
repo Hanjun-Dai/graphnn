@@ -40,6 +40,37 @@ private:
 };
 
 /**
+ * @brief      CPU specialization of UnaryTruncate
+ *
+ * @tparam     Dtype  { float/double/int }
+ */
+template<typename Dtype>
+class UnaryTruncate<CPU, Dtype>
+{
+public:
+	UnaryTruncate(Dtype lb, Dtype ub) : lower_bound(lb), upper_bound(ub) {}
+
+	/**
+	 * truncate dst
+	 */
+	inline void operator()(Dtype& dst)
+	{
+		dst = dst < lower_bound ? lower_bound : dst;
+		dst = dst > upper_bound ? upper_bound : dst;
+	}
+
+private:
+	/**
+	 * lower bound
+	 */
+	Dtype lower_bound;
+	/**
+	 * upper bound
+	 */
+	Dtype upper_bound;
+};
+
+/**
  * @brief      CPU specialization of UnarySigmoid
  *
  * @tparam     Dtype  { float/double/int }

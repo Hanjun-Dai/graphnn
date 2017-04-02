@@ -126,6 +126,15 @@ template<typename mode, typename Dtype>
 class UnaryExp {};
 
 /**
+ * @brief      Functor to truncate an element;
+ *
+ * @tparam     mode   { GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryTruncate {};
+
+/**
  * @brief      Class for unary engine.
  *
  * @tparam     mode  CPU/GPU
