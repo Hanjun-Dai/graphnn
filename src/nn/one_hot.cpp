@@ -4,6 +4,12 @@ namespace gnn
 {
 
 template<typename mode, typename Dtype>
+OneHot<mode, Dtype>::OneHot(std::string _name, size_t _dim) 
+					: Factor(_name, PropErr::N), dim(_dim)
+{
+}
+
+template<typename mode, typename Dtype>
 void OneHot<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 								 			std::vector< std::shared_ptr<Variable> >& outputs)
 {

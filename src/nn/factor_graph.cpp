@@ -121,6 +121,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 			}
 		if (!necessary)
 			continue;
+		// std::cerr << factor->name << std::endl;
 		factor->Forward(operands, outputs);
 		isFactorExecuted[FacIdx(factor)] = true;
 		for (auto p : outputs)
@@ -199,7 +200,7 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 		for (auto p_var : out_list)
 			if (isRequired[VarIdx(p_var)] && varEdges[p_var->name].second.size())
 				n_pending[i]++;
-		if (n_pending[i] == 0)
+		if (n_pending[i] == 0 && isFactorExecuted[i])
 			q.push(factor_list[i]->name);
 	}
 
@@ -243,17 +244,17 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 		
 		if (necessary)
 		{
+			//std::cerr << "bp: " << factor->name << std::endl;
 			factor->Backward(operands, info_const_list, outputs);
 			for (size_t i = 0; i < operands.size(); ++i)
 				if (!info_const_list[i])
 					var_has_grad[VarIdx(operands[i])] = true;
-			//std::cerr << "bp: " << factor->name << std::endl;
 		}
-
+		
 		for (auto p : operands)
 		{
 			auto& n_var_bp = var_bp_pendings[VarIdx(p->name)];
-			assert(n_var_bp);
+			ASSERT(n_var_bp, "variable " + p->name + " has more visits than expected");
 			if (--n_var_bp)
 				continue;
 			auto& in_list = varEdges[p->name].first;
