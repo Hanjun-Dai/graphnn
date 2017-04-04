@@ -64,29 +64,17 @@ public:
 	virtual EleType GetEleType() = 0;
 
 	/**
+	 * @brief      Get whether this variable is on CPU/GPU
+	 *
+	 * @return     The mode.
+	 */
+	virtual MatMode GetMode() = 0;
+
+	/**
 	 * the variable's string name
 	 */
 	std::string name;
 };
-
-/**
- * @brief      Class for void pointer variable.
- */
-class VoidPtrVar : public Variable
-{
-public:
-	VoidPtrVar(std::string _name);
-
-	virtual EleType GetEleType() override;
-
-	virtual void SetRef(void* p) override;	
-
-	/**
-	 * the actual void ptr
-	 */
-	void* void_ptr;
-};
-
 
 class GraphStruct;
 
@@ -99,6 +87,8 @@ public:
 	GraphVar(std::string _name);
 
 	virtual EleType GetEleType() override;
+
+	virtual MatMode GetMode() override;
 
 	virtual void SetRef(void* p) override;	
 
@@ -145,6 +135,11 @@ public:
 	virtual EleType GetEleType() override
 	{
 		return Dtype2Enum<Dtype>();
+	}
+
+	virtual MatMode GetMode() override
+	{
+		return mode::type; 
 	}
 
 	/**

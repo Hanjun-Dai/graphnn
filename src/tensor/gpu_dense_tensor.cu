@@ -21,17 +21,27 @@ TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate() : Tensor(), data(nullptr)
 }
 
 template<typename Dtype>
-TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l) : Tensor()
+TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate(std::vector<size_t> l, Dtype* _data) : Tensor()
 {
     pointer_buf.clear();
-	Reshape(l);
+    if (_data)
+    {
+        this->shape.Reshape(l);
+        this->data = std::make_shared< DenseData<GPU, Dtype> >(_data, 0, this->shape.Count());
+    } else 
+	   Reshape(l);
 }
 
 template<typename Dtype>
-TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate(TShape s) : Tensor()
+TensorTemplate<GPU, DENSE, Dtype>::TensorTemplate(TShape s, Dtype* _data) : Tensor()
 {
     pointer_buf.clear();
-	Reshape(s.dims);
+    if (_data)
+    {
+        this->shape.Reshape(s.dims);
+        this->data = std::make_shared< DenseData<GPU, Dtype> >(_data, 0, this->shape.Count());
+    } else 
+	   Reshape(s.dims);
 }
 
 template<typename Dtype>

@@ -21,26 +21,14 @@ EleType GraphVar::GetEleType()
 	return EleType::UNKNOWN;
 }
 
+MatMode GraphVar::GetMode()
+{
+	return MatMode::cpu;
+}
+
 void GraphVar::SetRef(void* p)
 {
 	graph = static_cast< GraphStruct* >(p);
-}
-
-//================ void ptr variable =====================
-
-VoidPtrVar::VoidPtrVar(std::string _name) : Variable(_name), void_ptr(nullptr)
-{
-
-}
-
-EleType VoidPtrVar::GetEleType()
-{
-	return EleType::UNKNOWN;
-}
-
-void VoidPtrVar::SetRef(void* p)
-{
-	void_ptr = p;
 }
 
 

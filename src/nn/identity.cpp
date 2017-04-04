@@ -18,9 +18,10 @@ void Identity<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& op
 
 	auto& output = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->value;
 
-	auto& input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->value;
-
-	output.CopyFrom(input);
+	MAT_MODE_SWITCH(operands[0]->GetMode(), matMode, {
+		auto& input = dynamic_cast<DTensorVar<matMode, Dtype>*>(operands[0].get())->value;
+		output.CopyFrom(input);	
+	});
 }
 
 template<typename mode, typename Dtype>
@@ -34,9 +35,13 @@ void Identity<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& o
 	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
 
 	if (!isConst[0])
-	{
-		auto& prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
-		prev_grad.Axpy(1.0, cur_grad);
+	{	
+		MAT_MODE_SWITCH(operands[0]->GetMode(), matMode, {
+			auto& prev_grad = dynamic_cast<DTensorVar<matMode, Dtype>*>(operands[0].get())->grad;
+			DTensor<matMode, Dtype> buf;
+			buf.CopyFrom(cur_grad);			
+			prev_grad.Axpy(1.0, buf);
+		});	
 	}	
 }
 

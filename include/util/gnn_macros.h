@@ -69,6 +69,24 @@ namespace gnn
       throw std::logic_error("unknown type"); \
     }                     \
 
+#define MAT_MODE_SWITCH(mode, matMode, ...) \
+    switch (mode) { \
+      case MatMode::cpu: \
+      { \
+        typedef CPU matMode; \
+        {__VA_ARGS__} \
+      } \
+      break; \
+      case MatMode::gpu: \
+      { \
+        typedef GPU matMode; \
+        {__VA_ARGS__} \
+      } \
+      break; \
+      default: \
+        throw std::logic_error("unknown mode"); \
+    } \
+    
 typedef unsigned int uint;
 
 enum class MatType

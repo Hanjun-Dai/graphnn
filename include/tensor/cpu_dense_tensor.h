@@ -19,8 +19,8 @@ public:
 
 	TensorTemplate();
 	virtual ~TensorTemplate() {}
-	TensorTemplate(std::vector<size_t> l);
-	TensorTemplate(TShape s);
+	TensorTemplate(std::vector<size_t> l, Dtype* _data = nullptr);
+	TensorTemplate(TShape s, Dtype* _data = nullptr);
 	
 	virtual void Reshape(std::vector<size_t> l) override;
 	virtual MatType GetMatType() override;
