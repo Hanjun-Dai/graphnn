@@ -276,6 +276,11 @@ public:
 	void Scale(Dtype scalar);
 
 	/**
+	 * @brief      set each element x to be |x|
+	 */
+	void Abs();
+
+	/**
 	 * @brief      set each element x to be 1/x
 	 */
 	void Inv();

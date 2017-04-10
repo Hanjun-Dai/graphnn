@@ -700,6 +700,12 @@ void TensorTemplate<GPU, DENSE, Dtype>::ElewiseDiv(DTensor<GPU, Dtype>& src)
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Abs()
+{
+    UnaryEngine<GPU>::Exec<UnaryAbs>(this->data->ptr, this->shape.Count());
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Inv()
 {
 	UnaryEngine<GPU>::Exec<UnaryInv>(this->data->ptr, this->shape.Count());

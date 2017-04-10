@@ -33,6 +33,16 @@ __device__ inline double cuda_pow(const double& x, const double& y)
         return pow(x, y);
 }
 
+__device__ inline float cuda_fabs(const float& src)
+{
+        return fabsf(src);
+}
+
+__device__ inline double cuda_fabs(const double& src)
+{
+        return fabs(src);
+}
+
 __device__ inline float cuda_exp(const float& src)
 {
         return expf(src);

@@ -1,6 +1,7 @@
 #ifndef NN_ALL_H
 #define NN_ALL_H
 
+#include "nn/abs_error.h"
 #include "nn/arg_max.h"
 #include "nn/axpby.h"
 #include "nn/binary_logloss.h"

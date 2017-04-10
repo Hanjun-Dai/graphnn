@@ -133,6 +133,24 @@ private:
 };
 
 /**
+ * @brief      UnaryAbs
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnaryAbs<GPU, Dtype>
+{
+public:
+	/**
+	 * abs dst
+	 */
+	__device__ inline void operator()(Dtype& dst)
+	{
+		dst = cuda_fabs(dst);
+	}
+};
+
+/**
  * @brief      UnaryInv
  *
  * @tparam     Dtype  { float/double }

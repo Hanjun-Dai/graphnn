@@ -452,6 +452,12 @@ void TensorTemplate<CPU, DENSE, Dtype>::Scale(Dtype scalar)
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Abs()
+{
+	MKL_Abs(this->shape.Count(), data->ptr, data->ptr);
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Inv()
 {
 	MKL_Inv(this->shape.Count(), data->ptr, data->ptr);

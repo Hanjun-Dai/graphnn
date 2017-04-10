@@ -146,6 +146,16 @@ inline void MKL_CSRMM(char trans, MKL_INT m, MKL_INT n, MKL_INT k, double alpha,
 			b, &ldb, &beta, c, &ldc);
 }
 
+inline void MKL_Abs(const MKL_INT n, float* a, float* y)
+{
+    vsAbs(n, a, y);
+}
+
+inline void MKL_Abs(const MKL_INT n, double* a, double* y)
+{
+    vdAbs(n, a, y);
+}
+
 inline void MKL_Sin(const MKL_INT n, float* a, float* y)
 {
     vsSin(n, a, y);

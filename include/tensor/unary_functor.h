@@ -54,6 +54,15 @@ template<typename mode, typename Dtype>
 class UnaryRandUniform {};
 
 /**
+ * @brief      Functor to abs an element; CPU doesn't need this;
+ *
+ * @tparam     mode   { GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryAbs {};
+
+/**
  * @brief      Functor to invert an element; CPU doesn't need this;
  *
  * @tparam     mode   { GPU }
