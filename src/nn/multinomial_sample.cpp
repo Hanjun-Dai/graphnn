@@ -26,9 +26,10 @@ void MultinomialSample<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variab
 		probs.Softmax();
 
 	output.Reshape({input.rows(), (size_t)1});
-	Dtype sum = 0;
+	
 	for (size_t i = 0; i < probs.rows(); ++i)
 	{
+		Dtype sum = 0;
 		Dtype threshold = (*distribution)(generator);
 		int idx = -1;
 
@@ -40,7 +41,7 @@ void MultinomialSample<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variab
 				idx = j;
 				break;
 			}
-		}
+		}		
 		ASSERT(idx >= 0 && idx < (int)probs.cols(), "unexpected summation of probs");
 		output.data->ptr[i] = idx;
 	}
