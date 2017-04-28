@@ -46,9 +46,6 @@ void Kxplusb<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& op
 	}
 }
 
-template class Kxplusb<CPU, float>;
-template class Kxplusb<CPU, double>;
-template class Kxplusb<GPU, float>;
-template class Kxplusb<GPU, double>;
+INSTANTIATE_CLASS(Kxplusb)
 
 }

@@ -39,10 +39,7 @@ void IMsgPass<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& op
 		output.CopyFrom(*(this->cpu_weight));
 }
 
-template class IMsgPass<CPU, double>;
-template class IMsgPass<CPU, float>;
-template class IMsgPass<GPU, double>;
-template class IMsgPass<GPU, float>;
+INSTANTIATE_CLASS(IMsgPass)
 
 //====================== Node2NodeMsgPass ========================
 template<typename mode, typename Dtype>
@@ -68,10 +65,7 @@ void Node2NodeMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 	data->row_ptr[graph->num_nodes] = nnz;
 }
 
-template class Node2NodeMsgPass<CPU, double>;
-template class Node2NodeMsgPass<CPU, float>;
-template class Node2NodeMsgPass<GPU, double>;
-template class Node2NodeMsgPass<GPU, float>;
+INSTANTIATE_CLASS(Node2NodeMsgPass)
 
 //====================== Edge2NodeMsgPass ========================
 template<typename mode, typename Dtype>
@@ -97,10 +91,7 @@ void Edge2NodeMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 	data->row_ptr[graph->num_nodes] = nnz;    
 }
 
-template class Edge2NodeMsgPass<CPU, double>;
-template class Edge2NodeMsgPass<CPU, float>;
-template class Edge2NodeMsgPass<GPU, double>;
-template class Edge2NodeMsgPass<GPU, float>;
+INSTANTIATE_CLASS(Edge2NodeMsgPass)
 
 //====================== Node2EdgeMsgPass ========================
 template<typename mode, typename Dtype>
@@ -122,10 +113,7 @@ void Node2EdgeMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
     assert(nnz == data->nnz);    
 }
 
-template class Node2EdgeMsgPass<CPU, double>;
-template class Node2EdgeMsgPass<CPU, float>;
-template class Node2EdgeMsgPass<GPU, double>;
-template class Node2EdgeMsgPass<GPU, float>;
+INSTANTIATE_CLASS(Node2EdgeMsgPass)
 
 //====================== Edge2EdgeMsgPass ========================
 template<typename mode, typename Dtype>
@@ -161,10 +149,7 @@ void Edge2EdgeMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
     assert(data->nnz == (int)cnt);
 }
 
-template class Edge2EdgeMsgPass<CPU, double>;
-template class Edge2EdgeMsgPass<CPU, float>;
-template class Edge2EdgeMsgPass<GPU, double>;
-template class Edge2EdgeMsgPass<GPU, float>;
+INSTANTIATE_CLASS(Edge2EdgeMsgPass)
 
 //====================== SubgraphMsgPass ========================
 template<typename mode, typename Dtype>
@@ -190,9 +175,6 @@ void SubgraphMsgPass<mode, Dtype>::InitCPUWeight(GraphStruct* graph)
 	data->row_ptr[graph->num_subgraph] = nnz;
 }
 
-template class SubgraphMsgPass<CPU, double>;
-template class SubgraphMsgPass<CPU, float>;
-template class SubgraphMsgPass<GPU, double>;
-template class SubgraphMsgPass<GPU, float>;
+INSTANTIATE_CLASS(SubgraphMsgPass)
 
 }

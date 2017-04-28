@@ -49,9 +49,6 @@ void MultinomialSample<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variab
 	}
 }
 
-template class MultinomialSample<CPU, float>;
-template class MultinomialSample<CPU, double>;
-template class MultinomialSample<GPU, float>;
-template class MultinomialSample<GPU, double>;
+INSTANTIATE_CLASS(MultinomialSample)
 
 }

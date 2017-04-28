@@ -12,6 +12,18 @@
 namespace gnn
 {
 
+#ifdef USE_GPU
+  #define INSTANTIATE_CLASS(classname) \
+    template class classname<CPU, float>; \
+    template class classname<CPU, double>; \
+    template class classname<GPU, float>; \
+    template class classname<GPU, double>;
+#else
+  #define INSTANTIATE_CLASS(classname) \
+    template class classname<CPU, float>; \
+    template class classname<CPU, double>;
+#endif
+
 #define NOT_IMPLEMENTED { throw std::logic_error(std::string("not implemented virtual func: ") + std::string(__FUNCTION__)); }
 
 #define ASSERT(condition, message) \

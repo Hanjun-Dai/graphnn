@@ -59,8 +59,6 @@ void ElewiseMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 	}
 }
 
-template class ElewiseMul<CPU, float>;
-template class ElewiseMul<CPU, double>;
-template class ElewiseMul<GPU, float>;
-template class ElewiseMul<GPU, double>;
+INSTANTIATE_CLASS(ElewiseMul)
+
 }

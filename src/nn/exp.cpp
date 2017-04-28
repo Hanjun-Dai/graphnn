@@ -44,9 +44,6 @@ void Exp<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& operan
 	prev_grad.Axpy(1.0, tmp);	
 }
 
-template class Exp<CPU, float>;
-template class Exp<CPU, double>;
-template class Exp<GPU, float>;
-template class Exp<GPU, double>;
+INSTANTIATE_CLASS(Exp)
 
 }

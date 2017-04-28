@@ -74,7 +74,10 @@ TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate(int newNzCap, int newPtrCap)
 template class TDataTemplate<CPU, SPARSE, float>;
 template class TDataTemplate<CPU, SPARSE, double>;
 template class TDataTemplate<CPU, SPARSE, int>;
+#ifdef USE_GPU
 template class TDataTemplate<GPU, SPARSE, float>;
 template class TDataTemplate<GPU, SPARSE, double>;
 template class TDataTemplate<GPU, SPARSE, int>;
+#endif
+
 }

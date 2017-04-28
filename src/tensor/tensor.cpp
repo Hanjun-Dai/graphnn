@@ -30,7 +30,10 @@ void Tensor::Deserialize(FILE* fid)
 template TensorTemplate<CPU, DENSE, float>& Tensor::Derived<CPU, DENSE, float>(); 
 template TensorTemplate<CPU, DENSE, double>& Tensor::Derived<CPU, DENSE, double>(); 
 template TensorTemplate<CPU, DENSE, int>& Tensor::Derived<CPU, DENSE, int>(); 
+#ifdef USE_GPU
 template TensorTemplate<GPU, DENSE, float>& Tensor::Derived<GPU, DENSE, float>(); 
 template TensorTemplate<GPU, DENSE, double>& Tensor::Derived<GPU, DENSE, double>(); 
 template TensorTemplate<GPU, DENSE, int>& Tensor::Derived<GPU, DENSE, int>(); 
+#endif
+
 }

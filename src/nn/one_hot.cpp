@@ -47,9 +47,6 @@ void OneHot<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& oper
 	}
 }
 
-template class OneHot<CPU, float>;
-template class OneHot<CPU, double>;
-template class OneHot<GPU, float>;
-template class OneHot<GPU, double>;
+INSTANTIATE_CLASS(OneHot)
 
 }

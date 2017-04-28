@@ -59,10 +59,6 @@ void ReLU<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& opera
 	ReLUDeriv(prev_grad, cur_out, cur_grad);
 }
 
-
-template class ReLU<CPU, float>;
-template class ReLU<CPU, double>;
-template class ReLU<GPU, float>;
-template class ReLU<GPU, double>;
+INSTANTIATE_CLASS(ReLU)
 
 }

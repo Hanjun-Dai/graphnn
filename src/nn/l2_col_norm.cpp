@@ -89,9 +89,7 @@ void L2ColNorm<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& 
 	L2ColNormGrad(prev_out, prev_grad, cur_grad, norm2, len);
 }
 
-template class L2ColNorm<CPU, float>;
-template class L2ColNorm<CPU, double>;
-template class L2ColNorm<GPU, float>;
-template class L2ColNorm<GPU, double>;
+
+INSTANTIATE_CLASS(L2ColNorm)
 
 }

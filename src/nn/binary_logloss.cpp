@@ -80,8 +80,6 @@ void BinaryLogLoss<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable>
 	}
 }
 
-template class BinaryLogLoss<CPU, float>;
-template class BinaryLogLoss<CPU, double>;
-template class BinaryLogLoss<GPU, float>;
-template class BinaryLogLoss<GPU, double>;
+INSTANTIATE_CLASS(BinaryLogLoss)
+
 }

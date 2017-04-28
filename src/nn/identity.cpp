@@ -45,8 +45,6 @@ void Identity<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& o
 	}	
 }
 
-template class Identity<CPU, float>;
-template class Identity<CPU, double>;
-template class Identity<GPU, float>;
-template class Identity<GPU, double>;
+INSTANTIATE_CLASS(Identity)
+
 }

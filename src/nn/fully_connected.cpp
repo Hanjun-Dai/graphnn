@@ -83,9 +83,6 @@ void FullyConnected<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable
 	}
 }
 
-template class FullyConnected<CPU, float>;
-template class FullyConnected<CPU, double>;
-template class FullyConnected<GPU, float>;
-template class FullyConnected<GPU, double>;
+INSTANTIATE_CLASS(FullyConnected)
 
 }

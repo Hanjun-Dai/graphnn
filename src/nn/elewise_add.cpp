@@ -50,8 +50,6 @@ void ElewiseAdd<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 	}
 }
 
-template class ElewiseAdd<CPU, float>;
-template class ElewiseAdd<CPU, double>;
-template class ElewiseAdd<GPU, float>;
-template class ElewiseAdd<GPU, double>;
+INSTANTIATE_CLASS(ElewiseAdd)
+
 }

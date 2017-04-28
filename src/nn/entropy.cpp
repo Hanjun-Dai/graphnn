@@ -63,8 +63,6 @@ void Entropy<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& op
 	grad_input.Axpy(1.0, tmp);
 }
 
-template class Entropy<CPU, float>;
-template class Entropy<CPU, double>;
-template class Entropy<GPU, float>;
-template class Entropy<GPU, double>;
+INSTANTIATE_CLASS(Entropy)
+
 }

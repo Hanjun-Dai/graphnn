@@ -2,6 +2,7 @@ dir_guard = @mkdir -p $(@D)
 
 CUDA_HOME := /usr/local/cuda
 MKL_ROOT := /opt/intel/mkl
+USE_GPU = 1
 
 FIND := find
 CXX := g++

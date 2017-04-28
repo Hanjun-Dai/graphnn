@@ -52,10 +52,6 @@ void ParamSet<mode, Dtype>::DeepCopyFrom(ParamSet<mode, Dtype>& src)
 	}
 }
 
-template class ParamSet<CPU, float>;
-template class ParamSet<CPU, double>;
-template class ParamSet<GPU, float>;
-template class ParamSet<GPU, double>;
-
+INSTANTIATE_CLASS(ParamSet)
 
 }

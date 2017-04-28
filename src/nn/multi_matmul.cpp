@@ -69,9 +69,6 @@ void MultiMatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >
 	}
 }
 
-template class MultiMatMul<CPU, float>;
-template class MultiMatMul<CPU, double>;
-template class MultiMatMul<GPU, float>;
-template class MultiMatMul<GPU, double>;
+INSTANTIATE_CLASS(MultiMatMul)
 
 }

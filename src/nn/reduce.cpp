@@ -81,9 +81,6 @@ void Reduce<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 	}
 }
 
-template class Reduce<CPU, float>;
-template class Reduce<CPU, double>;
-template class Reduce<GPU, float>;
-template class Reduce<GPU, double>;
+INSTANTIATE_CLASS(Reduce)
 
 }

@@ -1,6 +1,8 @@
 #ifndef GPU_HANDLE_H
 #define GPU_HANDLE_H
 
+#ifdef USE_GPU
+
 #include <curand.h>
 #include <cuda_runtime.h>
 #include <cusparse_v2.h>
@@ -57,4 +59,19 @@ private:
 };
 
 }
+
+#else
+
+namespace gnn
+{
+
+struct GpuHandle
+{
+	static void Init(int dev_id, unsigned int _streamcnt = 1U) {}
+	static void Destroy() {}
+};
+
+}
+#endif
+
 #endif

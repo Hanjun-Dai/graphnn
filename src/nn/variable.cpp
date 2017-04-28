@@ -95,9 +95,11 @@ void TensorVarTemplate<mode, DENSE, Dtype>::Deserialize(FILE* fid)
 template class TensorVarTemplate<CPU, DENSE, float>;
 template class TensorVarTemplate<CPU, DENSE, double>;
 template class TensorVarTemplate<CPU, DENSE, int>;
+#ifdef USE_GPU
 template class TensorVarTemplate<GPU, DENSE, float>;
 template class TensorVarTemplate<GPU, DENSE, double>;
 template class TensorVarTemplate<GPU, DENSE, int>;
+#endif
 
 //============ SPARSE Tensor Variable ==================
 
@@ -130,8 +132,10 @@ MatType TensorVarTemplate<mode, SPARSE, Dtype>::GetMatType()
 template class TensorVarTemplate<CPU, SPARSE, float>;
 template class TensorVarTemplate<CPU, SPARSE, double>;
 template class TensorVarTemplate<CPU, SPARSE, int>;
+#ifdef USE_GPU
 template class TensorVarTemplate<GPU, SPARSE, float>;
 template class TensorVarTemplate<GPU, SPARSE, double>;
 template class TensorVarTemplate<GPU, SPARSE, int>;
+#endif
 
 }

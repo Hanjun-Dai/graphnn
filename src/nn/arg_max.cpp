@@ -27,9 +27,6 @@ void ArgMax<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& oper
 	});
 }
 
-template class ArgMax<CPU, float>;
-template class ArgMax<CPU, double>;
-template class ArgMax<GPU, float>;
-template class ArgMax<GPU, double>;
+INSTANTIATE_CLASS(ArgMax)
 
 }

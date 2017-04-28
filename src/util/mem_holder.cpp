@@ -2,9 +2,11 @@
 #include <memory>
 #include <cstdlib>
 #include <cassert>
-#include <cuda_runtime.h>
-
 #include <iostream>
+
+#ifdef USE_GPU
+#include <cuda_runtime.h>
+#endif
 
 namespace gnn
 {
@@ -14,10 +16,12 @@ void Malloc(Dtype*& p, size_t nBytes)
 {
 	if (mode::type == MatMode::cpu)
 		p = (Dtype*) malloc(nBytes);
+#ifdef USE_GPU
 	else {
 		cudaError_t t = cudaMalloc(&p, nBytes);
 		assert(t == cudaSuccess);
 	}
+#endif
 }
 
 template< typename mode >
@@ -56,8 +60,10 @@ void MemHolder<mode>::ForceDel(T*& p)
 		ASSERT(it != pt_info.end(), "pointer not found");
 		if (mode::type == MatMode::cpu)
 			free(it->second.second);
+		#ifdef USE_GPU
 		else
 			cudaFree(it->second.second);
+		#endif
 		pt_info.erase(it);
 		p = nullptr;
 	}
@@ -90,7 +96,6 @@ void MemHolder<mode>::MallocArr(T*& p, size_t nBytes)
 }
 
 template class MemHolder<CPU>;
-template class MemHolder<GPU>;
 
 template void MemHolder<CPU>::ForceDel<float>(float*& p); 
 template void MemHolder<CPU>::ForceDel<double>(double*& p); 
@@ -104,6 +109,8 @@ template void MemHolder<CPU>::MallocArr<float>(float*& p, size_t nBytes);
 template void MemHolder<CPU>::MallocArr<double>(double*& p, size_t nBytes); 
 template void MemHolder<CPU>::MallocArr<int>(int*& p, size_t nBytes); 
 
+#ifdef USE_GPU
+template class MemHolder<GPU>;
 template void MemHolder<GPU>::ForceDel<float>(float*& p); 
 template void MemHolder<GPU>::ForceDel<double>(double*& p); 
 template void MemHolder<GPU>::ForceDel<int>(int*& p); 
@@ -115,5 +122,6 @@ template void MemHolder<GPU>::Recycle<int>(int*& p);
 template void MemHolder<GPU>::MallocArr<float>(float*& p, size_t nBytes); 
 template void MemHolder<GPU>::MallocArr<double>(double*& p, size_t nBytes); 
 template void MemHolder<GPU>::MallocArr<int>(int*& p, size_t nBytes); 
+#endif
 
 }

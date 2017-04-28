@@ -71,8 +71,6 @@ void CrossEntropy<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> 
 	grad_lhs.Axpy(1.0, probs);
 }
 
-template class CrossEntropy<CPU, float>;
-template class CrossEntropy<CPU, double>;
-template class CrossEntropy<GPU, float>;
-template class CrossEntropy<GPU, double>;
+INSTANTIATE_CLASS(CrossEntropy)
+
 }

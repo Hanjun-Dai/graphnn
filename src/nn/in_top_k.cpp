@@ -43,10 +43,6 @@ void InTopK<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& oper
 	IsInTopK(pred, label, out_bool, topK);
 }
 
-
-template class InTopK<CPU, float>;
-template class InTopK<CPU, double>;
-template class InTopK<GPU, float>;
-template class InTopK<GPU, double>;
+INSTANTIATE_CLASS(InTopK)
 
 }

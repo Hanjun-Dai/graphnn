@@ -43,8 +43,6 @@ void ElewiseMinus<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> 
 	}
 }
 
-template class ElewiseMinus<CPU, float>;
-template class ElewiseMinus<CPU, double>;
-template class ElewiseMinus<GPU, float>;
-template class ElewiseMinus<GPU, double>;
+INSTANTIATE_CLASS(ElewiseMinus)
+
 }

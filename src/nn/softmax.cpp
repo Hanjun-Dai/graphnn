@@ -66,10 +66,6 @@ void Softmax<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& op
 	SoftmaxDeriv(prev_grad, cur_out, cur_grad);
 }
 
-
-template class Softmax<CPU, float>;
-template class Softmax<CPU, double>;
-template class Softmax<GPU, float>;
-template class Softmax<GPU, double>;
+INSTANTIATE_CLASS(Softmax)
 
 }

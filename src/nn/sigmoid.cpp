@@ -49,9 +49,6 @@ void Sigmoid<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& op
 	SigmDeriv(prev_grad, cur_out, cur_grad);
 }
 
-template class Sigmoid<CPU, float>;
-template class Sigmoid<CPU, double>;
-template class Sigmoid<GPU, float>;
-template class Sigmoid<GPU, double>;
+INSTANTIATE_CLASS(Sigmoid)
 
 }

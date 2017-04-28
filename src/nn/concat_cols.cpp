@@ -51,8 +51,6 @@ void ConcatCols<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 	}
 }
 
-template class ConcatCols<CPU, float>;
-template class ConcatCols<CPU, double>;
-template class ConcatCols<GPU, float>;
-template class ConcatCols<GPU, double>;
+INSTANTIATE_CLASS(ConcatCols)
+
 }

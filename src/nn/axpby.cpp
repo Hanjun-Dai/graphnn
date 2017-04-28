@@ -46,9 +46,6 @@ void Axpby<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& oper
 	}
 }
 
-template class Axpby<CPU, float>;
-template class Axpby<CPU, double>;
-template class Axpby<GPU, float>;
-template class Axpby<GPU, double>;
+INSTANTIATE_CLASS(Axpby)
 
 }

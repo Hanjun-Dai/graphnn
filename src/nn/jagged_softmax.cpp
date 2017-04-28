@@ -72,9 +72,6 @@ void JaggedSoftmax<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable>
 	JaggedSoftmaxDeriv(prev_grad, cur_out, cur_grad, lens);
 }
 
-template class JaggedSoftmax<CPU, float>;
-template class JaggedSoftmax<CPU, double>;
-template class JaggedSoftmax<GPU, float>;
-template class JaggedSoftmax<GPU, double>;
+INSTANTIATE_CLASS(JaggedSoftmax)
 
 }

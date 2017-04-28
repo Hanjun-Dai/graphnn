@@ -44,9 +44,6 @@ void SquareError<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >
 	grad_lhs.Axpy(2.0, diff);
 }
 
-template class SquareError<CPU, float>;
-template class SquareError<CPU, double>;
-template class SquareError<GPU, float>;
-template class SquareError<GPU, double>;
+INSTANTIATE_CLASS(SquareError)
 
 }

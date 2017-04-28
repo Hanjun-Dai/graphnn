@@ -62,9 +62,6 @@ void Tanh<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& opera
 	TanhDeriv(prev_grad, cur_out, cur_grad);
 }
 
-template class Tanh<CPU, float>;
-template class Tanh<CPU, double>;
-template class Tanh<GPU, float>;
-template class Tanh<GPU, double>;
+INSTANTIATE_CLASS(Tanh)
 
 }

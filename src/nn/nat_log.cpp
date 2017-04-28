@@ -47,9 +47,6 @@ void NatLog<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 	prev_grad.Axpy(1.0, buf);
 }
 
-template class NatLog<CPU, float>;
-template class NatLog<CPU, double>;
-template class NatLog<GPU, float>;
-template class NatLog<GPU, double>;
+INSTANTIATE_CLASS(NatLog)
 
 }

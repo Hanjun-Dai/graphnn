@@ -35,9 +35,6 @@ void AbsError<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& o
 	ASSERT(false, "bp is not implemented yet in abs_error");
 }
 
-template class AbsError<CPU, float>;
-template class AbsError<CPU, double>;
-template class AbsError<GPU, float>;
-template class AbsError<GPU, double>;
+INSTANTIATE_CLASS(AbsError)
 
 }
