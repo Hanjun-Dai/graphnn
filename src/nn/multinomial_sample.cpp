@@ -41,7 +41,9 @@ void MultinomialSample<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variab
 				idx = j;
 				break;
 			}
-		}		
+		}
+		if (idx < 0)
+			idx = (int)probs.cols() - 1;
 		ASSERT(idx >= 0 && idx < (int)probs.cols(), "unexpected summation of probs");
 		output.data->ptr[i] = idx;
 	}
