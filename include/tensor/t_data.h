@@ -2,7 +2,9 @@
 #define T_DATA_H
 
 #include "tensor.h"
+#ifdef USE_GPU
 #include <thrust/device_vector.h>
+#endif
 
 namespace gnn{
 
@@ -68,6 +70,7 @@ public:
 	bool is_referring;
 };
 
+#ifdef USE_GPU
 /**
  * @brief      GPU DENSE specialization
  *
@@ -108,6 +111,7 @@ public:
 	 */
 	bool is_referring;	
 };
+#endif
 
 /**
  * @brief      SPARSE specialization of tensor data object

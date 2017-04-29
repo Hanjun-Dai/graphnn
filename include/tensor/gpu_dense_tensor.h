@@ -1,6 +1,7 @@
 #ifndef GPU_DENSE_TENSOR_H
 #define GPU_DENSE_TENSOR_H
 
+#ifdef USE_GPU
 #include "tensor.h"
 #include "t_data.h"
 #include "gpu_handle.h"
@@ -408,6 +409,6 @@ public:
 };
 
 }
-
+#endif
 
 #endif
