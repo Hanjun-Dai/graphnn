@@ -28,6 +28,7 @@ typename FacType<CPU, int>::OutType af(FactorGraph& g, std::vector< std::shared_
 	return af< FacType<CPU, int> >(g, op, std::forward<Args>(args)...);
 }
 
+#ifdef USE_GPU
 template<template <typename, typename> class FacType, typename... Args>
 typename FacType<GPU, float>::OutType af(FactorGraph& g, std::vector< std::shared_ptr< TensorVar<GPU, float> > > op, 
 										Args&&... args)
@@ -48,6 +49,7 @@ typename FacType<GPU, int>::OutType af(FactorGraph& g, std::vector< std::shared_
 {
 	return af< FacType<GPU, int> >(g, op, std::forward<Args>(args)...);
 }
+#endif
 
 }
 
