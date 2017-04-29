@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
+#include "mkl.h"
 
 #ifdef USE_GPU
 #include <cuda_runtime.h>
@@ -15,7 +16,7 @@ template<typename mode, typename Dtype>
 void Malloc(Dtype*& p, size_t nBytes)
 {
 	if (mode::type == MatMode::cpu)
-		p = (Dtype*) malloc(nBytes);
+		p = (Dtype*)mkl_malloc(nBytes, 64);
 #ifdef USE_GPU
 	else {
 		cudaError_t t = cudaMalloc(&p, nBytes);
@@ -59,7 +60,7 @@ void MemHolder<mode>::ForceDel(T*& p)
 		auto it = pt_info.find(id);
 		ASSERT(it != pt_info.end(), "pointer not found");
 		if (mode::type == MatMode::cpu)
-			free(it->second.second);
+			mkl_free(it->second.second);
 		#ifdef USE_GPU
 		else
 			cudaFree(it->second.second);
