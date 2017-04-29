@@ -1,8 +1,15 @@
 GNN_HOME=../..
 
 include $(GNN_HOME)/make_common
+USE_GPU = 0
 
-lib_dir := $(GNN_HOME)/build/lib
+ifeq ($(USE_GPU), 1)
+	lib_dir := $(GNN_HOME)/build/lib
+	CXXFLAGS += -DUSE_GPU
+else
+	lib_dir := $(GNN_HOME)/build_cpuonly/lib
+endif
+
 gnn_lib := $(lib_dir)/libgnn.a
 
 include_dirs := $(CUDA_HOME)/include $(MKL_ROOT)/include $(GNN_HOME)/include include
