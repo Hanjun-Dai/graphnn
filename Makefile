@@ -1,6 +1,10 @@
 include make_common
 
-build_root = build
+ifeq ($(USE_GPU), 1)
+    build_root = build
+else
+    build_root = build_cpuonly
+endif
 
 include_dirs = $(CUDA_HOME)/include $(MKL_ROOT)/include include
 CXXFLAGS += $(addprefix -I,$(include_dirs))
@@ -63,6 +67,6 @@ $(test_build_root)/test_main: test/test_main.cpp $(test_target) $(gnn_lib)
 	$(CXX) $(CXXFLAGS) -MMD -o $@ $(filter %.o, $^) -L$(lib_dir) -lgnn $(LDFLAGS) -lpthread -lgtest
 
 clean:
-	rm -rf build
+	rm -rf $(build_root)
 
 -include $(DEPS)
