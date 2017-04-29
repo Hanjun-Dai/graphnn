@@ -1,6 +1,8 @@
 #ifndef GPU_BINARY_FUNCTOR_H
 #define GPU_BINARY_FUNCTOR_H
 
+#ifdef USE_GPU
+
 #include "binary_functor.h"
 #include "gpu_handle.h"
 
@@ -93,5 +95,7 @@ public:
 };
 
 }
+
+#endif
 
 #endif

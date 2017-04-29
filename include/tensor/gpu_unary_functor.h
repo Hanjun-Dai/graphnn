@@ -1,6 +1,7 @@
 #ifndef GPU_UNARY_FUNCTOR_H
 #define GPU_UNARY_FUNCTOR_H
 
+#ifdef USE_GPU
 #include "unary_functor.h"
 #include "cuda_helper.h"
 #define min(x, y) (x < y ? x : y)
@@ -365,4 +366,6 @@ public:
 };
 
 }
+#endif
+
 #endif

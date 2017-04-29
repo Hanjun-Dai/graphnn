@@ -46,13 +46,14 @@ public:
 	 * @param      src   the CPU dense tensor with same data type
 	 */
 	void CopyFrom(DTensor<CPU, Dtype>& src);		
+#ifdef USE_GPU
 	/**
 	 * @brief      deeply copy src to this tensor
 	 *
 	 * @param      src   the GPU dense tensor with same data type
 	 */
 	void CopyFrom(DTensor<GPU, Dtype>& src);
-
+#endif
 	/**
 	 * @brief      deeply copy src to this tensor
 	 *
@@ -364,13 +365,14 @@ public:
 	 * @param      src   the CPU dense tensor with same data type
 	 */
 	void CopyFrom(DTensor<CPU, int>& src);		
+#ifdef USE_GPU	
 	/**
 	 * @brief      deeply copy src to this tensor
 	 *
 	 * @param      src   the GPU dense tensor with same data type
 	 */
 	void CopyFrom(DTensor<GPU, int>& src);
-
+#endif
 	/**
 	 * @brief      shallow copy (only set the shared_ptr)
 	 *

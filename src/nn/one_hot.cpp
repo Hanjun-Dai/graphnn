@@ -41,10 +41,13 @@ void OneHot<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& oper
 	{
 		memcpy(output.data->row_ptr, idxes.data(), sizeof(int) * idxes.size());
 		memcpy(output.data->col_idx, input.data->ptr, sizeof(int) * input.rows());
-	} else {
+	} 
+#ifdef USE_GPU
+	else {
 		cudaMemcpy(output.data->row_ptr, idxes.data(), sizeof(int) * idxes.size(), cudaMemcpyHostToDevice);
 		cudaMemcpy(output.data->col_idx, input.data->ptr, sizeof(int) * input.rows(), cudaMemcpyDeviceToDevice);
 	}
+#endif
 }
 
 INSTANTIATE_CLASS(OneHot)

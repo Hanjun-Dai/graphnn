@@ -1,6 +1,8 @@
 #ifndef GPU_SPARSE_TENSOR_H
 #define GPU_SPARSE_TENSOR_H
 
+#ifdef USE_GPU
+
 #include "tensor.h"
 #include "t_data.h"
 
@@ -90,5 +92,6 @@ public:
 
 }
 
+#endif
 
 #endif

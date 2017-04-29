@@ -1,6 +1,7 @@
 #ifndef CUDA_HELPER_H
 #define CUDA_HELPER_H
 
+#ifdef USE_GPU
 #include <curand.h>
 #include <cuda_runtime.h>
 #include <cusparse_v2.h>
@@ -198,5 +199,7 @@ inline void Cuda_SetRandNormal(curandGenerator_t& generator, double* outputPtr, 
 {
 		curandGenerateNormalDouble(generator, outputPtr, n, mean, stddev);
 }
+
+#endif
 
 #endif

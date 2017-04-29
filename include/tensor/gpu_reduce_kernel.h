@@ -1,6 +1,8 @@
 #ifndef GPU_REDUCE_KERNEL_H
 #define GPU_REDUCE_KERNEL_H
 
+#ifdef USE_GPU
+
 #define REDUCE_THREADS 256
 #define REDUCE_THREAD_BITS 8
 
@@ -96,5 +98,7 @@ public:
 	}
 };
 }
+
+#endif
 
 #endif

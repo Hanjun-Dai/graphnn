@@ -1,10 +1,13 @@
 #include "tensor/cpu_sparse_tensor.h"
-#include "tensor/gpu_sparse_tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/cpu_dense_tensor.h"
 #include "util/mem_holder.h"
 #include <cstring>
 #include <cassert>
+
+#ifdef USE_GPU
+#include "tensor/gpu_sparse_tensor.h"
+#endif
 
 namespace gnn 
 {
@@ -61,6 +64,7 @@ void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
 	memcpy(data->row_ptr, src.data->row_ptr, sizeof(int) * src.data->len_ptr);
 }
 
+#ifdef USE_GPU
 template<typename Dtype>
 void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
 {
@@ -70,6 +74,7 @@ void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
 	cudaMemcpy(data->col_idx, src.data->col_idx, sizeof(int) * src.data->nnz, cudaMemcpyDeviceToHost);
 	cudaMemcpy(data->row_ptr, src.data->row_ptr, sizeof(int) * src.data->len_ptr, cudaMemcpyDeviceToHost);
 }
+#endif
 
 template<typename Dtype>
 void TensorTemplate<CPU, SPARSE, Dtype>::ShallowCopy(SpTensor<CPU, Dtype>& src)

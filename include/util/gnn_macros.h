@@ -81,6 +81,7 @@ namespace gnn
       throw std::logic_error("unknown type"); \
     }                     \
 
+#ifdef USE_GPU
 #define MAT_MODE_SWITCH(mode, matMode, ...) \
     switch (mode) { \
       case MatMode::cpu: \
@@ -97,7 +98,25 @@ namespace gnn
       break; \
       default: \
         throw std::logic_error("unknown mode"); \
-    } \
+    }
+#else
+#define MAT_MODE_SWITCH(mode, matMode, ...) \
+    switch (mode) { \
+      case MatMode::cpu: \
+      { \
+        typedef CPU matMode; \
+        {__VA_ARGS__} \
+      } \
+      break; \
+      case MatMode::gpu: \
+      { \
+        throw std::logic_error("gpu mode is not enabled"); \
+      } \
+      break; \
+      default: \
+        throw std::logic_error("unknown mode"); \
+    }
+#endif
     
 typedef unsigned int uint;
 

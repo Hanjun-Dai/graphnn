@@ -1,5 +1,4 @@
 #include "tensor/cpu_dense_tensor.h"
-#include "tensor/gpu_dense_tensor.h"
 #include "tensor/cpu_sparse_tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/cpu_unary_functor.h"
@@ -8,6 +7,10 @@
 #include <cstring>
 #include <cassert>
 #include <functional>
+
+#ifdef USE_GPU
+#include "tensor/gpu_dense_tensor.h"
+#endif
 
 namespace gnn 
 {
@@ -87,13 +90,6 @@ void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<CPU, Dtype>& src)
 {
 	Reshape(src.shape.dims);
 	memcpy(data->ptr, src.data->ptr, sizeof(Dtype) * shape.Count());
-}
-
-template<typename Dtype>
-void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<GPU, Dtype>& src)
-{
-	Reshape(src.shape.dims);
-	cudaMemcpy(data->ptr, src.data->ptr, sizeof(Dtype) * this->shape.Count(), cudaMemcpyDeviceToHost);
 }
 
 template<typename Dtype>
@@ -506,9 +502,6 @@ void TensorTemplate<CPU, DENSE, Dtype>::Truncate(Dtype lb, Dtype ub)
 	UnaryEngine<CPU>::Exec<UnaryTruncate>(this->data->ptr, this->shape.Count(), lb, ub);
 }
 
-template class TensorTemplate<CPU, DENSE, float>;
-template class TensorTemplate<CPU, DENSE, double>;
-
 ///================================ int tensor ===================================
 
 TensorTemplate<CPU, DENSE, int>::TensorTemplate() : data(nullptr)
@@ -558,12 +551,6 @@ void TensorTemplate<CPU, DENSE, int>::CopyFrom(DTensor<CPU, int>& src)
 	memcpy(data->ptr, src.data->ptr, sizeof(int) * shape.Count());
 }
 
-void TensorTemplate<CPU, DENSE, int>::CopyFrom(DTensor<GPU, int>& src)
-{
-	Reshape(src.shape.dims);
-	cudaMemcpy(data->ptr, src.data->ptr, sizeof(int) * this->shape.Count(), cudaMemcpyDeviceToHost);
-}
-
 void TensorTemplate<CPU, DENSE, int>::ShallowCopy(DTensor<CPU, int>& src)
 {
 	this->shape = src.shape;
@@ -590,6 +577,24 @@ int TensorTemplate<CPU, DENSE, int>::AsScalar()
 	assert(this->shape.Count() == 1);
 	return this->data->ptr[0];	
 }
+
+#ifdef USE_GPU
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::CopyFrom(DTensor<GPU, Dtype>& src)
+{
+	Reshape(src.shape.dims);
+	cudaMemcpy(data->ptr, src.data->ptr, sizeof(Dtype) * this->shape.Count(), cudaMemcpyDeviceToHost);
+}
+
+void TensorTemplate<CPU, DENSE, int>::CopyFrom(DTensor<GPU, int>& src)
+{
+	Reshape(src.shape.dims);
+	cudaMemcpy(data->ptr, src.data->ptr, sizeof(int) * this->shape.Count(), cudaMemcpyDeviceToHost);
+}
+#endif
+
+template class TensorTemplate<CPU, DENSE, float>;
+template class TensorTemplate<CPU, DENSE, double>;
 
 template class TensorTemplate<CPU, DENSE, int>;
 

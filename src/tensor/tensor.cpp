@@ -1,6 +1,7 @@
 #include "tensor/tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/cpu_dense_tensor.h"
+#include <cassert>
 
 namespace gnn
 {
