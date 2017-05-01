@@ -27,9 +27,11 @@ public:
 	 *
 	 * @param      operands  The input arguments (variables) to this operator
 	 * @param      outputs   The output variables produced by this operator
+	 * @param      phase     train/test
 	 */
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 std::vector< std::shared_ptr<Variable> >& outputs) NOT_IMPLEMENTED
+						 std::vector< std::shared_ptr<Variable> >& outputs, 
+						 Phase phase) NOT_IMPLEMENTED
 
 	/**
 	 * @brief      Backward function

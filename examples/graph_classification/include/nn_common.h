@@ -131,7 +131,7 @@ void MainLoop()
 			for (unsigned i = 0; i < test_idx.size(); i += cfg::batch_size)
 			{
 				auto cur_bsize = GetBatch(test_idx, i, cfg::batch_size);
-				fg.FeedForward(targets, inputs);
+				fg.FeedForward(targets, inputs, Phase::TEST);
 				for (auto& t : targets)
 				{
 					if (!loss_total.count(t->name))
@@ -158,7 +158,7 @@ void MainLoop()
 		}
 	
 		GetBatch(train_idx, cur_pos, cfg::batch_size);
-		fg.FeedForward(targets, inputs);
+		fg.FeedForward(targets, inputs, Phase::TRAIN);
 		
     	if (cfg::iter % cfg::report_interval == 0)
 		{

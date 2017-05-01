@@ -13,7 +13,8 @@ ArgMax<mode, Dtype>::ArgMax(std::string _name, uint _axis)
 
 template<typename mode, typename Dtype>
 void ArgMax<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 			std::vector< std::shared_ptr<Variable> >& outputs)
+						 			std::vector< std::shared_ptr<Variable> >& outputs,
+						 			Phase phase)
 {
 	ASSERT(operands.size() == 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 

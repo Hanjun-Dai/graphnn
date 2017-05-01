@@ -152,16 +152,18 @@ public:
 	}
 
 	/**
-	 * @brief      feed forward function
+	 * @brief      { function_description }
 	 *
 	 * @param[in]  targets    The targets which the user wants to fetch
-	 * @param[in]  feed_dict  The feed dictionary; used to set the placeholders
+	 * @param[in]  feed_dict  The feed dictionary; used to set the placeholders	 
+	 * @param[in]  phase      train/test
 	 * @param[in]  n_thread   # threads used in this function
 	 *
-	 * @return     { The targets required by user}
+	 * @return     { The targets required by user }
 	 */
 	VarList FeedForward(std::vector< VarPtr > targets, 
 						std::map<std::string, void*> feed_dict,
+						Phase phase, 
 						uint n_thread = 1);
 
 	/**
@@ -241,9 +243,11 @@ protected:
 	 *
 	 * @param[in]  targets    The targets which the user wants to fetch
 	 * @param[in]  feed_dict  The feed dictionary; used to set the placeholders
+	 * @param[in]  phase	  train/test
 	 */
 	void SequentialForward(std::vector< VarPtr > targets, 
-							std::map<std::string, void*> feed_dict);
+							std::map<std::string, void*> feed_dict, 
+							Phase phase);
 
 	/**
 	 * @brief      The single threaded backward function

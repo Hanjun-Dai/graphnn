@@ -12,7 +12,8 @@ Kxplusb<mode, Dtype>::Kxplusb(std::string _name, Dtype _k, Dtype _b, PropErr _pr
 
 template<typename mode, typename Dtype>
 void Kxplusb<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 			std::vector< std::shared_ptr<Variable> >& outputs)
+						 			std::vector< std::shared_ptr<Variable> >& outputs, 
+						 			Phase phase)
 {
 	ASSERT(operands.size() == 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 

@@ -27,7 +27,8 @@ public:
 	
 	IMsgPass(std::string _name, bool _average);
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						std::vector< std::shared_ptr<Variable> >& outputs) override;
+						std::vector< std::shared_ptr<Variable> >& outputs, 
+						Phase phase) override;
 protected:
 	/**
 	 * @brief      setup the sparse matrix on cpu

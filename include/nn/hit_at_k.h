@@ -51,7 +51,8 @@ public:
 	HitAtK(std::string _name, int _topK = 1);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+						 std::vector< std::shared_ptr<Variable> >& outputs, 
+						 Phase phase) override;
 
 	/**
 	 * top K (by default 1)

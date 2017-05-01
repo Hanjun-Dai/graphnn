@@ -134,7 +134,7 @@ int main(const int argc, const char** argv)
         for (unsigned i = 0; i < labels_test.size(); i += batch_size)
         {
                 LoadBatch(i, images_test, labels_test);
-                g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}});
+                g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}}, Phase::TEST);
                 loss += var_loss->AsScalar() * input.rows();
                 err_rate += (1.0 - var_acc->AsScalar()) * input.rows();
         }
@@ -145,7 +145,7 @@ int main(const int argc, const char** argv)
         for (unsigned i = 0; i < labels_train.size(); i += batch_size)
         {
                 LoadBatch(i, images_train, labels_train);
-                g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}});
+                g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}}, Phase::TRAIN);
 
                 g.BackPropagate({var_loss});
 

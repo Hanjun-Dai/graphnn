@@ -62,6 +62,13 @@ public:
 	size_t Coor2Idx(const std::vector<size_t>& l);
 
 	/**
+	 * @brief      Returns a string representation of the object.
+	 *
+	 * @return     String representation of the object.
+	 */
+	std::string toString();
+
+	/**
 	 * stores the size per each dimension
 	 */
 	std::vector<size_t> dims;

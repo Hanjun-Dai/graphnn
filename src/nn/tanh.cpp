@@ -33,7 +33,8 @@ Tanh<mode, Dtype>::Tanh(std::string _name, PropErr _properr)
 
 template<typename mode, typename Dtype>
 void Tanh<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 		std::vector< std::shared_ptr<Variable> >& outputs) 
+						 		std::vector< std::shared_ptr<Variable> >& outputs, 
+						 		Phase phase) 
 {
 	ASSERT(operands.size() == 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 

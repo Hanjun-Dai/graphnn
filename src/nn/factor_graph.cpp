@@ -72,7 +72,8 @@ void FactorGraph::DependencyParse(std::vector<FactorGraph::VarPtr> targets)
 }
 
 void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets, 
-									std::map<std::string, void*> feed_dict)
+									std::map<std::string, void*> feed_dict, 
+									Phase phase)
 {
 	n_pending.resize(factor_list.size());
 	isFactorExecuted.resize(factor_list.size());
@@ -122,7 +123,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 		if (!necessary)
 			continue;
 		// std::cerr << factor->name << std::endl;
-		factor->Forward(operands, outputs);
+		factor->Forward(operands, outputs, phase);
 		isFactorExecuted[FacIdx(factor)] = true;
 		for (auto p : outputs)
 		{
@@ -144,6 +145,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 
 FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> targets, 
 											std::map<std::string, void*> feed_dict,
+											Phase phase,
 											uint n_thread)
 {	
 	DependencyParse(targets);
@@ -161,7 +163,7 @@ FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> t
 	}
 
 	if (n_thread == 1)
-		SequentialForward(targets, feed_dict);
+		SequentialForward(targets, feed_dict, phase);
 	else {
 		throw std::runtime_error("not implemented");	
 	}

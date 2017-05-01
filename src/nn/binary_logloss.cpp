@@ -26,7 +26,8 @@ BinaryLogLoss<mode, Dtype>::BinaryLogLoss(std::string _name, bool _need_sigmoid,
 
 template<typename mode, typename Dtype>
 void BinaryLogLoss<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 				std::vector< std::shared_ptr<Variable> >& outputs)
+						 				std::vector< std::shared_ptr<Variable> >& outputs, 
+						 				Phase phase)
 {
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 

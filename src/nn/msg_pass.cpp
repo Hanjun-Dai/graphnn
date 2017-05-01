@@ -24,7 +24,8 @@ IMsgPass<mode, Dtype>::IMsgPass(std::string _name, bool _average) : Factor(_name
 
 template<typename mode, typename Dtype>
 void IMsgPass<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-									std::vector< std::shared_ptr<Variable> >& outputs) 
+									std::vector< std::shared_ptr<Variable> >& outputs, 
+									Phase phase) 
 {
 	ASSERT(operands.size() == 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 

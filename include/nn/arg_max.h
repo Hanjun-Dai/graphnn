@@ -50,7 +50,8 @@ public:
 	ArgMax(std::string _name, uint _axis = 0);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+						 std::vector< std::shared_ptr<Variable> >& outputs, 
+						 Phase phase) override;
 
 	/**
 	 * the axis to be kept

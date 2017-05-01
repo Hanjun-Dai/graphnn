@@ -27,6 +27,19 @@ void TShape::Reshape(std::vector<size_t> l)
 	}
 }
 
+std::string TShape::toString()
+{
+	std::string ans = "[";
+	for (size_t i = 0; i < dims.size(); ++i)
+	{
+		ans += fmt::sprintf("%d", dims[i]);
+		if (i + 1 < dims.size())
+			ans += ",";
+	}
+	ans += "]";
+	return ans;
+}
+
 // size_t TShape::Count(uint dim)
 // {
 // 	if (dim == 0 && this->dims.size() == 0)

@@ -46,7 +46,8 @@ public:
 	MultinomialSample(std::string _name, bool _need_softmax);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+						 std::vector< std::shared_ptr<Variable> >& outputs, 
+						 Phase phase) override;
 	/**
 	 * whether need to do softmax for the input (whether the input is logits)
 	 */

@@ -30,7 +30,8 @@ InTopK<mode, Dtype>::InTopK(std::string _name, int _topK) : Factor(_name, PropEr
 
 template<typename mode, typename Dtype>
 void InTopK<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 			std::vector< std::shared_ptr<Variable> >& outputs)
+						 			std::vector< std::shared_ptr<Variable> >& outputs, 
+						 			Phase phase)
 {
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 

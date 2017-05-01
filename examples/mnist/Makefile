@@ -1,7 +1,7 @@
 GNN_HOME=../..
 
 include $(GNN_HOME)/make_common
-USE_GPU = 0
+USE_GPU = 1
 
 ifeq ($(USE_GPU), 1)
 	lib_dir := $(GNN_HOME)/build/lib

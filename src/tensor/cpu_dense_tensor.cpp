@@ -4,6 +4,7 @@
 #include "tensor/cpu_unary_functor.h"
 #include "tensor/mkl_helper.h"
 #include "util/mem_holder.h"
+#include "fmt/format.h"
 #include <cstring>
 #include <cassert>
 #include <functional>
@@ -289,7 +290,7 @@ void TensorTemplate<CPU, DENSE, Dtype>::Add(Dtype scalar)
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, DTensor<CPU, Dtype>& x)
 {
-	ASSERT(this->shape == x.shape, "shape doesn't match in Axpy");
+	ASSERT(this->shape == x.shape, fmt::sprintf("shape doesn't match in Axpy {0} vs {1}", this->shape.toString(), x.shape.toString()));
 	MKL_Axpy(shape.Count(), a, x.data->ptr, data->ptr);
 }
 

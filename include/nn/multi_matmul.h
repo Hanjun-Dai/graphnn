@@ -50,9 +50,12 @@ public:
 	 *
 	 * @param      operands  The operands, in the form of: op[0] * op[1] + op[2] * op[3] + ...
 	 * @param      outputs   The single output 
+	 * @param      phase     train/test
 	 */
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						std::vector< std::shared_ptr<Variable> >& outputs) override;
+						std::vector< std::shared_ptr<Variable> >& outputs, 
+						Phase phase) override;
+
 	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
 						std::vector< bool >& isConst, 
 						std::vector< std::shared_ptr<Variable> >& outputs) override;

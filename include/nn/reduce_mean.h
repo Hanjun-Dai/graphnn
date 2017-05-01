@@ -49,7 +49,8 @@ public:
 	ReduceMean(std::string _name, int _axis = -1, bool _keep_dim = false, PropErr _properr = PropErr::T);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
-						 std::vector< std::shared_ptr<Variable> >& outputs) override;
+						 std::vector< std::shared_ptr<Variable> >& outputs, 
+						 Phase phase) override;
 	
 	virtual void Backward(std::vector< std::shared_ptr<Variable> >& operands, 
 						  std::vector< bool >& isConst, 
