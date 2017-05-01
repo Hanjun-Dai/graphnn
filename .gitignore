@@ -1,4 +1,6 @@
 build/
+*.model
+log.txt
 build_cpuonly/
 .vscode/
 html/

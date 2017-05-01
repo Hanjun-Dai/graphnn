@@ -21,6 +21,7 @@
 #include "nn/in_top_k.h"
 #include "nn/is_equal.h"
 #include "nn/jagged_softmax.h"
+#include "nn/kxplusb.h"
 #include "nn/l2_col_norm.h"
 #include "nn/matmul.h"
 #include "nn/msg_pass.h"

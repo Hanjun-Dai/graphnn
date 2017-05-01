@@ -40,11 +40,11 @@ public:
 	 * @brief      Constructor
 	 *
 	 * @param[in]  _name     The name
-	 * @param[in]  _a        coeff a
+	 * @param[in]  _k        coeff k
 	 * @param[in]  _b        coeff b
 	 * @param[in]  _properr  The properr
 	 */
-	Kxplusb(std::string _name, Dtype _a, Dtype _b, PropErr _properr = PropErr::T);
+	Kxplusb(std::string _name, Dtype _k, Dtype _b, PropErr _properr = PropErr::T);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 std::vector< std::shared_ptr<Variable> >& outputs) override;
@@ -53,9 +53,9 @@ public:
 						std::vector< bool >& isConst, 
 						std::vector< std::shared_ptr<Variable> >& outputs) override;
 	/**
-	 * coeff a
+	 * coeff k
 	 */
-	Dtype a;
+	Dtype k;
 
 	/**
 	 * coeff b
