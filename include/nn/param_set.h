@@ -28,6 +28,13 @@ public:
 	void AddParam(std::shared_ptr< DTensorVar<mode, Dtype> > param);
 
 	/**
+	 * @brief      Adds a non differentiable param
+	 *
+	 * @param[in]  param  The parameter
+	 */
+	void AddNondiff(std::shared_ptr< DTensorVar<mode, Dtype> > param);
+
+	/**
 	 * @brief      save the params into disk
 	 *
 	 * @param[in]  filename  The filename
@@ -52,6 +59,11 @@ public:
 	 * the dictionary: param name -> param shared pointer
 	 */
 	std::map<std::string, std::shared_ptr< DTensorVar<mode, Dtype> > > params;
+
+	/**
+	 * the dictionary: nondiff param name -> nondiff param shared pointer
+	 */
+	std::map<std::string, std::shared_ptr< DTensorVar<mode, Dtype> > > nondiff_params;
 };
 
 template<template <typename, typename> class ParamType, typename mode, typename Dtype, typename... Args>
@@ -68,6 +80,23 @@ std::shared_ptr< ParamType<mode, Dtype> > add_diff(ParamSet<mode, Dtype>& pset, 
 {
 	auto p = std::make_shared< ParamType<mode, Dtype> >(param_name, l, std::forward<Args>(args)...);
 	pset.AddParam(p);
+	return p;
+}
+
+template<template <typename, typename> class ParamType, typename mode, typename Dtype, typename... Args>
+std::shared_ptr< ParamType<mode, Dtype> > add_nondiff(ParamSet<mode, Dtype>& pset, std::string param_name, Args&&... args)
+{
+	auto p = std::make_shared< ParamType<mode, Dtype> >(param_name, std::forward<Args>(args)...);
+	pset.AddNonDiff(p);
+	return p;
+}
+
+template<template <typename, typename> class ParamType, typename mode, typename Dtype, typename IdxType, typename... Args>
+std::shared_ptr< ParamType<mode, Dtype> > add_nondiff(ParamSet<mode, Dtype>& pset, std::string param_name, 
+												std::initializer_list<IdxType> l, Args&&... args)
+{
+	auto p = std::make_shared< ParamType<mode, Dtype> >(param_name, l, std::forward<Args>(args)...);
+	pset.AddNonDiff(p);
 	return p;
 }
 
