@@ -734,6 +734,12 @@ void TensorTemplate<GPU, DENSE, Dtype>::Sqrt()
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::InvSqrt()
+{
+    UnaryEngine<GPU>::Exec<UnaryInvSqrt>(this->data->ptr, this->shape.Count());
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Sigmoid()
 {
     UnaryEngine<GPU>::Exec<UnarySigmoid>(this->data->ptr, this->shape.Count());
@@ -755,6 +761,15 @@ template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::Truncate(Dtype lb, Dtype ub)
 {
     UnaryEngine<GPU>::Exec<UnaryTruncate>(this->data->ptr, this->shape.Count(), lb, ub);
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Print2Screen()
+{
+    ASSERT(shape.dims.size() == 2, "can only print matrix");
+    DTensor<CPU, Dtype> buf;
+    buf.CopyFrom(*this);
+    buf.Print2Screen();
 }
 
 template class TensorTemplate<GPU, DENSE, float>;

@@ -1,17 +1,17 @@
-#include "nn/batch_norm.h"
+#include "nn/moving_norm.h"
 
 namespace gnn
 {
 
 template<typename mode, typename Dtype>
-BatchNorm<mode, Dtype>::BatchNorm(std::string _name, Dtype _alpha, PropErr _properr) 
+MovingNorm<mode, Dtype>::MovingNorm(std::string _name, Dtype _alpha, PropErr _properr) 
 		: Factor(_name, _properr), alpha(_alpha)
 {
-
+	eps = 1e-5;
 }
 
 template<typename mode, typename Dtype>
-void BatchNorm<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
+void MovingNorm<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 			std::vector< std::shared_ptr<Variable> >& outputs, 
 						 			Phase phase)
 {
@@ -22,11 +22,12 @@ void BatchNorm<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& o
 
 	auto& input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->value;
 	auto& moving_mean = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[1].get())->value;
-	auto& moving_std = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[2].get())->value;
+	auto& moving_inv_std = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[2].get())->value;
 
 	output.CopyFrom(input);
 	auto mul = DTensor<mode, Dtype>({input.rows(), (size_t)1});
 	mul.Fill(1.0);
+
 	if (phase == Phase::TRAIN)
 	{
 		DTensor<mode, Dtype> cur_mean;
@@ -37,18 +38,27 @@ void BatchNorm<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& o
 	
 	output.MM(mul, moving_mean, Trans::N, Trans::N, -1.0, 1.0);
 
-	DTensor<mode, Dtype> buf, cur_std;
-	buf.CopyFrom(output);
-	buf.Square();
+	if (phase == Phase::TRAIN)
+	{
+		DTensor<mode, Dtype> buf, cur_inv_std;
+		buf.CopyFrom(output);
+		buf.Square();
 
-	cur_std.MM(mul, buf, Trans::T, Trans::N, 1.0 / input.rows(), 0.0);
-	//cur_std.InvSqrt();
+		cur_inv_std.MM(mul, buf, Trans::T, Trans::N, 1.0 / input.rows(), 0.0);
+		cur_inv_std.Add(eps);
+		cur_inv_std.InvSqrt();
 
+		moving_inv_std.Axpby(alpha, cur_inv_std, 1 - alpha);	
+	}
+	
+	normed_inv_std.CopyFrom(moving_inv_std);
+	normed_inv_std.Truncate(0, 1.0);
 
+	output.ElewiseMul(normed_inv_std);
 }
 
 template<typename mode, typename Dtype>
-void BatchNorm<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& operands, 
+void MovingNorm<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& operands, 
 									std::vector< bool >& isConst, 
 						 			std::vector< std::shared_ptr<Variable> >& outputs)
 {
@@ -61,8 +71,13 @@ void BatchNorm<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& 
 
 	auto& grad_0 = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
 
+	DTensor<mode, Dtype> buf;
+	buf.CopyFrom(cur_grad);
+	buf.ElewiseMul(normed_inv_std);
+
+	grad_0.Axpy(1.0, buf);
 }
 
-INSTANTIATE_CLASS(BatchNorm)
+INSTANTIATE_CLASS(MovingNorm)
 
 }

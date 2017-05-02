@@ -117,6 +117,16 @@ template<typename mode, typename Dtype>
 class UnarySqrt {};
 
 /**
+ * @brief      Functor to inv_sqrt an element; CPU doesn't need this;
+ *
+ * @tparam     mode   { GPU }
+ * @tparam     Dtype  { float/double }
+ */
+template<typename mode, typename Dtype>
+class UnaryInvSqrt {};
+
+
+/**
  * @brief      Functor to log an element; CPU doesn't need this;
  *
  * @tparam     mode   { GPU }

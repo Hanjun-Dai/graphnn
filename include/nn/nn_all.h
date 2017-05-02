@@ -24,6 +24,7 @@
 #include "nn/kxplusb.h"
 #include "nn/l2_col_norm.h"
 #include "nn/matmul.h"
+#include "nn/moving_norm.h"
 #include "nn/msg_pass.h"
 #include "nn/multi_matmul.h"
 #include "nn/multinomial_sample.h"

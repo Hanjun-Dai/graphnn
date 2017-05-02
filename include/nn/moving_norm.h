@@ -1,5 +1,5 @@
-#ifndef BATCH_NORM_H
-#define BATCH_NORM_H
+#ifndef MOVING_NORM_H
+#define MOVING_NORM_H
 
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
@@ -9,12 +9,12 @@ namespace gnn
 {
 
 template<typename mode, typename Dtype>
-class BatchNorm : public Factor
+class MovingNorm : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "BatchNorm";
+		return "MovingNorm";
 	}
 	
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;
@@ -30,7 +30,7 @@ public:
 		return std::make_shared< DTensorVar<mode, Dtype> >(out_name);
 	}
 
-	BatchNorm(std::string _name, Dtype _alpha, PropErr _properr = PropErr::T);
+	MovingNorm(std::string _name, Dtype _alpha, PropErr _properr = PropErr::T);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 std::vector< std::shared_ptr<Variable> >& outputs, 
@@ -44,6 +44,16 @@ public:
 	 * smoothing factor; c = a * c_1 + (1-a) * c
 	 */
 	Dtype alpha;
+
+	/**
+	 * eps to prevent 'divide by zero'
+	 */
+	Dtype eps;
+
+	/**
+	 * truncate inv std
+	 */
+	DTensor<mode, Dtype> normed_inv_std;
 };
 
 }

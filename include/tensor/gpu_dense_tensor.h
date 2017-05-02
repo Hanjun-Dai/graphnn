@@ -296,6 +296,12 @@ public:
 	 * @brief      set each element x to be x^0.5
 	 */
 	void Sqrt();
+
+	/**
+	 * @brief      set each element x to be 1/ (x^0.5)
+	 */
+	void InvSqrt();
+
 	/**
 	 * @brief      set each element x to be 1 / (1 + exp(-x))
 	 */
@@ -316,6 +322,10 @@ public:
 	 */
 	void Truncate(Dtype lb, Dtype ub);
 	
+	/**
+	 * @brief      print tensor to screen; for debug purpose
+	 */
+	void Print2Screen(); 
 	/**
 	 * the shared ptr to the data structure (which is used to keep the data of this tensor)
 	 */

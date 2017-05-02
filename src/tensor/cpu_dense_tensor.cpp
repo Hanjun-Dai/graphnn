@@ -479,6 +479,12 @@ void TensorTemplate<CPU, DENSE, Dtype>::Sqrt()
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::InvSqrt()
+{
+	MKL_InvSqrt(this->shape.Count(), data->ptr, data->ptr);
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Sigmoid()
 {
 	UnaryEngine<CPU>::Exec<UnarySigmoid>(this->data->ptr, this->shape.Count());
@@ -501,6 +507,20 @@ void TensorTemplate<CPU, DENSE, Dtype>::Truncate(Dtype lb, Dtype ub)
 {
 	ASSERT(lb <= ub, "the interval is invalid");
 	UnaryEngine<CPU>::Exec<UnaryTruncate>(this->data->ptr, this->shape.Count(), lb, ub);
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Print2Screen()
+{
+	ASSERT(shape.dims.size() == 2, "can only print matrix");
+	std::cerr << "========= " << rows() << " x " << cols() << " ==========" << std::endl;
+	for (size_t i = 0; i < rows(); ++i)
+	{
+		for (size_t j = 0; j < cols(); ++j)
+			std::cerr << data->ptr[i * cols() + j] << " ";
+		std::cerr << std::endl;
+	}
+	std::cerr << std::endl;
 }
 
 ///================================ int tensor ===================================

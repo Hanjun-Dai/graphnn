@@ -24,6 +24,16 @@ __device__ inline int get_sp_row_idx(int i, int* row_ptr, int n_rows)
     return row;
 }
 
+__device__ inline float cuda_rsqrt(const float& src)
+{
+        return rsqrtf(src);
+}
+
+__device__ inline float cuda_rsqrt(const double& src)
+{
+        return rsqrt(src);
+}
+
 __device__ inline float cuda_pow(const float& x, const float& y)
 {
         return powf(x, y);

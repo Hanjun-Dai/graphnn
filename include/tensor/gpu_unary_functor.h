@@ -247,6 +247,24 @@ public:
 };
 
 /**
+ * @brief      UnaryInvSqrt
+ *
+ * @tparam     Dtype  { float/double }
+ */
+template<typename Dtype>
+class UnaryInvSqrt<GPU, Dtype>
+{
+public:
+	/**
+	 * dst = 1.0 / sqrt(dst)
+	 */
+	__device__ inline void operator()(Dtype& dst)
+	{
+		dst = cuda_rsqrt(dst);
+	}
+};
+
+/**
  * @brief      UnaryExp
  *
  * @tparam     Dtype  { float/double }
