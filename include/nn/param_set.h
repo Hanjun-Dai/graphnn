@@ -87,7 +87,7 @@ template<template <typename, typename> class ParamType, typename mode, typename 
 std::shared_ptr< ParamType<mode, Dtype> > add_nondiff(ParamSet<mode, Dtype>& pset, std::string param_name, Args&&... args)
 {
 	auto p = std::make_shared< ParamType<mode, Dtype> >(param_name, std::forward<Args>(args)...);
-	pset.AddNonDiff(p);
+	pset.AddNondiff(p);
 	return p;
 }
 
@@ -96,7 +96,7 @@ std::shared_ptr< ParamType<mode, Dtype> > add_nondiff(ParamSet<mode, Dtype>& pse
 												std::initializer_list<IdxType> l, Args&&... args)
 {
 	auto p = std::make_shared< ParamType<mode, Dtype> >(param_name, l, std::forward<Args>(args)...);
-	pset.AddNonDiff(p);
+	pset.AddNondiff(p);
 	return p;
 }
 
