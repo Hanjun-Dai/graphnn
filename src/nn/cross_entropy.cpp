@@ -13,7 +13,12 @@ void CalcCrossEntropy(DTensor<CPU, Dtype>& prob, SpTensor<CPU, Dtype>& label, DT
 	{
 		Dtype loss = 0.0;
 		for (int k = label.data->row_ptr[i]; k < label.data->row_ptr[i + 1]; ++k)
-		    loss -= log(prob.data->ptr[label.cols() * i + label.data->col_idx[k]]) * label.data->val[k];
+                {
+		    auto t = prob.data->ptr[label.cols() * i + label.data->col_idx[k]];
+		    if (fabs(t) < 1e-8)
+		            t = 1e-8;
+		    loss -= log(t) * label.data->val[k];
+                }
 		out.data->ptr[i] = loss;
 	}
 }

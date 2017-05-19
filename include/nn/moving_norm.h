@@ -54,6 +54,8 @@ public:
 	 * truncate inv std
 	 */
 	DTensor<mode, Dtype> normed_inv_std;
+
+	bool has_first;
 };
 
 }
