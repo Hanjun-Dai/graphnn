@@ -7,13 +7,16 @@ namespace gnn
 template<typename Dtype>
 void CalcBinaryLogLoss(DTensor<CPU, Dtype>& prob, DTensor<CPU, Dtype>& label, DTensor<CPU, Dtype>& out)
 {
-	ASSERT(prob.cols() == 1 && label.cols() == 1, "# columns should be 1");
-	out.Reshape({prob.rows(), 1});
+	ASSERT(prob.cols() == label.cols(), "# columns should match");
+	out.Reshape({prob.rows(), prob.cols()});
 	for (size_t i = 0; i < prob.rows(); ++i)
 	{
-		auto& y = label.data->ptr[i];
-		auto& p = prob.data->ptr[i];
-		out.data->ptr[i] = -y * log(p) - (1 - y) * log(1 - p);
+	        for (size_t j = 0; j < prob.cols(); ++j)
+                {
+		        auto& y = label.data->ptr[i * prob.cols() + j];
+		        auto& p = prob.data->ptr[i * prob.cols() + j];
+		        out.data->ptr[i * prob.cols() + j] = -y * log(p + 1e-9) - (1 - y) * log(1 - p + 1e-9);
+                }
 	}
 }
 
