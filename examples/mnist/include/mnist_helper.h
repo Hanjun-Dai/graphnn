@@ -1,10 +1,10 @@
 #ifndef MNIST_HELPER_H
 #define MNIST_HELPER_H
 
+#include <algorithm>
 #include <cstring>
 #include <cassert>
 #include <vector>
-#include <algorithm>
 
 typedef float Dtype;
 
