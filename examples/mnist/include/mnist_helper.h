@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cassert>
 #include <vector>
+#include <algorithm>
 
 typedef float Dtype;
 
@@ -17,6 +18,7 @@ void LoadRaw(const char* f_image, const char* f_label, std::vector< Dtype* >& im
     num = __builtin_bswap32(num); // the raw data is high endian    
     assert(fread(&buf, sizeof(int), 1, fid) == 1); // rows 
     assert(fread(&buf, sizeof(int), 1, fid) == 1); // cols
+    std::for_each(images.begin(), images.end(), [](Dtype*& val) {delete val;});
     images.clear();    
     unsigned char* buffer = new unsigned char[784];
     for (int i = 0; i < num; ++i)
