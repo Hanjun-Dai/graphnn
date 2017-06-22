@@ -44,8 +44,7 @@ void FactorGraph::DependencyParse(std::vector<FactorGraph::VarPtr> targets)
 	for (size_t i = 0; i < isRequired.size(); ++i)
 		isRequired[i] = false;
 
-	while (!q.empty())
-		q.pop();
+    std::queue<std::string>().swap(q);
 
 	for (auto p : targets)
 	{
@@ -65,24 +64,23 @@ void FactorGraph::DependencyParse(std::vector<FactorGraph::VarPtr> targets)
 				if (!isRequired[VarIdx(p)])
 				{
 					isRequired[VarIdx(p)] = true;
-					q.push(p->name);	
+					q.push(p->name);
 				}
 		}
 	}
 }
 
-void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets, 
-									std::map<std::string, void*> feed_dict, 
+void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
+									std::map<std::string, void*> feed_dict,
 									Phase phase)
 {
 	n_pending.resize(factor_list.size());
 	isFactorExecuted.resize(factor_list.size());
 
-	while (!q.empty())
-		q.pop();
+    std::queue<std::string>().swap(q);
 
 	for (size_t i = 0; i < factor_list.size(); ++i)
-	{		
+	{
 		auto& in_list = factorEdges[factor_list[i]->name].first;
 		n_pending[i] = in_list.size();
 		isFactorExecuted[i] = false;
@@ -91,7 +89,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 	for (size_t i = 0; i < isReady.size(); ++i)
 		if (isReady[i])
 		{
-			auto& out_list = varEdges[var_list[i]->name].second;	
+			auto& out_list = varEdges[var_list[i]->name].second;
 			for (auto f : out_list)
 			{
 				auto& n_rest = n_pending[FacIdx(f)];
@@ -106,7 +104,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 
 	while (!q.empty())
 	{
-		auto& cur_name = q.front();		
+		auto& cur_name = q.front();
 		q.pop();
 
 		auto& factor = factor_dict[cur_name].second;
@@ -143,15 +141,15 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 	}
 }
 
-FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> targets, 
+FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> targets,
 											std::map<std::string, void*> feed_dict,
 											Phase phase,
 											uint n_thread)
-{	
+{
 	DependencyParse(targets);
 	isReady.resize(var_dict.size());
 	for (size_t i = 0; i < isReady.size(); ++i)
-		isReady[i] = false;	
+		isReady[i] = false;
 
 	for (auto st : ready_dict)
 		isReady[VarIdx(st.first)] = true;
@@ -165,7 +163,7 @@ FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> t
 	if (n_thread == 1)
 		SequentialForward(targets, feed_dict, phase);
 	else {
-		throw std::runtime_error("not implemented");	
+		throw std::runtime_error("not implemented");
 	}
 
 	for (auto p : targets)
@@ -192,11 +190,10 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 				var_bp_pendings[i]++;
 	}
 
-	while (!q.empty())
-		q.pop();
+    std::queue<std::string>().swap(q);
 
 	for (size_t i = 0; i < factor_list.size(); ++i)
-	{		
+	{
 		auto& out_list = factorEdges[factor_list[i]->name].second;
 		n_pending[i] =0;
 		for (auto p_var : out_list)
@@ -217,7 +214,7 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 		auto& operands = factorEdges[cur_name].first;
 		auto& outputs = factorEdges[cur_name].second;
 
-		bool necessary = factor->properr == PropErr::T;		
+		bool necessary = factor->properr == PropErr::T;
 		if (necessary)
 		{
 			info_const_list.resize(operands.size());
@@ -243,7 +240,7 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 			//std::cerr << factor->name << " " << has_grad << " " << need_prop << std::endl;
 			necessary = has_grad && need_prop;
 		}
-		
+
 		if (necessary)
 		{
 			//std::cerr << "bp: " << factor->name << std::endl;
@@ -252,7 +249,7 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 				if (!info_const_list[i])
 					var_has_grad[VarIdx(operands[i])] = true;
 		}
-		
+
 		for (auto p : operands)
 		{
 			auto& n_var_bp = var_bp_pendings[VarIdx(p->name)];
@@ -267,18 +264,18 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 				if (--n_rest == 0)
 					q.push(f->name);
 			}
-		}		
+		}
 	}
 }
 
-void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets, 
+void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets,
 								uint n_thread)
 {
-	ASSERT(isReady.size() == var_dict.size() && n_pending.size() == factor_list.size() && isReady.size() == isRequired.size(), 
+	ASSERT(isReady.size() == var_dict.size() && n_pending.size() == factor_list.size() && isReady.size() == isRequired.size(),
 		"unexpected change of computation graph in backward stage");
 	var_has_grad.resize(var_list.size());
 	for (size_t i = 0; i < var_list.size(); ++i)
-	{		
+	{
 		var_has_grad[i] = false;
 		if (!isConst[i])
 		{
@@ -303,13 +300,13 @@ void FactorGraph::BackPropagate(std::vector< FactorGraph::VarPtr > targets,
 	if (n_thread == 1)
 		SequentialBackward(targets);
 	else {
-		throw std::runtime_error("not implemented");	
+		throw std::runtime_error("not implemented");
 	}
 }
 
 void FactorGraph::AddVar(VarPtr var)
 {
-	ASSERT(var_dict.count(var->name) == 0 && varEdges.count(var->name) == 0, 
+	ASSERT(var_dict.count(var->name) == 0 && varEdges.count(var->name) == 0,
 			fmt::sprintf("variable %s is already inserted", var->name.c_str()));
 	varEdges[var->name] = std::pair<FactorList, FactorList>();
 	var_dict[var->name] = std::make_pair(var_list.size(), var);
