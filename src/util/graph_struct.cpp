@@ -7,24 +7,20 @@ template<typename T>
 LinkedTable<T>::LinkedTable()
 {
 	n = ncap = 0;
-	head.clear();	
 }
 
 template<typename T>
 void LinkedTable<T>::AddEntry(int head_id, T content)
-{			
+{
 	if (head_id >= n)
-	{				
+	{
 		if (head_id + 1 > ncap)
 		{
 			ncap = std::max(ncap * 2, head_id + 1);
-			head.resize(ncap);	
-			for (int i = n; i < head_id + 1; ++i)
-				head[i].clear();
+			head.resize(ncap);
 		}
 		n = head_id + 1;
 	}
-	
 	head[head_id].push_back(content);
 }
 
@@ -37,8 +33,8 @@ void LinkedTable<T>::Resize(int new_n)
 		head.resize(ncap);
 	}
 	n = new_n;
-	for (size_t i = 0; i < head.size(); ++i)
-		head[i].clear();
+    for (size_t i = 0; i < head.size(); ++i)
+        head[i].clear();
 }
 
 template class LinkedTable<int>;
