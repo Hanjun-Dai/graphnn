@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "nn/factor_graph.h"
 #include "nn/variable.h"
 
@@ -41,8 +43,7 @@ size_t FactorGraph::FacIdx(std::shared_ptr<Factor> fac)
 void FactorGraph::DependencyParse(std::vector<FactorGraph::VarPtr> targets)
 {
 	isRequired.resize(var_dict.size());
-	for (size_t i = 0; i < isRequired.size(); ++i)
-		isRequired[i] = false;
+    std::fill(isRequired.begin(), isRequired.end(), false);
 
     std::queue<std::string>().swap(q);
 
@@ -148,8 +149,7 @@ FactorGraph::VarList FactorGraph::FeedForward(std::vector<FactorGraph::VarPtr> t
 {
 	DependencyParse(targets);
 	isReady.resize(var_dict.size());
-	for (size_t i = 0; i < isReady.size(); ++i)
-		isReady[i] = false;
+    std::fill(isReady.begin(), isReady.end(), false);
 
 	for (auto st : ready_dict)
 		isReady[VarIdx(st.first)] = true;
