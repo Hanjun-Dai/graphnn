@@ -43,7 +43,7 @@ void L2ColNormGrad(DTensor<CPU, Dtype>& x, DTensor<CPU, Dtype>& prev_grad, DTens
 	}
 
 	tmp.CopyFrom(x);
-	tmp.ElewiseDiv(norm2);
+	tmp.ElewiseMul(norm2);
 	prev_grad.Axpy(-1.0, tmp);
 
 	tmp.CopyFrom(cur_grad);
