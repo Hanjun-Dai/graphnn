@@ -26,7 +26,7 @@ void L2ColNormFwd(DTensor<CPU, Dtype>& in, DTensor<CPU, Dtype>& out, DTensor<CPU
 }
 
 template<typename Dtype>
-void L2ColNormGrad(DTensor<CPU, Dtype>& x, DTensor<CPU, Dtype>& prev_grad, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, Dtype>& norm2, DTensor<CPU, Dtype>& len)
+void L2ColNormGrad(DTensor<CPU, Dtype>& x, DTensor<CPU, Dtype>& prev_grad, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, Dtype>& norm2, DTensor<CPU, Dtype>& len, Dtype scale)
 {
 	DTensor<CPU, Dtype> tmp(x.shape.dims);
 	tmp.CopyFrom(x);
@@ -44,16 +44,16 @@ void L2ColNormGrad(DTensor<CPU, Dtype>& x, DTensor<CPU, Dtype>& prev_grad, DTens
 
 	tmp.CopyFrom(x);
 	tmp.ElewiseMul(norm2);
-	prev_grad.Axpy(-1.0, tmp);
+	prev_grad.Axpy(-scale, tmp);
 
 	tmp.CopyFrom(cur_grad);
 	tmp.ElewiseDiv(len);
-	prev_grad.Axpy(1.0, tmp);
+	prev_grad.Axpy(scale, tmp);
 }
 
 template<typename mode, typename Dtype>
-L2ColNorm<mode, Dtype>::L2ColNorm(std::string _name, PropErr _properr) 
-					: Factor(_name, _properr)
+L2ColNorm<mode, Dtype>::L2ColNorm(std::string _name, Dtype _scale, PropErr _properr) 
+					: Factor(_name, _properr), scale(_scale)
 {
 
 }
@@ -70,6 +70,7 @@ void L2ColNorm<mode, Dtype>::Forward(std::vector< std::shared_ptr<Variable> >& o
 	auto& input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->value;
 
 	L2ColNormFwd(input, output, norm2, len);
+	output.Scale(scale);
 }
 
 template<typename mode, typename Dtype>
@@ -87,7 +88,7 @@ void L2ColNorm<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& 
 	auto& prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
 	auto& prev_out = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->value;
 
-	L2ColNormGrad(prev_out, prev_grad, cur_grad, norm2, len);
+	L2ColNormGrad(prev_out, prev_grad, cur_grad, norm2, len, scale);
 }
 
 

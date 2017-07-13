@@ -1,5 +1,5 @@
-#ifndef L2_COL_NORM_H
-#define L2_COL_NORM_H
+#ifndef INNER_PRODUCT_H
+#define INNER_PRODUCT_H
 
 #include "util/gnn_macros.h"
 #include "nn/factor.h"
@@ -8,31 +8,19 @@
 namespace gnn
 {
 
-template<typename Dtype>
-void L2ColNormFwd(DTensor<CPU, Dtype>& in, DTensor<CPU, Dtype>& out, DTensor<CPU, Dtype>& norm2, DTensor<CPU, Dtype>& len);
-
-template<typename Dtype>
-void L2ColNormFwd(DTensor<GPU, Dtype>& in, DTensor<GPU, Dtype>& out, DTensor<GPU, Dtype>& norm2, DTensor<GPU, Dtype>& len);
-
-template<typename Dtype>
-void L2ColNormGrad(DTensor<CPU, Dtype>& x, DTensor<CPU, Dtype>& prev_grad, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, Dtype>& norm2, DTensor<CPU, Dtype>& len, Dtype scale);
-
-template<typename Dtype>
-void L2ColNormGrad(DTensor<GPU, Dtype>& x, DTensor<GPU, Dtype>& prev_grad, DTensor<GPU, Dtype>& cur_grad, DTensor<GPU, Dtype>& norm2, DTensor<GPU, Dtype>& len, Dtype scale);
-
 /**
- * @brief      normalize each row of the matrix
+ * @brief      Operator: inner product
  *
  * @tparam     mode   { CPU/GPU }
  * @tparam     Dtype  { ele_type (float/double) }
  */
 template<typename mode, typename Dtype>
-class L2ColNorm : public Factor
+class InnerProduct : public Factor
 {
 public:
 	static std::string StrType()
 	{
-		return "L2ColNorm";
+		return "InnerProduct";
 	}
 
 	using OutType = std::shared_ptr< DTensorVar<mode, Dtype> >;
@@ -52,10 +40,9 @@ public:
 	 * @brief      constructor
 	 *
 	 * @param[in]  _name     The name
-	 * @param[in]  _scale    The scale after norm
 	 * @param[in]  _properr  The properr
 	 */
-	L2ColNorm(std::string _name, Dtype _scale, PropErr _properr = PropErr::T);
+	InnerProduct(std::string _name, PropErr _properr = PropErr::T);
 
 	virtual void Forward(std::vector< std::shared_ptr<Variable> >& operands, 
 						 std::vector< std::shared_ptr<Variable> >& outputs, 
@@ -66,10 +53,8 @@ public:
 						std::vector< std::shared_ptr<Variable> >& outputs) override;
 
 private:
-	DTensor<mode, Dtype> norm2, len;
-	Dtype scale;
+    DTensor<mode, Dtype> ones, buf;
 };
 
 }
-
 #endif
