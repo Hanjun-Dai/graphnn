@@ -1,5 +1,5 @@
-#ifndef SPARSE_TENSOR_H
-#define SPARSE_TENSOR_H
+#ifndef CSR_SPARSE_TENSOR_H
+#define CSR_SPARSE_TENSOR_H
 
 #include "tensor.h"
 #include "t_data.h"
@@ -8,12 +8,12 @@ namespace gnn
 {
 
 /**
- * @brief      CPU SPARSE specialization of Tensor
+ * @brief      CPU CSR_SPARSE specialization of Tensor
  *
  * @tparam     Dtype  { float/double }
  */
 template<typename Dtype>
-class TensorTemplate<CPU, SPARSE, Dtype> : public Tensor
+class TensorTemplate<CPU, CSR_SPARSE, Dtype> : public Tensor
 {
 public:
 
@@ -56,11 +56,11 @@ public:
 };
 
 /**
- * @brief      CPU SPARSE int tensor specialization; this tensor is not used for heavy computation
+ * @brief      CPU CSR_SPARSE int tensor specialization; this tensor is not used for heavy computation
  * 				(e.g., matmul)
  */
 template<>
-class TensorTemplate<CPU, SPARSE, int> : public Tensor
+class TensorTemplate<CPU, CSR_SPARSE, int> : public Tensor
 {
 public:
 

@@ -5,11 +5,7 @@
 #include <vector>
 
 #include "fmt/format.h"
-#include "tensor/tensor.h"
-#include "tensor/cpu_dense_tensor.h"
-#include "tensor/gpu_dense_tensor.h"
-#include "tensor/cpu_sparse_tensor.h"
-#include "tensor/gpu_sparse_tensor.h"
+#include "tensor/tensor_all.h"
 
 namespace gnn
 {
@@ -105,7 +101,7 @@ template<typename mode, typename Dtype>
 using DTensorVar = TensorVarTemplate<mode, DENSE, Dtype>;
 
 template<typename mode, typename Dtype>
-using SpTensorVar = TensorVarTemplate<mode, SPARSE, Dtype>;
+using SpTensorVar = TensorVarTemplate<mode, CSR_SPARSE, Dtype>;
 
 /**
  * @brief      Class for tensor variable, which is the most common variable in this package
@@ -118,9 +114,9 @@ class TensorVar : public Variable
 {
 public:
 	/**
-	 * @brief      Get the specific derived tensor variable type (DENSE/SPARSE)
+	 * @brief      Get the specific derived tensor variable type (DENSE/CSR_SPARSE)
 	 *
-	 * @tparam     matType  whether the derived tensor is DENSE/SPARSE
+	 * @tparam     matType  whether the derived tensor is DENSE/CSR_SPARSE
 	 *
 	 * @return     the derived subclass
 	 */
@@ -157,7 +153,7 @@ public:
 	virtual Dtype AsScalar() = 0;
 
 	/**
-	 * @brief      Gets the matrix type (DENSE/SPARSE)
+	 * @brief      Gets the matrix type (DENSE/CSR_SPARSE)
 	 *             
 	 * @return     The matrix enum type
 	 */
@@ -168,7 +164,7 @@ public:
  * @brief      implementation of TensorVar;
  *
  * @tparam     mode     { CPU/GPU }
- * @tparam     matType  { DENSE/SPARSE }
+ * @tparam     matType  { DENSE/CSR_SPARSE }
  * @tparam     Dtype    { float/double/int }
  */
 template<typename mode, typename matType, typename Dtype>
@@ -255,17 +251,17 @@ public:
 	/**
 	 * stores the gradient with respect to this variable
 	 */
-	DTensor< mode, Dtype> grad;
+	RowSpTensor< mode, Dtype> grad;
 };
 
 /**
- * @brief      SPARSE tensor specialization of TensorVar
+ * @brief      CSR_SPARSE tensor specialization of TensorVar
  *
  * @tparam     mode   { CPU/GPU }
  * @tparam     Dtype  { float/double/int }
  */
 template<typename mode, typename Dtype>
-class TensorVarTemplate<mode, SPARSE, Dtype> : public TensorVar<mode, Dtype>
+class TensorVarTemplate<mode, CSR_SPARSE, Dtype> : public TensorVar<mode, Dtype>
 {
 public:
 	TensorVarTemplate(std::string _name);

@@ -24,7 +24,7 @@ public:
 		return "OneHot";
 	}
 
-	using OutType = std::shared_ptr< TensorVarTemplate<mode, SPARSE, Dtype> >;
+	using OutType = std::shared_ptr< TensorVarTemplate<mode, CSR_SPARSE, Dtype> >;
 	
 	/**
 	 * @brief      Creates an out variable.
@@ -34,7 +34,7 @@ public:
 	OutType CreateOutVar()
 	{
 		auto out_name = fmt::sprintf("%s:out_0", this->name);
-		return std::make_shared< TensorVarTemplate<mode, SPARSE, Dtype> >(out_name);
+		return std::make_shared< TensorVarTemplate<mode, CSR_SPARSE, Dtype> >(out_name);
 	}
 
 	/**

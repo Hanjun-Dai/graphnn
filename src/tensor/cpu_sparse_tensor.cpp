@@ -13,19 +13,19 @@ namespace gnn
 {
 
 template<typename Dtype>
-TensorTemplate<CPU, SPARSE, Dtype>::TensorTemplate() : data(nullptr)
+TensorTemplate<CPU, CSR_SPARSE, Dtype>::TensorTemplate() : data(nullptr)
 {
 }
 
 template<typename Dtype>
-void TensorTemplate<CPU, SPARSE, Dtype>::Reshape(std::vector<size_t> l)
+void TensorTemplate<CPU, CSR_SPARSE, Dtype>::Reshape(std::vector<size_t> l)
 {
 	ASSERT(l.size() == 2, "only support sparse matrix");
 	this->shape.Reshape(l);
 }
 
 template<typename Dtype>
-void TensorTemplate<CPU, SPARSE, Dtype>::ResizeSp(int newNNZ, int newNPtr)
+void TensorTemplate<CPU, CSR_SPARSE, Dtype>::ResizeSp(int newNNZ, int newNPtr)
 {
 	if (this->data == nullptr)
 		this->data = std::make_shared< SparseData<CPU, Dtype> >();
@@ -43,19 +43,19 @@ void TensorTemplate<CPU, SPARSE, Dtype>::ResizeSp(int newNNZ, int newNPtr)
 }
 
 template<typename Dtype>
-MatType TensorTemplate<CPU, SPARSE, Dtype>::GetMatType()
+MatType TensorTemplate<CPU, CSR_SPARSE, Dtype>::GetMatType()
 {
 	return MatType::sparse;
 }
 
 template<typename Dtype>
-MatMode TensorTemplate<CPU, SPARSE, Dtype>::GetMatMode()
+MatMode TensorTemplate<CPU, CSR_SPARSE, Dtype>::GetMatMode()
 {
 	return MatMode::cpu;
 }
 
 template<typename Dtype>
-void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
+void TensorTemplate<CPU, CSR_SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
 {
 	this->shape = src.shape;
 	ResizeSp(src.data->nnz, src.data->len_ptr);
@@ -66,7 +66,7 @@ void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
 
 #ifdef USE_GPU
 template<typename Dtype>
-void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
+void TensorTemplate<CPU, CSR_SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
 {
 	this->shape = src.shape;
 	ResizeSp(src.data->nnz, src.data->len_ptr);
@@ -77,14 +77,14 @@ void TensorTemplate<CPU, SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
 #endif
 
 template<typename Dtype>
-void TensorTemplate<CPU, SPARSE, Dtype>::ShallowCopy(SpTensor<CPU, Dtype>& src)
+void TensorTemplate<CPU, CSR_SPARSE, Dtype>::ShallowCopy(SpTensor<CPU, Dtype>& src)
 {
 	this->shape = src.shape;
 	this->data = src.data;
 }
 
 template<typename Dtype>
-void TensorTemplate<CPU, SPARSE, Dtype>::ArgMax(DTensor<CPU, int>& dst, uint axis)
+void TensorTemplate<CPU, CSR_SPARSE, Dtype>::ArgMax(DTensor<CPU, int>& dst, uint axis)
 {
 	ASSERT(axis == 0, "not supported for axis > 0 in CPU Sparse Tensor");
 	dst.Reshape({this->shape[0]});
@@ -102,34 +102,34 @@ void TensorTemplate<CPU, SPARSE, Dtype>::ArgMax(DTensor<CPU, int>& dst, uint axi
 	}
 }
 
-template class TensorTemplate<CPU, SPARSE, float>;
-template class TensorTemplate<CPU, SPARSE, double>;
+template class TensorTemplate<CPU, CSR_SPARSE, float>;
+template class TensorTemplate<CPU, CSR_SPARSE, double>;
 
-TensorTemplate<CPU, SPARSE, int>::TensorTemplate() : data(nullptr)
+TensorTemplate<CPU, CSR_SPARSE, int>::TensorTemplate() : data(nullptr)
 {
 }
 
-void TensorTemplate<CPU, SPARSE, int>::Reshape(std::vector<size_t> l)
+void TensorTemplate<CPU, CSR_SPARSE, int>::Reshape(std::vector<size_t> l)
 {
 }
 
-MatType TensorTemplate<CPU, SPARSE, int>::GetMatType()
+MatType TensorTemplate<CPU, CSR_SPARSE, int>::GetMatType()
 {
 	return MatType::sparse;
 }
 
-MatMode TensorTemplate<CPU, SPARSE, int>::GetMatMode()
+MatMode TensorTemplate<CPU, CSR_SPARSE, int>::GetMatMode()
 {
 	return MatMode::cpu;
 }
 
-void TensorTemplate<CPU, SPARSE, int>::ShallowCopy(SpTensor<CPU, int>& src)
+void TensorTemplate<CPU, CSR_SPARSE, int>::ShallowCopy(SpTensor<CPU, int>& src)
 {
 	this->shape = src.shape;
 	this->data = src.data;
 }
 
-void TensorTemplate<CPU, SPARSE, int>::ResizeSp(int newNNZ, int newNPtr)
+void TensorTemplate<CPU, CSR_SPARSE, int>::ResizeSp(int newNNZ, int newNPtr)
 {
 	if (this->data == nullptr)
 		this->data = std::make_shared< SparseData<CPU, int> >();
@@ -146,7 +146,7 @@ void TensorTemplate<CPU, SPARSE, int>::ResizeSp(int newNNZ, int newNPtr)
 	data->len_ptr = newNPtr;
 }
 
-template class TensorTemplate<CPU, SPARSE, int>;
+template class TensorTemplate<CPU, CSR_SPARSE, int>;
 
 }
 

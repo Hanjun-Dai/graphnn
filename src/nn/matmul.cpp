@@ -40,10 +40,10 @@ void MatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	auto* rhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[1].get());
-	auto& right_grad = rhs->grad;
+	auto right_grad = rhs->grad.Full();
 
 	auto* lhs = dynamic_cast< TensorVar<mode, Dtype>* >(operands[0].get());
 
@@ -66,7 +66,7 @@ void MatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 	if (!isConst[0])
 	{
 		ASSERT(lhs->GetMatType() == MatType::dense, "differentiable lhs can't be sparse");
-		auto& left_grad = lhs->template Derived<DENSE>().grad;
+		auto left_grad = lhs->template Derived<DENSE>().grad.Full();
 		auto& right_mat = rhs->value;
 		
 		if (transA == Trans::N)

@@ -38,8 +38,8 @@ void SquareError<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType());
 	if (isConst[0])
 		return;
-	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
-	auto& grad_lhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
+	auto grad_lhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 	
 	diff.ElewiseMul(grad_out);
 	grad_lhs.Axpy(2.0, diff);

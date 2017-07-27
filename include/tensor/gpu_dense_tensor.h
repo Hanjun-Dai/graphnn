@@ -223,6 +223,15 @@ public:
 	void Axpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b);
 
 	/**
+	 * @brief      the same axpby defined in blas: y = a * x + b * y
+	 *
+	 * @param[in]  a     scalar a
+	 * @param      x     row sparse tensor x
+	 * @param[in]  b     scalar b
+	 */
+	void Axpby(Dtype a, RowSpTensor<GPU, Dtype>& x, Dtype b);
+
+	/**
 	 * @brief      concatenate cols of {matrix}
 	 *
 	 * @param[in]  src_list  The matrix list
@@ -245,7 +254,7 @@ public:
 	 * @param      src   The sparse tensor
 	 */
 	void ElewiseMul(SpTensor<GPU, Dtype>& src);
-
+	
 	/**
 	 * @brief      element-wise multiplication between two dense tensors; broadcasting
 	 * 				is enabled, but we assume the result tensor keeps the shape of this

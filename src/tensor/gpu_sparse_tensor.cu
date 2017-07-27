@@ -11,19 +11,19 @@ namespace gnn
 {
 
 template<typename Dtype>
-TensorTemplate<GPU, SPARSE, Dtype>::TensorTemplate() : data(nullptr)
+TensorTemplate<GPU, CSR_SPARSE, Dtype>::TensorTemplate() : data(nullptr)
 {
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, SPARSE, Dtype>::Reshape(std::vector<size_t> l)
+void TensorTemplate<GPU, CSR_SPARSE, Dtype>::Reshape(std::vector<size_t> l)
 {
 	ASSERT(l.size() == 2, "only support sparse matrix");
 	this->shape.Reshape(l);
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, SPARSE, Dtype>::ResizeSp(int newNNZ, int newNPtr)
+void TensorTemplate<GPU, CSR_SPARSE, Dtype>::ResizeSp(int newNNZ, int newNPtr)
 {
 	if (this->data == nullptr)
 		this->data = std::make_shared< SparseData<GPU, Dtype> >();
@@ -41,19 +41,19 @@ void TensorTemplate<GPU, SPARSE, Dtype>::ResizeSp(int newNNZ, int newNPtr)
 }
 
 template<typename Dtype>
-MatType TensorTemplate<GPU, SPARSE, Dtype>::GetMatType()
+MatType TensorTemplate<GPU, CSR_SPARSE, Dtype>::GetMatType()
 {
 	return MatType::sparse;
 }
 
 template<typename Dtype>
-MatMode TensorTemplate<GPU, SPARSE, Dtype>::GetMatMode()
+MatMode TensorTemplate<GPU, CSR_SPARSE, Dtype>::GetMatMode()
 {
 	return MatMode::gpu;
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
+void TensorTemplate<GPU, CSR_SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
 {
 	this->shape = src.shape;
 	ResizeSp(src.data->nnz, src.data->len_ptr);
@@ -63,7 +63,7 @@ void TensorTemplate<GPU, SPARSE, Dtype>::CopyFrom(SpTensor<CPU, Dtype>& src)
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
+void TensorTemplate<GPU, CSR_SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
 {
 	this->shape = src.shape;
 	ResizeSp(src.data->nnz, src.data->len_ptr);
@@ -73,7 +73,7 @@ void TensorTemplate<GPU, SPARSE, Dtype>::CopyFrom(SpTensor<GPU, Dtype>& src)
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, SPARSE, Dtype>::ShallowCopy(SpTensor<GPU, Dtype>& src)
+void TensorTemplate<GPU, CSR_SPARSE, Dtype>::ShallowCopy(SpTensor<GPU, Dtype>& src)
 {
 	this->shape = src.shape;
 	this->data = src.data;
@@ -112,7 +112,7 @@ __global__ void SparseMatColReduceKernel(dstDtype* dst, int* row_ptr, int* col_i
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, SPARSE, Dtype>::ArgMax(DTensor<GPU, int>& dst, uint axis)
+void TensorTemplate<GPU, CSR_SPARSE, Dtype>::ArgMax(DTensor<GPU, int>& dst, uint axis)
 {
 	ASSERT(axis == 0, "not supported for axis > 0 in GPU Sparse Tensor");
 	dst.Reshape({this->shape[0]});
@@ -121,34 +121,34 @@ void TensorTemplate<GPU, SPARSE, Dtype>::ArgMax(DTensor<GPU, int>& dst, uint axi
     SparseMatColReduceKernel<<<blocks, threads, 0, cudaStreamPerThread>>> (dst.data->ptr, data->row_ptr, data->col_idx, data->val);
 }
 
-template class TensorTemplate<GPU, SPARSE, float>;
-template class TensorTemplate<GPU, SPARSE, double>;
+template class TensorTemplate<GPU, CSR_SPARSE, float>;
+template class TensorTemplate<GPU, CSR_SPARSE, double>;
 
-TensorTemplate<GPU, SPARSE, int>::TensorTemplate() : data(nullptr)
+TensorTemplate<GPU, CSR_SPARSE, int>::TensorTemplate() : data(nullptr)
 {
 }
 
-void TensorTemplate<GPU, SPARSE, int>::Reshape(std::vector<size_t> l)
+void TensorTemplate<GPU, CSR_SPARSE, int>::Reshape(std::vector<size_t> l)
 {
 }
 
-MatType TensorTemplate<GPU, SPARSE, int>::GetMatType()
+MatType TensorTemplate<GPU, CSR_SPARSE, int>::GetMatType()
 {
 	return MatType::sparse;
 }
 
-MatMode TensorTemplate<GPU, SPARSE, int>::GetMatMode()
+MatMode TensorTemplate<GPU, CSR_SPARSE, int>::GetMatMode()
 {
 	return MatMode::gpu;
 }
 
-void TensorTemplate<GPU, SPARSE, int>::ShallowCopy(SpTensor<GPU, int>& src)
+void TensorTemplate<GPU, CSR_SPARSE, int>::ShallowCopy(SpTensor<GPU, int>& src)
 {
 	this->shape = src.shape;
 	this->data = src.data;
 }
 
-void TensorTemplate<GPU, SPARSE, int>::ResizeSp(int newNNZ, int newNPtr)
+void TensorTemplate<GPU, CSR_SPARSE, int>::ResizeSp(int newNNZ, int newNPtr)
 {
 	if (this->data == nullptr)
 		this->data = std::make_shared< SparseData<GPU, int> >();
@@ -165,6 +165,6 @@ void TensorTemplate<GPU, SPARSE, int>::ResizeSp(int newNNZ, int newNPtr)
 	data->len_ptr = newNPtr;
 }
 
-template class TensorTemplate<GPU, SPARSE, int>;
+template class TensorTemplate<GPU, CSR_SPARSE, int>;
 
 }

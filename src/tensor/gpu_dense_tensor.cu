@@ -2,6 +2,7 @@
 #include <thrust/copy.h>
 #include "tensor/gpu_dense_tensor.h"
 #include "tensor/gpu_sparse_tensor.h"
+#include "tensor/gpu_row_sparse_tensor.h"
 #include "tensor/cpu_dense_tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/cu_rand_kernel.h"
@@ -598,6 +599,17 @@ void TensorTemplate<GPU, DENSE, Dtype>::Axpy(Dtype a, SpTensor<GPU, Dtype>& x)
     int blocksPerGrid = (x.data->nnz + thread_num - 1) / thread_num;
 
     SpAxpyKernel <<< blocksPerGrid, thread_num, 0, cudaStreamPerThread >>> (this->data->ptr, x.data->row_ptr, x.data->col_idx, x.data->val, x.data->nnz, this->rows(), this->cols(), a); 
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::Axpby(Dtype a, RowSpTensor<GPU, Dtype>& x, Dtype b)
+{
+    if (x.is_full)
+    {
+        auto dtensor = x.Full();
+        Axpby(a, dtensor, b);
+    } else 
+        throw std::logic_error(std::string("not implemented virtual func: "));
 }
 
 template<typename Dtype>

@@ -20,7 +20,7 @@ Dtype IOptimizer<mode, Dtype>::ClipGradients()
 		Dtype norm = 0.0;
 		for (auto& map_pair : param_set->params)
 		{
-			auto p = map_pair.second;		    
+			auto p = map_pair.second;
 		    Dtype norm2 = p->grad.Norm2();
 		    norm += norm2 * norm2;
 		}
@@ -49,7 +49,7 @@ void SGDOptimizer<mode, Dtype>::Update()
     {        
         auto& param = param_pair.second;
         param->value.Axpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
-        param->grad.Zeros();
+        param->grad.SparseZeros();
     }
 }
 
@@ -84,7 +84,7 @@ void MomentumSGDOptimizer<mode, Dtype>::Update()
             param->value.Axpy(-1.0, *acc_grad_dict[name]);
         } else // do normal sgd
             param->value.Axpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
-        param->grad.Zeros();
+        param->grad.SparseZeros();
     }    
 }
 
@@ -142,7 +142,7 @@ void AdamOptimizer<mode, Dtype>::Update()
 		v_hat.ElewiseMul(m_t);
 		param->value.Axpby(-this->cur_lr * s1, v_hat, 1.0);
 
-		param->grad.Zeros();
+		param->grad.SparseZeros();
     }
 }
 

@@ -43,9 +43,9 @@ void Sigmoid<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& op
 		return;
 	auto* var_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get());
 	auto& cur_out = var_out->value;
-	auto& cur_grad = var_out->grad;
+	auto cur_grad = var_out->grad.Full();
 
-	auto& prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 
 	SigmDeriv(prev_grad, cur_out, cur_grad);
 }

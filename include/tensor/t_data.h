@@ -22,7 +22,7 @@ template<typename mode, typename Dtype>
 using DenseData = TDataTemplate<mode, DENSE, Dtype>;
 
 template<typename mode, typename Dtype>
-using SparseData = TDataTemplate<mode, SPARSE, Dtype>;
+using SparseData = TDataTemplate<mode, CSR_SPARSE, Dtype>;
 
 /**
  * @brief      the data object that used to keep the values of tensor
@@ -114,13 +114,13 @@ public:
 #endif
 
 /**
- * @brief      SPARSE specialization of tensor data object
+ * @brief      CSR_SPARSE specialization of tensor data object
  *
  * @tparam     mode   { CPU/GPU }
  * @tparam     Dtype  { float/double/int }
  */
 template<typename mode, typename Dtype>
-class TDataTemplate<mode, SPARSE, Dtype> : public TData
+class TDataTemplate<mode, CSR_SPARSE, Dtype> : public TData
 {
 public:
 	TDataTemplate();

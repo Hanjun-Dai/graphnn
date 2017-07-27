@@ -35,11 +35,11 @@ void Kxplusb<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& op
 	ASSERT(operands.size() == 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	if (isConst[0])
 		return;
-	auto& grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 	grad.Axpy(k, cur_grad);
 }
 

@@ -35,7 +35,7 @@ void ConcatCols<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 	ASSERT(operands.size() >= 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 	size_t col_start = 0;
 
 	DTensor<mode, Dtype> buf;		
@@ -43,7 +43,7 @@ void ConcatCols<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 	{		
 		if (!isConst[i])
 		{
-			auto& grad_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad;
+			auto grad_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad.Full();
 			buf.CopyColsFrom(cur_grad, col_start, grad_i.cols());
 			grad_i.Axpy(1.0, buf);
 		}

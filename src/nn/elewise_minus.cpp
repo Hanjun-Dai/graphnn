@@ -33,13 +33,13 @@ void ElewiseMinus<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> 
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	for (size_t i = 0; i < operands.size(); ++i)
 	{
 		if (isConst[i])
 			continue;
-		auto& grad_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad;
+		auto grad_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad.Full();
 		grad_i.Axpy((i == 0) ? 1.0 : -1.0, cur_grad);
 	}
 }

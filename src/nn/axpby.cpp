@@ -35,7 +35,7 @@ void Axpby<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& oper
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	for (size_t i = 0; i < operands.size(); ++i)
 	{

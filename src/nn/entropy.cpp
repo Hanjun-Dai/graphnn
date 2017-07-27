@@ -49,9 +49,9 @@ void Entropy<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& op
 		return;
 	auto& probs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->value;
 	ASSERT(probs.cols() == 1, "only support binary now");
-	auto& grad_input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto grad_input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 
-	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 	
 	DTensor<mode, Dtype> tmp;
 	tmp.CopyFrom(probs);

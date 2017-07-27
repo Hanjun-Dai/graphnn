@@ -53,8 +53,8 @@ void ReduceMean<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >&
 	
 	ASSERT(axis == -1 && keep_dim == false, "currently only support axis=-1 and keep_dim=false in " << StrType());
 
-	auto& output = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
-	auto& input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto output = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
+	auto input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 	Dtype grad_out = output.AsScalar();
 	grad_out /= input.shape.Count();
 

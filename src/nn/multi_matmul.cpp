@@ -43,12 +43,12 @@ void MultiMatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >
 	ASSERT(operands.size() % 2 == 0, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	for (size_t i = 0; i < operands.size(); i += 2)
 	{
 		auto* rhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i + 1].get());
-		auto& right_grad = rhs->grad;
+		auto right_grad = rhs->grad.Full();
 		auto* lhs = dynamic_cast< TensorVar<mode, Dtype>* >(operands[i].get());
 
 		if (!isConst[i + 1])
@@ -62,7 +62,7 @@ void MultiMatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >
 		if (!isConst[0])
 		{
 			ASSERT(lhs->GetMatType() == MatType::dense, "differentiable lhs can't be sparse");
-			auto& left_grad = lhs->template Derived<DENSE>().grad;
+			auto left_grad = lhs->template Derived<DENSE>().grad.Full();
 			auto& right_mat = rhs->value;
 			
 			left_grad.MM(grad_out, right_mat, Trans::N, Trans::T, 1.0, 1.0);

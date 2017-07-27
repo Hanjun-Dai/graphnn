@@ -90,6 +90,13 @@ public:
 	void Zeros(); 
 
 	/**
+	 * @brief      set selected rows to be zero
+	 *
+	 * @param      row_idxes  The row idxes
+	 */
+	void RowSelectiveZeros(DTensor<CPU, int>& row_idxes);
+
+	/**
 	 * @brief      if this tensor is actually a scalar, return it; otherwise raise error
 	 *
 	 * @return     the only element in this tensor
@@ -218,6 +225,15 @@ public:
 	 * @param[in]  b     scalar b
 	 */
 	void Axpby(Dtype a, DTensor<CPU, Dtype>& x, Dtype b);
+
+	/**
+	 * @brief      the same axpby defined in blas: y = a * x + b * y
+	 *
+	 * @param[in]  a     scalar a
+	 * @param      x     row sparse tensor x
+	 * @param[in]  b     scalar b
+	 */
+	void Axpby(Dtype a, RowSpTensor<CPU, Dtype>& x, Dtype b);
 
 	/**
 	 * @brief      broadcast operation

@@ -38,6 +38,7 @@ template<typename mode, typename Dtype>
 TensorVarTemplate<mode, DENSE, Dtype>::TensorVarTemplate(std::string _name)
 			 : TensorVar<mode, Dtype>(_name)
 {
+
 }
 
 template<typename mode, typename Dtype>
@@ -69,8 +70,12 @@ MatType TensorVarTemplate<mode, DENSE, Dtype>::GetMatType()
 template<typename mode, typename Dtype>
 void TensorVarTemplate<mode, DENSE, Dtype>::ZeroGrad()
 {
-	grad.Reshape(value.shape.dims);
-	grad.Zeros();
+	if (grad.shape == value.shape)
+		grad.SparseZeros();
+	else {
+		grad.Reshape(value.shape.dims);
+		grad.FullZeros();
+	}
 }
 
 template<typename mode, typename Dtype>
@@ -101,41 +106,41 @@ template class TensorVarTemplate<GPU, DENSE, double>;
 template class TensorVarTemplate<GPU, DENSE, int>;
 #endif
 
-//============ SPARSE Tensor Variable ==================
+//============ CSR_SPARSE Tensor Variable ==================
 
 template<typename mode, typename Dtype>
-TensorVarTemplate<mode, SPARSE, Dtype>::TensorVarTemplate(std::string _name) 
+TensorVarTemplate<mode, CSR_SPARSE, Dtype>::TensorVarTemplate(std::string _name) 
 			: TensorVar<mode, Dtype>(_name)
 {
 
 }
 
 template<typename mode, typename Dtype>
-void TensorVarTemplate<mode, SPARSE, Dtype>::SetRef(void* p)
+void TensorVarTemplate<mode, CSR_SPARSE, Dtype>::SetRef(void* p)
 {
 	auto* pt = static_cast< SpTensor<mode, Dtype>* >(p);
 	this->value.ShallowCopy(*pt);
 }
 
 template<typename mode, typename Dtype>
-Dtype TensorVarTemplate<mode, SPARSE, Dtype>::AsScalar()
+Dtype TensorVarTemplate<mode, CSR_SPARSE, Dtype>::AsScalar()
 {
 	return 0;
 }
 
 template<typename mode, typename Dtype>
-MatType TensorVarTemplate<mode, SPARSE, Dtype>::GetMatType()
+MatType TensorVarTemplate<mode, CSR_SPARSE, Dtype>::GetMatType()
 {
 	return MatType::sparse;
 }
 
-template class TensorVarTemplate<CPU, SPARSE, float>;
-template class TensorVarTemplate<CPU, SPARSE, double>;
-template class TensorVarTemplate<CPU, SPARSE, int>;
+template class TensorVarTemplate<CPU, CSR_SPARSE, float>;
+template class TensorVarTemplate<CPU, CSR_SPARSE, double>;
+template class TensorVarTemplate<CPU, CSR_SPARSE, int>;
 #ifdef USE_GPU
-template class TensorVarTemplate<GPU, SPARSE, float>;
-template class TensorVarTemplate<GPU, SPARSE, double>;
-template class TensorVarTemplate<GPU, SPARSE, int>;
+template class TensorVarTemplate<GPU, CSR_SPARSE, float>;
+template class TensorVarTemplate<GPU, CSR_SPARSE, double>;
+template class TensorVarTemplate<GPU, CSR_SPARSE, int>;
 #endif
 
 }

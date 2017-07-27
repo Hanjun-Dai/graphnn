@@ -33,12 +33,12 @@ void Identity<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& o
 	ASSERT(operands.size() == 1, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	if (!isConst[0])
 	{	
 		MAT_MODE_SWITCH(operands[0]->GetMode(), matMode, {
-			auto& prev_grad = dynamic_cast<DTensorVar<matMode, Dtype>*>(operands[0].get())->grad;
+			auto prev_grad = dynamic_cast<DTensorVar<matMode, Dtype>*>(operands[0].get())->grad.Full();
 			DTensor<matMode, Dtype> buf;
 			buf.CopyFrom(cur_grad);			
 			prev_grad.Axpy(1.0, buf);

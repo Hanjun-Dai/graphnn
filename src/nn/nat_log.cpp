@@ -36,14 +36,14 @@ void NatLog<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 	DTensor<mode, Dtype> buf;
 
 	auto& input = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->value;
-	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	buf.CopyFrom(input);
 	buf.Inv();
 
 	buf.ElewiseMul(cur_grad);
 
-	auto& prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 
 	prev_grad.Axpy(1.0, buf);
 }

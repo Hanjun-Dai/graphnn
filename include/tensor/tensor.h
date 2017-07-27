@@ -32,7 +32,10 @@ template<typename mode, typename Dtype>
 using DTensor = TensorTemplate<mode, DENSE, Dtype>;
 
 template<typename mode, typename Dtype>
-using SpTensor = TensorTemplate<mode, SPARSE, Dtype>;
+using SpTensor = TensorTemplate<mode, CSR_SPARSE, Dtype>;
+
+template<typename mode, typename Dtype>
+using RowSpTensor = TensorTemplate<mode, ROW_SPARSE, Dtype>;
 
 /**
  * @brief      Abstract Class for tensor.
@@ -45,7 +48,7 @@ public:
 	 * @brief      get derived subclass from the pointer to this abstract class
 	 *
 	 * @tparam     mode     { CPU/GPU }
-	 * @tparam     matType  { DENSE/SPARSE }
+	 * @tparam     matType  { DENSE/CSR_SPARSE/ROW_SPARSE }
 	 * @tparam     Dtype    { float/double/int }
 	 *
 	 * @return     the derived subclass
@@ -98,7 +101,7 @@ public:
 	/**
 	 * @brief      Gets the matrix type.
 	 *
-	 * @return     DENSE/SPARSE enum
+	 * @return     DENSE/CSR_SPARSE/ROW_SPARSE enum
 	 */
 	virtual MatType GetMatType() = 0;
 
@@ -135,7 +138,7 @@ private:
  * @brief      the implementation of abstract tensor
  *
  * @tparam     mode     { CPU/GPU }	
- * @tparam     matType  { DENSE/SPARSE }
+ * @tparam     matType  { DENSE/CSR_SPARSE/ROW_SPARSE }
  * @tparam     Dtype    { float/double/int }
  */
 template<typename mode, typename matType, typename Dtype>

@@ -61,8 +61,8 @@ void BinaryLogLoss<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable>
 	auto& label = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[1].get())->value;
 	auto& probs = need_sigmoid ? tmp_probs : raw_pred;
 
-	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
-	auto& grad_lhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
+	auto grad_lhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 
 	if (need_sigmoid)
 	{

@@ -1,5 +1,6 @@
 #include "tensor/cpu_dense_tensor.h"
 #include "tensor/cpu_sparse_tensor.h"
+#include "tensor/cpu_row_sparse_tensor.h"
 #include "tensor/t_data.h"
 #include "tensor/cpu_unary_functor.h"
 #include "tensor/mkl_helper.h"
@@ -8,6 +9,7 @@
 #include <cstring>
 #include <cassert>
 #include <functional>
+#include "tbb/tbb.h"
 
 #ifdef USE_GPU
 #include "tensor/gpu_dense_tensor.h"
@@ -123,6 +125,18 @@ void TensorTemplate<CPU, DENSE, Dtype>::Zeros()
 {
 	if (shape.Count())
 	   memset(this->data->ptr, 0, sizeof(Dtype) * shape.Count());
+}
+
+template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::RowSelectiveZeros(DTensor<CPU, int>& row_idxes)
+{
+	size_t row_cnt = row_idxes.shape.Count();
+	size_t dim = this->shape.Count(1);
+	tbb::parallel_for(size_t(0), row_cnt, size_t(1), [&](size_t i){
+		size_t row_idx = row_idxes.data->ptr[i];
+		auto* row_ptr = data->ptr + row_idx * dim;
+		memset(row_ptr, 0, sizeof(Dtype) * dim);
+	});
 }
 
 template<typename Dtype>
@@ -306,6 +320,17 @@ void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, SpTensor<CPU, Dtype>& x)
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::Axpby(Dtype a, RowSpTensor<CPU, Dtype>& x, Dtype b)
+{
+	if (x.is_full)
+	{
+		auto dtensor = x.Full();
+		Axpby(a, dtensor, b);
+	} else 
+		throw std::logic_error(std::string("not implemented virtual func: "));
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Axpby(Dtype a, DTensor<CPU, Dtype>& x, Dtype b)
 {
 	ASSERT(this->shape == x.shape, "shape doesn't match in Axpby");
@@ -404,7 +429,6 @@ void TensorTemplate<CPU, DENSE, Dtype>::CopyColsFrom(DTensor<CPU, Dtype>& src, s
         offset += src.cols();
     }
 } 
-
 
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::ElewiseMul(DTensor<CPU, Dtype>& src)

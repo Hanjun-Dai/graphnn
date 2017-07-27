@@ -48,10 +48,10 @@ void FullyConnected<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	auto* rhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[1].get());
-	auto& param_grad = rhs->grad;
+	auto param_grad = rhs->grad.Full();
 
 	auto* lhs = dynamic_cast< TensorVar<mode, Dtype>* >(operands[0].get());
 
@@ -77,7 +77,7 @@ void FullyConnected<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable
 	if (!isConst[0])
 	{
 		ASSERT(lhs->GetMatType() == MatType::dense, "differentiable lhs can't be sparse");
-		auto& input_grad = lhs->template Derived<DENSE>().grad;
+		auto input_grad = lhs->template Derived<DENSE>().grad.Full();
 		auto weight = rhs->value.GetRowRef(0, input_grad.cols());
 
 		input_grad.MM(grad_out, weight, Trans::N, Trans::T, 1.0, 1.0);

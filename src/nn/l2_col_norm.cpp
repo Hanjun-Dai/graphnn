@@ -83,9 +83,9 @@ void L2ColNorm<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& 
 	if (isConst[0])
 		return;
 	auto* var_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get());
-	auto& cur_grad = var_out->grad;
+	auto cur_grad = var_out->grad.Full();
 
-	auto& prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
+	auto prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
 	auto& prev_out = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->value;
 
 	L2ColNormGrad(prev_out, prev_grad, cur_grad, norm2, len, scale);

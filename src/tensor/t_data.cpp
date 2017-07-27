@@ -43,7 +43,7 @@ template class TDataTemplate<CPU, DENSE, double>;
 template class TDataTemplate<CPU, DENSE, int>;
 
 template<typename mode, typename Dtype>
-TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate()
+TDataTemplate<mode, CSR_SPARSE, Dtype>::TDataTemplate()
 		: TData()
 {
 	nnz = len_ptr = nzCap = ptrCap = 0;
@@ -52,7 +52,7 @@ TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate()
 }
 
 template<typename mode, typename Dtype>
-TDataTemplate<mode, SPARSE, Dtype>::~TDataTemplate()
+TDataTemplate<mode, CSR_SPARSE, Dtype>::~TDataTemplate()
 {
 	MemHolder<mode>::Recycle(val);
 	MemHolder<mode>::Recycle(col_idx);
@@ -60,7 +60,7 @@ TDataTemplate<mode, SPARSE, Dtype>::~TDataTemplate()
 }
 
 template<typename mode, typename Dtype>
-TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate(int newNzCap, int newPtrCap)
+TDataTemplate<mode, CSR_SPARSE, Dtype>::TDataTemplate(int newNzCap, int newPtrCap)
 		: TData()
 {
 	nnz = len_ptr = 0;
@@ -71,13 +71,13 @@ TDataTemplate<mode, SPARSE, Dtype>::TDataTemplate(int newNzCap, int newPtrCap)
 	MemHolder<mode>::MallocArr(row_ptr, sizeof(int) * ptrCap);
 }
 
-template class TDataTemplate<CPU, SPARSE, float>;
-template class TDataTemplate<CPU, SPARSE, double>;
-template class TDataTemplate<CPU, SPARSE, int>;
+template class TDataTemplate<CPU, CSR_SPARSE, float>;
+template class TDataTemplate<CPU, CSR_SPARSE, double>;
+template class TDataTemplate<CPU, CSR_SPARSE, int>;
 #ifdef USE_GPU
-template class TDataTemplate<GPU, SPARSE, float>;
-template class TDataTemplate<GPU, SPARSE, double>;
-template class TDataTemplate<GPU, SPARSE, int>;
+template class TDataTemplate<GPU, CSR_SPARSE, float>;
+template class TDataTemplate<GPU, CSR_SPARSE, double>;
+template class TDataTemplate<GPU, CSR_SPARSE, int>;
 #endif
 
 }

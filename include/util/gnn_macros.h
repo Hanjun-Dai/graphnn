@@ -49,7 +49,7 @@ namespace gnn
       break;                                  \
     case MatType::sparse:						\
     	{										\
-    		typedef SPARSE matType;				\
+    		typedef CSR_SPARSE matType;				\
     		{__VA_ARGS__}						\
     	}										\
     	break;									\
@@ -123,7 +123,8 @@ typedef unsigned int uint;
 enum class MatType
 {
   dense,
-  sparse
+  sparse,
+  row_sparse
 };
 
 enum class PropErr
@@ -195,13 +196,20 @@ struct DENSE
 };
 
 /**
- * @brief      SPARSE tensor token; used for template parsing
+ * @brief      CSR SPARSE tensor token; used for template parsing
  */
-struct SPARSE
+struct CSR_SPARSE
 {
 	static const MatType type = MatType::sparse;
 };
 
+/**
+ * @brief      ROW SPARSE tensor token; used for template parsing
+ */
+struct ROW_SPARSE
+{
+  static const MatType type = MatType::row_sparse;
+};
 }
 
 #endif

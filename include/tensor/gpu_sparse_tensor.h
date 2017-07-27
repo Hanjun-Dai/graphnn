@@ -1,5 +1,5 @@
-#ifndef GPU_SPARSE_TENSOR_H
-#define GPU_SPARSE_TENSOR_H
+#ifndef GPU_CSR_SPARSE_TENSOR_H
+#define GPU_CSR_SPARSE_TENSOR_H
 
 #ifdef USE_GPU
 
@@ -10,12 +10,12 @@ namespace gnn
 {
 
 /**
- * @brief      GPU SPARSE specialization of Tensor
+ * @brief      GPU CSR_SPARSE specialization of Tensor
  *
  * @tparam     Dtype  { float/double }
  */
 template<typename Dtype>
-class TensorTemplate<GPU, SPARSE, Dtype> : public Tensor
+class TensorTemplate<GPU, CSR_SPARSE, Dtype> : public Tensor
 {
 public:
 
@@ -58,11 +58,11 @@ public:
 };
 
 /**
- * @brief      GPU SPARSE int tensor specialization; this tensor is not used for heavy computation
+ * @brief      GPU CSR_SPARSE int tensor specialization; this tensor is not used for heavy computation
  * 				(e.g., matmul)
  */
 template<>
-class TensorTemplate<GPU, SPARSE, int> : public Tensor
+class TensorTemplate<GPU, CSR_SPARSE, int> : public Tensor
 {
 public:
 

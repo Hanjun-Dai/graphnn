@@ -39,13 +39,13 @@ void InnerProduct<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> 
 	ASSERT(operands.size() == 2, "unexpected input size for " << StrType());
 	ASSERT(outputs.size() == 1, "unexpected output size for " << StrType()); 
 
-	auto& cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad;
+	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
     for (int i = 0; i < 2; ++i)
     {
         if (isConst[i])
             continue;
-        auto& grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad;
+        auto grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad.Full();
         auto& another_operand = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[1 - i].get())->value;
 
         buf.CopyFrom(another_operand);
