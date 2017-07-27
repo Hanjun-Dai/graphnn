@@ -12,13 +12,18 @@ namespace gnn
 template<typename Dtype>
 TensorTemplate<GPU, ROW_SPARSE, Dtype>::TensorTemplate() : data(nullptr), is_full(false)
 {
+	row_idxes.Reshape({0});
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Reshape(std::vector<size_t> l)
 {
 	this->shape.Reshape(l);
-	is_full = false;
+	if (this->data == nullptr)
+		this->data = std::make_shared< DenseData<GPU, Dtype> >();
+
+	this->data->Resize(this->shape.Count());
+	is_full = true;
 	row_idxes.Reshape({0});
 }
 
@@ -46,7 +51,7 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::SparseZeros()
 {
 	if (is_full)
 		Full().Zeros();
-	else {
+	else if (row_idxes.shape.Count()) {
 		throw std::logic_error(std::string("not implemented virtual func: "));
 	}
 	row_idxes.Reshape({0});
@@ -63,43 +68,49 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::FullZeros()
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Fill(Dtype scalar)
 {
-	throw std::logic_error(std::string("not implemented virtual func: "));
+	Full().Fill(scalar);
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::MM(DTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
 {
-	throw std::logic_error(std::string("not implemented virtual func: "));
+	Full().MM(a, b, transA, transB, alpha, beta);
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
 {
-	throw std::logic_error(std::string("not implemented virtual func: "));
+	Full().MM(a, b, transA, transB, alpha, beta);
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Axpy(Dtype a, DTensor<GPU, Dtype>& x)
 {
-	throw std::logic_error(std::string("not implemented virtual func: "));
+	Full().Axpy(a, x);
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Axpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b)
 {
-	throw std::logic_error(std::string("not implemented virtual func: "));
+	Full().Axpby(a, x, b);
 }
 
 template<typename Dtype>
 Dtype TensorTemplate<GPU, ROW_SPARSE, Dtype>::Norm2()
 {
-	throw std::logic_error(std::string("not implemented virtual func: "));
+	if (is_full)
+		return Full().Norm2();
+	throw std::logic_error(std::string("not implemented"));
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Square()
 {
-	throw std::logic_error(std::string("not implemented virtual func: "));
+	if (is_full)
+		Full().Square();
+	else {
+		throw std::logic_error(std::string("not implemented"));
+	}
 }
 
 
@@ -117,7 +128,7 @@ void TensorTemplate<GPU, ROW_SPARSE, int>::Reshape(std::vector<size_t> l)
 
 MatType TensorTemplate<GPU, ROW_SPARSE, int>::GetMatType()
 {
-	return MatType::sparse;
+	return MatType::row_sparse;
 }
 
 MatMode TensorTemplate<GPU, ROW_SPARSE, int>::GetMatMode()

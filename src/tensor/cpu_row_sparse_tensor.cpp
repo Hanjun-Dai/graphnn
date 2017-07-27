@@ -5,10 +5,6 @@
 #include <cstring>
 #include <cassert>
 
-#ifdef USE_GPU
-#include "tensor/gpu_row_sparse_tensor.h"
-#endif
-
 namespace gnn 
 {
 
