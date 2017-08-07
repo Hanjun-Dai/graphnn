@@ -84,9 +84,22 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::SparseMM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
+{
+	throw std::logic_error(std::string("not implemented"));
+	//Full().MM(a, b, transA, transB, alpha, beta);
+}
+
+template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Axpy(Dtype a, DTensor<GPU, Dtype>& x)
 {
 	Full().Axpy(a, x);
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseAxpy(Dtype a, DTensor<GPU, Dtype>& x)
+{
+	throw std::logic_error(std::string("not implemented"));
 }
 
 template<typename Dtype>

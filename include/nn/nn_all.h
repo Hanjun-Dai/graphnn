@@ -39,6 +39,7 @@
 #include "nn/row_selection.h"
 #include "nn/sigmoid.h"
 #include "nn/softmax.h"
+#include "nn/sparse_dense_matmul.h"
 #include "nn/square_error.h"
 #include "nn/tanh.h"
 #include "nn/type_cast.h"

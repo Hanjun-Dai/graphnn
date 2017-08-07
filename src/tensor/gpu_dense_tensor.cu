@@ -496,6 +496,13 @@ void TensorTemplate<GPU, DENSE, Dtype>::Axpy(Dtype a, DTensor<GPU, Dtype>& x)
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, DENSE, Dtype>::RowSelectiveAxpy(DTensor<GPU, int>& row_idxes, Dtype a, DTensor<GPU, Dtype>& x)
+{
+    throw std::logic_error(std::string("not implemented RowSelectiveAxpy"));
+}
+
+
+template<typename Dtype>
 void TensorTemplate<GPU, DENSE, Dtype>::GetPointerBuf(std::vector< DTensor<GPU, Dtype>* >& mat_list)
 {
     if (mat_list.size() > pointer_buf.size())
@@ -602,13 +609,13 @@ void TensorTemplate<GPU, DENSE, Dtype>::Axpy(Dtype a, SpTensor<GPU, Dtype>& x)
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, DENSE, Dtype>::Axpby(Dtype a, RowSpTensor<GPU, Dtype>& x, Dtype b)
+void TensorTemplate<GPU, DENSE, Dtype>::RowSparseAxpby(Dtype a, RowSpTensor<GPU, Dtype>& x, Dtype b)
 {
     if (x.is_full)
     {
         auto dtensor = x.Full();
         Axpby(a, dtensor, b);
-    } else 
+    } else if (x.row_idxes.shape.Count())
         throw std::logic_error(std::string("not implemented virtual func: "));
 }
 

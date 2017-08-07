@@ -205,6 +205,16 @@ public:
 	void Axpy(Dtype a, DTensor<GPU, Dtype>& x);
 
 	/**
+	 * @brief      the same axpy defined in blas: y = a * x + y, but on
+	 * 				selected rows
+	 *
+	 * @param      row_idxes  The row idxes
+	 * @param[in]  a          scalar a
+	 * @param      x          dense tensor x
+	 */
+	void RowSelectiveAxpy(DTensor<GPU, int>& row_idxes, Dtype a, DTensor<GPU, Dtype>& x);
+
+	/**
 	 * @brief      the same axpy defined in blas: y = a * x + y; but here
 	 * 				x is a sparse tensor
 	 *
@@ -229,7 +239,7 @@ public:
 	 * @param      x     row sparse tensor x
 	 * @param[in]  b     scalar b
 	 */
-	void Axpby(Dtype a, RowSpTensor<GPU, Dtype>& x, Dtype b);
+	void RowSparseAxpby(Dtype a, RowSpTensor<GPU, Dtype>& x, Dtype b);
 
 	/**
 	 * @brief      concatenate cols of {matrix}

@@ -73,12 +73,32 @@ public:
 	void MM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta);
 
 	/**
+	 * @brief      compute and store the result (a dense matrix) of matrix multiplication; 
+	 *				this = alpha * A x B + beta * this
+	 * @param      a       operand A (sparse matrix)
+	 * @param      b       operand B (dense matrix)
+	 * @param[in]  transA  whether to transpose A
+	 * @param[in]  transB  whether to transpose B
+	 * @param[in]  alpha   The alpha
+	 * @param[in]  beta    The beta
+	 */
+	void SparseMM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta);
+
+	/**
 	 * @brief      the same axpy defined in blas: y = a * x + y
 	 *
 	 * @param[in]  a     scalar a
 	 * @param      x     dense tensor x
 	 */
 	void Axpy(Dtype a, DTensor<GPU, Dtype>& x);
+
+	/**
+	 * @brief      (*row sparse) the same axpy defined in blas: y = a * x + y
+	 *
+	 * @param[in]  a     scalar a
+	 * @param      x     dense tensor x
+	 */
+	void RowSparseAxpy(Dtype a, DTensor<GPU, Dtype>& x);
 
 	/**
 	 * @brief      the same axpby defined in blas: y = a * x + b * y
@@ -115,6 +135,11 @@ public:
 	 * is dense matrix?
 	 */
 	bool is_full;
+
+	/**
+	 * buffer
+	 */
+	DTensor<GPU, int> idx_buf;
 };
 
 /**

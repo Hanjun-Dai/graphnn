@@ -48,7 +48,7 @@ void SGDOptimizer<mode, Dtype>::Update()
     for (auto& param_pair : this->param_set->params)
     {        
         auto& param = param_pair.second;
-        param->value.Axpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
+        param->value.RowSparseAxpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
         param->grad.SparseZeros();
     }
 }
@@ -71,7 +71,7 @@ void MomentumSGDOptimizer<mode, Dtype>::Update()
     for (auto& param_pair : this->param_set->params)
     {        
         auto& name = param_pair.first;
-        auto& param = param_pair.second;        
+        auto& param = param_pair.second;   
         if (momentum > 0)
         {
             if (acc_grad_dict.count(name) == 0)
@@ -79,11 +79,14 @@ void MomentumSGDOptimizer<mode, Dtype>::Update()
                 acc_grad_dict[name] = std::make_shared< DTensor<mode, Dtype> >(param->grad.shape);
                 acc_grad_dict[name]->Zeros();
             }
-            param->grad.Axpy(this->l2_penalty, param->value);
-            acc_grad_dict[name]->Axpby(this->cur_lr, param->grad, momentum);
-            param->value.Axpy(-1.0, *acc_grad_dict[name]);
+            param->grad.RowSparseAxpy(this->l2_penalty, param->value);
+            acc_grad_dict[name]->RowSparseAxpby(this->cur_lr, param->grad, momentum);
+            if (param->grad.is_full)
+            	param->value.Axpy(-1.0, *acc_grad_dict[name]);
+            else if (param->grad.row_idxes.shape.Count())
+            	param->value.RowSelectiveAxpy(param->grad.row_idxes, -1.0, *acc_grad_dict[name]);
         } else // do normal sgd
-            param->value.Axpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
+            param->value.RowSparseAxpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
         param->grad.SparseZeros();
     }    
 }
@@ -121,10 +124,10 @@ void AdamOptimizer<mode, Dtype>::Update()
 		// clipping and weight decay
 		param->grad.Axpby(this->l2_penalty, param->value, gscale);
 		// m_t = beta_1 * m_{t-1} + (1 - beta_1) * gt
-		m_t.Axpby(1 - beta_1, param->grad, beta_1);
+		m_t.RowSparseAxpby(1 - beta_1, param->grad, beta_1);
 		// v_t = beta_2 * v_{t-1} + (1 - beta_2) * gt^2
 		param->grad.Square();
-		v_t.Axpby(1 - beta_2, param->grad, beta_2);
+		v_t.RowSparseAxpby(1 - beta_2, param->grad, beta_2);
 
 		// 1 / (1 - beta^t)
 		Dtype s1 = 1.0 / (1 - pow(beta_1, this->cur_iter));

@@ -208,6 +208,17 @@ public:
 	 */
 	void Axpy(Dtype a, DTensor<CPU, Dtype>& x);
 
+
+	/**
+	 * @brief      the same axpy defined in blas: y = a * x + y, but on
+	 * 				selected rows
+	 *
+	 * @param      row_idxes  The row idxes
+	 * @param[in]  a          scalar a
+	 * @param      x          dense tensor x
+	 */
+	void RowSelectiveAxpy(DTensor<CPU, int>& row_idxes, Dtype a, DTensor<CPU, Dtype>& x);
+
 	/**
 	 * @brief      the same axpy defined in blas: y = a * x + y; but here
 	 * 				x is a sparse tensor
@@ -233,7 +244,7 @@ public:
 	 * @param      x     row sparse tensor x
 	 * @param[in]  b     scalar b
 	 */
-	void Axpby(Dtype a, RowSpTensor<CPU, Dtype>& x, Dtype b);
+	void RowSparseAxpby(Dtype a, RowSpTensor<CPU, Dtype>& x, Dtype b);
 
 	/**
 	 * @brief      broadcast operation

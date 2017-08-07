@@ -309,6 +309,20 @@ void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, DTensor<CPU, Dtype>& x)
 }
 
 template<typename Dtype>
+void TensorTemplate<CPU, DENSE, Dtype>::RowSelectiveAxpy(DTensor<CPU, int>& row_idxes, Dtype a, DTensor<CPU, Dtype>& x)
+{
+	ASSERT(this->shape == x.shape, fmt::sprintf("shape doesn't match in Axpy {0} vs {1}", this->shape.toString(), x.shape.toString()));
+	ASSERT(row_idxes.shape.Count(), "wrong usage in row selective axpy");
+
+	size_t dim = this->shape.Count(1);
+	tbb::parallel_for(size_t(0), row_idxes.shape.Count(), size_t(1), [&](size_t i){
+		size_t row_idx = row_idxes.data->ptr[i];
+
+		MKL_Axpy(dim, a, x.data->ptr + row_idx * dim, data->ptr + row_idx * dim);
+	});
+}
+
+template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, SpTensor<CPU, Dtype>& x)
 {
 	ASSERT(this->shape == x.shape, "shape doesn't match in Axpy");
@@ -320,14 +334,24 @@ void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, SpTensor<CPU, Dtype>& x)
 }
 
 template<typename Dtype>
-void TensorTemplate<CPU, DENSE, Dtype>::Axpby(Dtype a, RowSpTensor<CPU, Dtype>& x, Dtype b)
+void TensorTemplate<CPU, DENSE, Dtype>::RowSparseAxpby(Dtype a, RowSpTensor<CPU, Dtype>& x, Dtype b)
 {
 	if (x.is_full)
 	{
 		auto dtensor = x.Full();
 		Axpby(a, dtensor, b);
-	} else 
-		throw std::logic_error(std::string("not implemented virtual func: "));
+	} else if (x.row_idxes.shape.Count())
+	{
+		size_t row_cnt = x.row_idxes.shape.Count();
+		size_t dim = this->shape.Count(1);
+		tbb::parallel_for(size_t(0), row_cnt, size_t(1), [&](size_t i){
+			size_t row_idx = x.row_idxes.data->ptr[i];
+			MKL_Axpby(dim, a, 
+					x.data->ptr + row_idx * dim, 
+					b,
+					data->ptr + row_idx * dim);
+		});
+	}
 }
 
 template<typename Dtype>
