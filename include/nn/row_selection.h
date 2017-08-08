@@ -12,7 +12,7 @@ template<typename Dtype>
 void RowSelectionFwd(DTensor<CPU, Dtype>& input, DTensor<CPU, Dtype>& output, DTensor<CPU, int>& row_idxes);
 
 template<typename Dtype>
-void RowSelectionBackwd(DTensor<CPU, Dtype>& prev_grad, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, int>& row_idxes);
+void RowSelectionBackwd(RowSpTensor<CPU, Dtype>& prev_grad, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, int>& row_idxes);
 
 /**
  * @brief      Operator: row selection

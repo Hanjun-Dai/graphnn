@@ -25,6 +25,51 @@ public:
 	virtual MatMode GetMatMode() override;
 
 	/**
+	 * @brief      reshape the structure only
+	 *
+	 * @param      src   The source
+	 */
+	void ReshapeLike(RowSpTensor<GPU, Dtype>& src);
+
+	/**
+	 * @brief      only copy the sparse rows
+	 *
+	 * @param      src   The source
+	 */
+	void RowSparseCopy(DTensor<GPU, Dtype>& src);
+
+	/**
+	 * @brief      multiply a scalar
+	 *
+	 * @param[in]  scalar  The scalar
+	 */
+	void Scale(Dtype scalar);
+
+	/**
+	 * @brief      take square root
+	 */
+	void Sqrt();
+
+	/**
+	 * @brief      add scalar to nonempty rows
+	 *
+	 * @param[in]  scalar  The scalar
+	 */
+	void RowSparseAdd(Dtype scalar);
+
+	/**
+	 * @brief      x = 1/x for nonempty rows
+	 */
+	void RowSparseInv();
+
+	/**
+	 * @brief      elememt-wise multiplication
+	 *
+	 * @param      src   The source
+	 */
+	void ElewiseMul(DTensor<GPU, Dtype>& src);
+
+	/**
 	 * @brief      return a view from dense tensor
 	 *
 	 * @return     dense referenced tensor
@@ -34,7 +79,7 @@ public:
 	/**
 	 * @brief      set this tensor to be zero
 	 */
-	void SparseZeros();
+	void RowSpZeros();
 
 	/**
 	 * @brief      set this full tensor to be zero
@@ -46,31 +91,7 @@ public:
 	 *
 	 * @param[in]  scalar  The scalar to be set
 	 */
-	void Fill(Dtype scalar);
-
-	/**
-	 * @brief      compute and store the result (a dense matrix) of matrix multiplication; 
-	 *				this = alpha * A x B + beta * this
-	 * @param      a       operand A (dense matrix)
-	 * @param      b       operand B (dense matrix)
-	 * @param[in]  transA  whether to transpose A
-	 * @param[in]  transB  whether to transpose B
-	 * @param[in]  alpha   The alpha
-	 * @param[in]  beta    The beta
-	 */
-	void MM(DTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta);
-
-	/**
-	 * @brief      compute and store the result (a dense matrix) of matrix multiplication; 
-	 *				this = alpha * A x B + beta * this
-	 * @param      a       operand A (sparse matrix)
-	 * @param      b       operand B (dense matrix)
-	 * @param[in]  transA  whether to transpose A
-	 * @param[in]  transB  whether to transpose B
-	 * @param[in]  alpha   The alpha
-	 * @param[in]  beta    The beta
-	 */
-	void MM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta);
+	void RowSparseFill(Dtype scalar);
 
 	/**
 	 * @brief      compute and store the result (a dense matrix) of matrix multiplication; 
@@ -85,14 +106,6 @@ public:
 	void SparseMM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta);
 
 	/**
-	 * @brief      the same axpy defined in blas: y = a * x + y
-	 *
-	 * @param[in]  a     scalar a
-	 * @param      x     dense tensor x
-	 */
-	void Axpy(Dtype a, DTensor<GPU, Dtype>& x);
-
-	/**
 	 * @brief      (*row sparse) the same axpy defined in blas: y = a * x + y
 	 *
 	 * @param[in]  a     scalar a
@@ -101,13 +114,13 @@ public:
 	void RowSparseAxpy(Dtype a, DTensor<GPU, Dtype>& x);
 
 	/**
-	 * @brief      the same axpby defined in blas: y = a * x + b * y
+	 * @brief      (*row sparse) the same axpby defined in blas: y = a * x + b * y
 	 *
 	 * @param[in]  a     scalar a
 	 * @param      x     dense tensor x
 	 * @param[in]  b     scalar b
 	 */
-	void Axpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b);
+	void RowSparseAxpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b);
 
 	/**
 	 * @brief      get l2-norm of tensor
@@ -156,20 +169,20 @@ public:
 	virtual MatType GetMatType() override;
 	virtual MatMode GetMatMode() override;
 	/**
+	 * @brief      return a view from dense tensor
+	 *
+	 * @return     dense referenced tensor
+	 */
+	DTensor<GPU, int> Full() { throw std::logic_error(std::string("not implemented")); } 
+
+	/**
 	 * @brief      set this tensor to be zero
 	 */
-	void SparseZeros() {}
+	void RowSpZeros() {}
 	/**
 	 * @brief      set this full tensor to be zero
 	 */
 	void FullZeros() {}
-	
-	/**
-	 * @brief      fill this tensor with same scalar
-	 *
-	 * @param[in]  scalar  The scalar to be set
-	 */
-	void Fill(int scalar) {}
 };
 
 }

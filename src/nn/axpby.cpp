@@ -43,7 +43,7 @@ void Axpby<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& oper
 			continue;
 		auto& grad_i = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[i].get())->grad;		
 		ASSERT(grad_i.shape == cur_grad.shape, "no broadcasting is supported right now");		
-		grad_i.Axpy( i == 0 ? a : b, cur_grad);
+		grad_i.Full().Axpy( i == 0 ? a : b, cur_grad);
 	}
 }
 

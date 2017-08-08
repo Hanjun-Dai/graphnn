@@ -1,5 +1,6 @@
 #include "nn/row_selection.h"
 #include "tensor/mkl_helper.h"
+#include "tbb/tbb.h"
 
 namespace gnn
 {
@@ -8,29 +9,37 @@ template<typename Dtype>
 void RowSelectionFwd(DTensor<CPU, Dtype>& input, DTensor<CPU, Dtype>& output, DTensor<CPU, int>& row_idxes)
 {
 	output.Reshape({row_idxes.shape.Count(), input.cols()});
-	Dtype* dst = output.data->ptr;
-	for (size_t i = 0; i < row_idxes.shape.Count(); ++i)
-	{
-		Dtype* src = input.data->ptr + row_idxes.data->ptr[i] * input.cols();
+	
+	auto* src_ptr = row_idxes.data->ptr;
+
+	size_t row_cnt = row_idxes.shape.Count();
+	size_t dim = input.cols();
+
+	tbb::parallel_for(size_t(0), row_cnt, size_t(1), [&](size_t i){
+		Dtype* src = input.data->ptr + src_ptr[i] * dim;
+		Dtype* dst = output.data->ptr + dim * i;
 		memcpy(dst, src, sizeof(Dtype) * input.cols());
-		dst += input.cols();
-	}
+	});
 }
 
 template<typename Dtype>
-void RowSelectionBackwd(DTensor<CPU, Dtype>& prev_grad, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, int>& row_idxes)
+void RowSelectionBackwd(RowSpTensor<CPU, Dtype>& prev_grad, DTensor<CPU, Dtype>& cur_grad, DTensor<CPU, int>& row_idxes)
 {
-	ASSERT( prev_grad.rows() == row_idxes.shape.Count(), "shape mismatch");
+	ASSERT( cur_grad.rows() == row_idxes.shape.Count(), "shape mismatch");
+	ASSERT( !prev_grad.is_full, "suppose to be row sparse in RowSelectionBackwd");
+	ASSERT( prev_grad.row_idxes.shape.Count() == 0, "only support one bp in RowSelectionBackwd");
 
-	const Dtype* src = cur_grad.data->ptr;
+	size_t row_cnt = row_idxes.shape.Count();
+	size_t dim = cur_grad.cols();
 
-	for (size_t i = 0; i < row_idxes.shape.Count(); ++i)
-	{
-		Dtype* dst = prev_grad.data->ptr + row_idxes.data->ptr[i] * cur_grad.cols();
+	tbb::parallel_for(size_t(0), row_cnt, size_t(1), [&](size_t i){
+		Dtype* dst = prev_grad.data->ptr + row_idxes.data->ptr[i] * dim;
+		const Dtype* src = cur_grad.data->ptr + i * dim;
 
-		MKL_Axpy(cur_grad.cols(), 1.0, src, dst);
-		src += cur_grad.cols();
-	}
+		MKL_Axpy(dim, 1.0, src, dst);
+	});
+
+	prev_grad.InsertRowIdxes(row_cnt, row_idxes.data->ptr);
 }
 
 template<typename mode, typename Dtype>
@@ -66,7 +75,7 @@ void RowSelection<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> 
 
 	auto cur_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
-	auto prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad.Full();
+	auto& prev_grad = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[0].get())->grad;
 	auto& idxes = dynamic_cast<DTensorVar<mode, int>*>(operands[1].get())->value;
 
 	RowSelectionBackwd(prev_grad, cur_grad, idxes);

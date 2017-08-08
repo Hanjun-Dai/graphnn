@@ -39,16 +39,16 @@ TEST(OpTest, MovingNorm)
 	std::vector< std::shared_ptr<Variable> > outs = {v_o};
 	op->Forward(ops, outs, Phase::TRAIN);
 
-	v_x->value.Print2Screen();
-	v_mean->value.Print2Screen();
-	v_inv_std->value.Print2Screen();
+	// v_x->value.Print2Screen();
+	// v_mean->value.Print2Screen();
+	// v_inv_std->value.Print2Screen();
 
-	v_o->value.Print2Screen();
+	// v_o->value.Print2Screen();
 
 	op->Forward(ops, outs, Phase::TEST);
-	v_x->value.Print2Screen();
-	v_mean->value.Print2Screen();
-	v_inv_std->value.Print2Screen();
+	// v_x->value.Print2Screen();
+	// v_mean->value.Print2Screen();
+	// v_inv_std->value.Print2Screen();
 
-	v_o->value.Print2Screen();	
+	// v_o->value.Print2Screen();	
 }

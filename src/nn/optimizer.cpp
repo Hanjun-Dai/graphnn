@@ -49,7 +49,7 @@ void SGDOptimizer<mode, Dtype>::Update()
     {        
         auto& param = param_pair.second;
         param->value.RowSparseAxpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
-        param->grad.SparseZeros();
+        param->grad.RowSpZeros();
     }
 }
 
@@ -87,7 +87,7 @@ void MomentumSGDOptimizer<mode, Dtype>::Update()
             	param->value.RowSelectiveAxpy(param->grad.row_idxes, -1.0, *acc_grad_dict[name]);
         } else // do normal sgd
             param->value.RowSparseAxpby(-this->cur_lr, param->grad, 1 - this->cur_lr * this->l2_penalty);
-        param->grad.SparseZeros();
+        param->grad.RowSpZeros();
     }    
 }
 
@@ -122,7 +122,7 @@ void AdamOptimizer<mode, Dtype>::Update()
 		auto& m_t = *(first_moments[name]); 
 		auto& v_t = *(second_moments[name]);
 		// clipping and weight decay
-		param->grad.Axpby(this->l2_penalty, param->value, gscale);
+		param->grad.RowSparseAxpby(this->l2_penalty, param->value, gscale);
 		// m_t = beta_1 * m_{t-1} + (1 - beta_1) * gt
 		m_t.RowSparseAxpby(1 - beta_1, param->grad, beta_1);
 		// v_t = beta_2 * v_{t-1} + (1 - beta_2) * gt^2
@@ -134,18 +134,28 @@ void AdamOptimizer<mode, Dtype>::Update()
 		Dtype s2 = 1.0 / (1 - pow(beta_2, this->cur_iter)); 
 
 		// v_hat = 1 ./ (sqrt(v_t / (1 - beta_2^t)) + eps)
-		v_hat.CopyFrom(v_t);
+
+		ASSERT(!v_hat.is_full && v_hat.row_idxes.shape.Count() == 0, "v_hat should be empty at the beginning");
+		if (v_hat.data == nullptr || v_t.shape.Count() > v_hat.data->mem_size)
+		{
+			v_hat.Reshape(v_t.shape.dims);
+			v_hat.FullZeros();
+		}
+
+		v_hat.ReshapeLike(param->grad);		
+
+		v_hat.RowSparseCopy(v_t);
 		v_hat.Scale(s2);
 
 		v_hat.Sqrt();
 
-		v_hat.Add(eps);
-		v_hat.Inv();
-		                
+		v_hat.RowSparseAdd(eps);
+		v_hat.RowSparseInv();
 		v_hat.ElewiseMul(m_t);
-		param->value.Axpby(-this->cur_lr * s1, v_hat, 1.0);
 
-		param->grad.SparseZeros();
+		param->value.RowSparseAxpby(-this->cur_lr * s1, v_hat, 1.0);
+		v_hat.RowSpZeros();	
+		param->grad.RowSpZeros();
     }
 }
 

@@ -28,6 +28,48 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Reshape(std::vector<size_t> l)
 }
 
 template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::ReshapeLike(RowSpTensor<GPU, Dtype>& src)
+{
+	throw std::logic_error(std::string("not implemented"));
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseCopy(DTensor<GPU, Dtype>& src)
+{
+	throw std::logic_error(std::string("not implemented"));
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Scale(Dtype scalar)
+{
+	throw std::logic_error(std::string("not implemented"));
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Sqrt()
+{
+	throw std::logic_error(std::string("not implemented"));
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseAdd(Dtype scalar)
+{
+	throw std::logic_error(std::string("not implemented"));
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseInv()
+{
+	throw std::logic_error(std::string("not implemented"));
+}
+
+template<typename Dtype>
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::ElewiseMul(DTensor<GPU, Dtype>& src)
+{
+	throw std::logic_error(std::string("not implemented"));
+}
+
+template<typename Dtype>
 MatType TensorTemplate<GPU, ROW_SPARSE, Dtype>::GetMatType()
 {
 	return MatType::row_sparse;
@@ -47,7 +89,7 @@ DTensor<GPU, Dtype> TensorTemplate<GPU, ROW_SPARSE, Dtype>::Full()
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, ROW_SPARSE, Dtype>::SparseZeros()
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSpZeros()
 {
 	if (is_full)
 		Full().Zeros();
@@ -62,25 +104,13 @@ template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::FullZeros()
 {
 	is_full = true;
-	SparseZeros();
+	RowSpZeros();
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Fill(Dtype scalar)
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseFill(Dtype scalar)
 {
-	Full().Fill(scalar);
-}
-
-template<typename Dtype>
-void TensorTemplate<GPU, ROW_SPARSE, Dtype>::MM(DTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
-{
-	Full().MM(a, b, transA, transB, alpha, beta);
-}
-
-template<typename Dtype>
-void TensorTemplate<GPU, ROW_SPARSE, Dtype>::MM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
-{
-	Full().MM(a, b, transA, transB, alpha, beta);
+	throw std::logic_error(std::string("not implemented"));
 }
 
 template<typename Dtype>
@@ -91,21 +121,15 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::SparseMM(SpTensor<GPU, Dtype>& a, D
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Axpy(Dtype a, DTensor<GPU, Dtype>& x)
-{
-	Full().Axpy(a, x);
-}
-
-template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseAxpy(Dtype a, DTensor<GPU, Dtype>& x)
 {
 	throw std::logic_error(std::string("not implemented"));
 }
 
 template<typename Dtype>
-void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Axpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b)
+void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseAxpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b)
 {
-	Full().Axpby(a, x, b);
+	throw std::logic_error(std::string("not implemented"));
 }
 
 template<typename Dtype>

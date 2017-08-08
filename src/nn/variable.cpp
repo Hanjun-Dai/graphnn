@@ -71,7 +71,7 @@ template<typename mode, typename Dtype>
 void TensorVarTemplate<mode, DENSE, Dtype>::ZeroGrad()
 {
 	if (grad.shape == value.shape)
-		grad.SparseZeros();
+		grad.RowSpZeros();
 	else {
 		grad.Reshape(value.shape.dims);
 		grad.FullZeros();
@@ -82,7 +82,7 @@ template<typename mode, typename Dtype>
 void TensorVarTemplate<mode, DENSE, Dtype>::OnesGrad()
 {
 	grad.Reshape(value.shape.dims);
-	grad.Fill(1);
+	grad.Full().Fill(1);
 }
 
 template<typename mode, typename Dtype>

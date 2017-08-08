@@ -146,7 +146,7 @@ public:
 
 	std::map<std::string, std::shared_ptr< DTensor<mode, Dtype> > > first_moments, second_moments;
 	Dtype beta_1, beta_2, eps;
-	DTensor<mode, Dtype> m_hat, v_hat;
+	RowSpTensor<mode, Dtype> v_hat;
 };
 
 }
