@@ -43,12 +43,11 @@ void MatMul<mode, Dtype>::Backward(std::vector< std::shared_ptr<Variable> >& ope
 	auto grad_out = dynamic_cast<DTensorVar<mode, Dtype>*>(outputs[0].get())->grad.Full();
 
 	auto* rhs = dynamic_cast<DTensorVar<mode, Dtype>*>(operands[1].get());
-	auto right_grad = rhs->grad.Full();
-
 	auto* lhs = dynamic_cast< TensorVar<mode, Dtype>* >(operands[0].get());
 
 	if (!isConst[1])
 	{
+		auto right_grad = rhs->grad.Full();
 		if (transB == Trans::T)
 		{
 			ASSERT(lhs->GetMatType() == MatType::dense, "unsupported backprop in matmul");
