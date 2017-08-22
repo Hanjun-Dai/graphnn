@@ -24,49 +24,88 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Reshape(std::vector<size_t> l)
 
 	this->data->Resize(this->shape.Count());
 	is_full = true;
+	row_idxes.Reshape({this->shape.dims[0]});
 	row_idxes.Reshape({0});
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::ReshapeLike(RowSpTensor<GPU, Dtype>& src)
 {
-	throw std::logic_error(std::string("not implemented"));
+	ASSERT(!is_full && row_idxes.shape.Count() == 0, "should be empty before reshaping");
+	ASSERT(data && data->mem_size >= src.shape.Count(), "should manually allocate memory before reshaping");
+
+	this->shape.Reshape(src.shape.dims);
+	this->is_full = src.is_full;
+	if (!src.is_full)
+		row_idxes.CopyFrom(src.row_idxes);
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseCopy(DTensor<GPU, Dtype>& src)
 {
-	throw std::logic_error(std::string("not implemented"));
+	if (is_full)
+		Full().CopyFrom(src);
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("RowSparseCopy not implemented"));
+	}	
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Scale(Dtype scalar)
 {
-	throw std::logic_error(std::string("not implemented"));
+	if (is_full)
+		Full().Scale(scalar);
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("Scale not implemented"));
+	}	
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Sqrt()
 {
-	throw std::logic_error(std::string("not implemented"));
+	if (is_full)
+		Full().Sqrt();
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("Sqrt not implemented"));
+	}	
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseAdd(Dtype scalar)
 {
-	throw std::logic_error(std::string("not implemented"));
+	if (is_full)
+		Full().Add(scalar);
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("RowSparseAdd not implemented"));
+	}	
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseInv()
 {
-	throw std::logic_error(std::string("not implemented"));
+	if (is_full)
+		Full().Inv();
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("RowSparseInv not implemented"));
+	}	
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::ElewiseMul(DTensor<GPU, Dtype>& src)
 {
-	throw std::logic_error(std::string("not implemented"));
+	ASSERT(this->shape == src.shape, "shape doesn't match in ElewiseMul");
+
+	if (is_full)
+		Full().ElewiseMul(src);
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("ElewiseMul not implemented"));
+	}		
 }
 
 template<typename Dtype>
@@ -94,7 +133,7 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSpZeros()
 	if (is_full)
 		Full().Zeros();
 	else if (row_idxes.shape.Count()) {
-		throw std::logic_error(std::string("not implemented virtual func: "));
+		throw std::logic_error(std::string("RowSpZeros not implemented"));
 	}
 	row_idxes.Reshape({0});
 	is_full = false;
@@ -116,20 +155,36 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseFill(Dtype scalar)
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::SparseMM(SpTensor<GPU, Dtype>& a, DTensor<GPU, Dtype>& b, Trans transA, Trans transB, Dtype alpha, Dtype beta)
 {
-	throw std::logic_error(std::string("not implemented"));
-	//Full().MM(a, b, transA, transB, alpha, beta);
+	ASSERT(transA == Trans::T, "only for bp right now");
+
+	if (is_full)
+	{
+		Full().MM(a, b, transA, transB, alpha, beta);
+		return;
+	}	
+	throw std::logic_error(std::string("SparseMM not implemented"));
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseAxpy(Dtype a, DTensor<GPU, Dtype>& x)
 {
-	throw std::logic_error(std::string("not implemented"));
+	if (is_full)
+		Full().Axpy(a, x);
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("RowSparseAxpy not implemented"));
+	}	
 }
 
 template<typename Dtype>
 void TensorTemplate<GPU, ROW_SPARSE, Dtype>::RowSparseAxpby(Dtype a, DTensor<GPU, Dtype>& x, Dtype b)
 {
-	throw std::logic_error(std::string("not implemented"));
+	if (is_full)
+		Full().Axpby(a, x, b);
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("RowSparseAxpby not implemented"));
+	}
 }
 
 template<typename Dtype>
@@ -137,7 +192,12 @@ Dtype TensorTemplate<GPU, ROW_SPARSE, Dtype>::Norm2()
 {
 	if (is_full)
 		return Full().Norm2();
-	throw std::logic_error(std::string("not implemented"));
+	else if (row_idxes.shape.Count())
+	{
+		throw std::logic_error(std::string("Norm2 not implemented"));
+	}
+	else 
+		return 0;
 }
 
 template<typename Dtype>
@@ -145,8 +205,8 @@ void TensorTemplate<GPU, ROW_SPARSE, Dtype>::Square()
 {
 	if (is_full)
 		Full().Square();
-	else {
-		throw std::logic_error(std::string("not implemented"));
+	else if (row_idxes.shape.Count()) {
+		throw std::logic_error(std::string("Square not implemented"));
 	}
 }
 
