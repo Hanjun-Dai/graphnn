@@ -4,7 +4,7 @@
 #include "util/gnn_macros.h"
 #include "nn/variable.h"
 #include "nn/factor.h"
-#include "fmt/format.h"
+#include "fmt/printf.h"
 #include <initializer_list>
 #include <string>
 #include <map>

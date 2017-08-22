@@ -5,7 +5,7 @@
 #include "tensor/cpu_unary_functor.h"
 #include "tensor/mkl_helper.h"
 #include "util/mem_holder.h"
-#include "fmt/format.h"
+#include "fmt/printf.h"
 #include <cstring>
 #include <cassert>
 #include <functional>

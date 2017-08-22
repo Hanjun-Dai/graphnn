@@ -5,7 +5,7 @@
 #include "tensor/mkl_helper.h"
 #include "util/mem_holder.h"
 #include "tbb/tbb.h"
-#include "fmt/format.h"
+#include "fmt/printf.h"
 #include <cstring>
 #include <atomic>
 #include <cassert>
