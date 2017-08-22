@@ -105,7 +105,7 @@ void FactorGraph::SequentialForward(std::vector< FactorGraph::VarPtr > targets,
 
 	while (!q.empty())
 	{
-		auto& cur_name = q.front();
+		auto cur_name = q.front();
 		q.pop();
 
 		auto& factor = factor_dict[cur_name].second;
@@ -207,7 +207,7 @@ void FactorGraph::SequentialBackward(std::vector< FactorGraph::VarPtr > targets)
 
 	while (!q.empty())
 	{
-		auto& cur_name = q.front();
+		auto cur_name = q.front();
 		q.pop();
 
 		auto& factor = factor_dict[cur_name].second;
