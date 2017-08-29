@@ -41,6 +41,8 @@ void LoadParams(const int argc, const char** argv)
 ParamSet<mode, Dtype> pset;
 FactorGraph g;
 
+std::shared_ptr< DTensorVar<mode, Dtype> > prob;
+
 std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVar<mode, Dtype> > > BuildGraph()
 {
 	auto w1 = add_diff<DTensorVar>(pset, "w1", {785, 1024});	
@@ -62,7 +64,7 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
 	auto h2 = af< FullyConnected >(g, {h1, w2});	
 	h2 = af< ReLU >(g, {h2});
 	auto output = af< FullyConnected >(g, {h2, wo});
-        auto prob = af< Softmax >(g, {output});
+        prob = af< Softmax >(g, {output});
 	auto ce = af< CrossEntropy >(g, {prob, y}, false);
 	auto loss = af< ReduceMean >(g, {ce});
 
@@ -135,6 +137,14 @@ int main(const int argc, const char** argv)
         {
                 LoadBatch(i, images_test, labels_test);
                 g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}}, Phase::TEST);
+                DTensor<CPU, Dtype> prob_cpu;
+                prob_cpu.CopyFrom(prob->value);
+                for (size_t j = 0; j < prob_cpu.rows(); ++j)
+                {
+                    for (size_t k = 0; k < prob_cpu.cols(); ++k)
+                        printf("%.2f ", prob_cpu.data->ptr[j * prob_cpu.cols() + k]);
+                    printf("\n");
+                }
                 loss += var_loss->AsScalar() * input.rows();
                 err_rate += (1.0 - var_acc->AsScalar()) * input.rows();
         }
