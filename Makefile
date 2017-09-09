@@ -6,7 +6,7 @@ else
     build_root = build_cpuonly
 endif
 
-include_dirs = $(CUDA_HOME)/include $(MKL_ROOT)/include include
+include_dirs = $(CUDA_HOME)/include $(MKL_ROOT)/include $(TBB_ROOT)/include include
 CXXFLAGS += $(addprefix -I,$(include_dirs))
 CXXFLAGS += -fPIC
 
