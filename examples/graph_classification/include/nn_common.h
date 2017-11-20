@@ -6,7 +6,7 @@
 
 #include "config.h"
 #include "utils.h"
-#include "fmt/format.h"
+#include "util/fmt.h"
 #include "tensor/tensor_all.h"
 #include "nn/nn_all.h"
 
