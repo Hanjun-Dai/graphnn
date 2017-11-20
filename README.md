@@ -27,17 +27,12 @@ Tested under Ubuntu 14.04, 16.04 and Mac OSX 10.12.6
   in .bashrc, add the following path
   
     source {path_to_your_intel_root/name_of_parallel_tool_box}/bin/psxevars.sh
-    export MKL_ROOT={path_to_your_intel_root}/mkl
-    
-##### Install cppformat (now called fmtlib)
-
-    check https://github.com/fmtlib/fmt for help
 
 #### Build static library
 
     cp make_common.example make_common
     modify configurations in make_common file
-    make
+    make -j8
     
 #### Run example
 
@@ -45,7 +40,7 @@ Tested under Ubuntu 14.04, 16.04 and Mac OSX 10.12.6
 
     cd examples/mnist
     make
-    ./run_exp.sh
+    ./run.sh
 
 ##### Run graph classification
 
