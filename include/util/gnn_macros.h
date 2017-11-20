@@ -117,7 +117,7 @@ namespace gnn
         throw std::logic_error("unknown mode"); \
     }
 #endif
-    
+
 typedef unsigned int uint;
 
 enum class MatType

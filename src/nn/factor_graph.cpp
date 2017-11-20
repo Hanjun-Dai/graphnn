@@ -2,6 +2,7 @@
 
 #include "nn/factor_graph.h"
 #include "nn/variable.h"
+#include "util/fmt.h"
 
 namespace gnn
 {

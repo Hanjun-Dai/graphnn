@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "fmt/printf.h"
 #include "tensor/tensor_all.h"
 
 namespace gnn

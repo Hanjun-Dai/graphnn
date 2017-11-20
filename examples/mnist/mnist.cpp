@@ -5,6 +5,7 @@
 #include "mnist_helper.h"
 #include "tensor/tensor_all.h"
 #include "nn/nn_all.h"
+#include "util/fmt.h"
 
 using namespace gnn;
 
@@ -23,19 +24,19 @@ typedef CPU mode;
 
 void LoadParams(const int argc, const char** argv)
 {
-	for (int i = 1; i < argc; i += 2)
-	{
-		if (strcmp(argv[i], "-train_feat") == 0)
-			f_train_feat = argv[i + 1];
+    for (int i = 1; i < argc; i += 2)
+    {
+        if (strcmp(argv[i], "-train_feat") == 0)
+            f_train_feat = argv[i + 1];
         if (strcmp(argv[i], "-train_label") == 0)
-			f_train_label = argv[i + 1];
+            f_train_label = argv[i + 1];
         if (strcmp(argv[i], "-test_feat") == 0)
-			f_test_feat = argv[i + 1];
+            f_test_feat = argv[i + 1];
         if (strcmp(argv[i], "-test_label") == 0)
-			f_test_label = argv[i + 1];
+            f_test_label = argv[i + 1];
         if (strcmp(argv[i], "-device") == 0)
-			dev_id = atoi(argv[i + 1]);                                                                
-	}
+            dev_id = atoi(argv[i + 1]);                                                                
+    }
 }
 
 ParamSet<mode, Dtype> pset;
@@ -45,28 +46,28 @@ std::shared_ptr< DTensorVar<mode, Dtype> > prob;
 
 std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVar<mode, Dtype> > > BuildGraph()
 {
-	auto w1 = add_diff<DTensorVar>(pset, "w1", {785, 1024});	
-	auto w2 = add_diff<DTensorVar>(pset, "w2", {1025, 1024});
-	auto wo = add_diff<DTensorVar>(pset, "wo", {1025, 10});
-	w1->value.SetRandN(0, 0.01);
-	w2->value.SetRandN(0, 0.01);
-	wo->value.SetRandN(0, 0.01);
+    auto w1 = add_diff<DTensorVar>(pset, "w1", {785, 1024});    
+    auto w2 = add_diff<DTensorVar>(pset, "w2", {1025, 1024});
+    auto wo = add_diff<DTensorVar>(pset, "wo", {1025, 10});
+    w1->value.SetRandN(0, 0.01);
+    w2->value.SetRandN(0, 0.01);
+    wo->value.SetRandN(0, 0.01);
 
     g.AddParam(w1);
     g.AddParam(w2);
     g.AddParam(wo);
 
-	auto x = add_const< DTensorVar<mode, Dtype> >(g, "x", true);
-	auto y = add_const< SpTensorVar<mode, Dtype> >(g, "y", true);
-	auto h1 = af< FullyConnected >(g, {x, w1});
+    auto x = add_const< DTensorVar<mode, Dtype> >(g, "x", true);
+    auto y = add_const< SpTensorVar<mode, Dtype> >(g, "y", true);
+    auto h1 = af< FullyConnected >(g, {x, w1});
 
-	h1 = af< ReLU >(g, {h1});
-	auto h2 = af< FullyConnected >(g, {h1, w2});	
-	h2 = af< ReLU >(g, {h2});
-	auto output = af< FullyConnected >(g, {h2, wo});
+    h1 = af< ReLU >(g, {h1});
+    auto h2 = af< FullyConnected >(g, {h1, w2});    
+    h2 = af< ReLU >(g, {h2});
+    auto output = af< FullyConnected >(g, {h2, wo});
         prob = af< Softmax >(g, {output});
-	auto ce = af< CrossEntropy >(g, {prob, y}, false);
-	auto loss = af< ReduceMean >(g, {ce});
+    auto ce = af< CrossEntropy >(g, {prob, y}, false);
+    auto loss = af< ReduceMean >(g, {ce});
 
     auto label = af< ArgMax >(g, {y});    
 
@@ -76,9 +77,9 @@ std::pair<std::shared_ptr< DTensorVar<mode, Dtype> >, std::shared_ptr< DTensorVa
     auto cmp = af< InTopK<mode, Dtype> >(g, std::make_pair(output, label));
     auto real_cmp = af< TypeCast<mode, Dtype> >(g, {cmp});
 
-	auto acc = af< ReduceMean >(g, { real_cmp });
+    auto acc = af< ReduceMean >(g, { real_cmp });
 
-	return {loss, acc};	
+    return {loss, acc};    
 }
 
 DTensor<CPU, Dtype> x_cpu;
@@ -110,7 +111,7 @@ void LoadBatch(unsigned idx_st, std::vector< Dtype* >& images, std::vector< int 
 
 int main(const int argc, const char** argv)
 {
-	LoadParams(argc, argv); 
+    LoadParams(argc, argv); 
     GpuHandle::Init(dev_id, 1);
 
     LoadRaw(f_train_feat, f_train_label, images_train, labels_train);
@@ -126,9 +127,9 @@ int main(const int argc, const char** argv)
     //AdamOptimizer<mode, Dtype> optmz(&pset, lr);
     optmz.clipping_enabled = false;
 
-	Dtype loss, err_rate;  
+    Dtype loss, err_rate;
     
-	for (int epoch = 0; epoch < 10; ++epoch)
+    for (int epoch = 0; epoch < 10; ++epoch)
     {
         pset.Save(fmt::sprintf("epoch_%d.model", epoch));
         std::cerr << "testing" << std::endl;
@@ -137,6 +138,8 @@ int main(const int argc, const char** argv)
         {
                 LoadBatch(i, images_test, labels_test);
                 g.FeedForward({var_loss, var_acc}, {{"x", &input}, {"y", &label}}, Phase::TEST);
+                // output predicted probabilities
+                /* 
                 DTensor<CPU, Dtype> prob_cpu;
                 prob_cpu.CopyFrom(prob->value);
                 for (size_t j = 0; j < prob_cpu.rows(); ++j)
@@ -145,6 +148,7 @@ int main(const int argc, const char** argv)
                         printf("%.2f ", prob_cpu.data->ptr[j * prob_cpu.cols() + k]);
                     printf("\n");
                 }
+                */
                 loss += var_loss->AsScalar() * input.rows();
                 err_rate += (1.0 - var_acc->AsScalar()) * input.rows();
         }
@@ -163,5 +167,5 @@ int main(const int argc, const char** argv)
         }
     }
     GpuHandle::Destroy();
-	return 0;
+    return 0;
 }

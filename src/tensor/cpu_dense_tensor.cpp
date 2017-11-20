@@ -5,7 +5,6 @@
 #include "tensor/cpu_unary_functor.h"
 #include "tensor/mkl_helper.h"
 #include "util/mem_holder.h"
-#include "fmt/printf.h"
 #include <cstring>
 #include <cassert>
 #include <functional>
@@ -304,14 +303,14 @@ void TensorTemplate<CPU, DENSE, Dtype>::Add(Dtype scalar)
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::Axpy(Dtype a, DTensor<CPU, Dtype>& x)
 {
-	ASSERT(this->shape == x.shape, fmt::sprintf("shape doesn't match in Axpy {0} vs {1}", this->shape.toString(), x.shape.toString()));
+	ASSERT(this->shape == x.shape, "shape doesn't match in Axpy");
 	MKL_Axpy(shape.Count(), a, x.data->ptr, data->ptr);
 }
 
 template<typename Dtype>
 void TensorTemplate<CPU, DENSE, Dtype>::RowSelectiveAxpy(DTensor<CPU, int>& row_idxes, Dtype a, DTensor<CPU, Dtype>& x)
 {
-	ASSERT(this->shape == x.shape, fmt::sprintf("shape doesn't match in Axpy {0} vs {1}", this->shape.toString(), x.shape.toString()));
+	ASSERT(this->shape == x.shape, "shape doesn't match in Axpy");
 	ASSERT(row_idxes.shape.Count(), "wrong usage in row selective axpy");
 
 	size_t dim = this->shape.Count(1);

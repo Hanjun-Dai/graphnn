@@ -3,6 +3,7 @@
 
 #include "nn/variable.h"
 #include <string>
+#include "util/fmt.h"
 
 namespace gnn
 {
