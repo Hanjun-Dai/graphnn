@@ -6,6 +6,7 @@
 #include "util/mem_holder.h"
 #include "tbb/tbb.h"
 #include <cstring>
+#include <cmath>
 #include <atomic>
 #include <cassert>
 
