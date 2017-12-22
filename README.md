@@ -1,3 +1,9 @@
+## Dec. 22, 2017 update: pytorch version of structure2vec
+
+For people who prefer python, here is the pytorch implementation of s2v: 
+
+https://github.com/Hanjun-Dai/pytorch_structure2vec
+
 # graphnn
 
 #### Document
