@@ -10,7 +10,7 @@ CXX := g++
 CXXFLAGS += -Wall -O3 -std=c++11
 LDFLAGS += -lm  -lmkl_rt -ltbb
 ifeq ($(USE_GPU), 1)
-    CUDA_HOME := /usr/local/cuda
+    CUDA_HOME := /usr/local/cuda-8.0
     NVCC := $(CUDA_HOME)/bin/nvcc
     NVCCFLAGS += --default-stream per-thread
     LDFLAGS += -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand -lcusparse
