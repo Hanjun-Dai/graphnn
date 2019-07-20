@@ -1,4 +1,5 @@
 build/
+.DS_Store
 *.model
 log.txt
 build_cpuonly/
