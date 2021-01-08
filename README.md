@@ -34,6 +34,17 @@ Tested under Ubuntu 14.04, 16.04 and Mac OSX 10.12.6
   
     source {path_to_your_intel_root/name_of_parallel_tool_box}/bin/psxevars.sh
 
+
+#### Docker
+  Dockerfile contains all the required installations (including Intel MKL and TBB) above. Only additional requirement is to provide `NVIDIA*.run` script that will load the same NVIDIA driver of host into the target. Then to build the container, execute:
+
+    docker build -t "graphnn:test" .
+
+  To run it:
+
+    docker run --runtime=nvidia graphnn:test bash
+
+  If above command fails for a reason, refer to https://github.com/NVIDIA/nvidia-docker. If no error occurs, you can simply follow the below instructions and execute them in the container without failure.
 #### Build static library
 
     cp make_common.example make_common
